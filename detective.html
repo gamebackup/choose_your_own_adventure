@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Shadows</title>
+    <style>
+        :root {
+            --neon-pink: #ff44aa;
+            --neon-cyan: #00eeff;
+            --bg: #080012;
+            --dim: #4a1a5a;
+            --red: #ff3355;
+            --glow-street: rgba(255, 68, 170, 0.3);
+            --glow-office: rgba(0, 238, 255, 0.25);
+            --glow-alley: rgba(200, 100, 200, 0.2);
+            --glow-danger: rgba(255, 51, 85, 0.35);
+            --glow-truth: rgba(0, 238, 255, 0.4);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #05000a;
+            color: var(--neon-pink);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 16px;
+            line-height: 1.55;
+            min-height: 100vh;
+            background-image: repeating-linear-gradient(0deg,
+                transparent, transparent 2px,
+                rgba(50, 10, 50, 0.03) 2px,
+                rgba(50, 10, 50, 0.03) 4px);
+            background-size: 100% 4px;
+        }
+        .game-container {
+            max-width: 720px;
+            margin: 0 auto;
+            border: 2px solid var(--neon-cyan);
+            padding: 28px 22px;
+            min-height: 82vh;
+            box-shadow: 0 0 20px var(--glow-street);
+            position: relative;
+            background: radial-gradient(ellipse at center,
+                rgba(20, 5, 35, 0.8) 0%,
+                rgba(2, 0, 5, 0.95) 70%);
+            transition: box-shadow 0.6s, border-color 0.6s, color 0.6s;
+        }
+        .env-street { box-shadow: 0 0 20px var(--glow-street); border-color: #cc44aa; color: #f0a0cc; }
+        .env-office { box-shadow: 0 0 20px var(--glow-office); border-color: #00bbdd; color: #a0f0ff; }
+        .env-alley { box-shadow: 0 0 20px var(--glow-alley); border-color: #8844aa; color: #d0a0f0; }
+        .env-danger { box-shadow: 0 0 20px var(--glow-danger); border-color: #cc2244; color: #ff8899; }
+        .env-truth { box-shadow: 0 0 20px var(--glow-truth); border-color: #00ddff; color: #e0f8ff; }
+        pre {
+            font-size: 13px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 24px;
+            text-shadow: 0 0 6px currentColor;
+            letter-spacing: 0;
+            line-height: 1.25;
+            overflow-x: auto;
+            padding: 4px 0;
+            animation: flickerIn 1.2s ease-out;
+        }
+        @keyframes flickerIn {
+            0% { opacity: 0; text-shadow: 0 0 20px currentColor; }
+            15% { opacity: 0.4; text-shadow: 0 0 2px currentColor; }
+            25% { opacity: 0.7; text-shadow: 0 0 14px currentColor; }
+            35% { opacity: 0.5; }
+            50% { opacity: 0.9; text-shadow: 0 0 8px currentColor; }
+            100% { opacity: 1; text-shadow: 0 0 6px currentColor; }
+        }
+        .story-text {
+            font-size: 1.15rem;
+            margin-bottom: 28px;
+            text-align: center;
+            padding: 0 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .choices { display: flex; flex-direction: column; gap: 13px; align-items: center; }
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 26px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.25s;
+            width: 82%;
+            text-align: center;
+            background: #0a0015;
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: relative;
+            user-select: none;
+        }
+        label:hover {
+            background-color: currentColor;
+            color: #0a0015;
+            font-weight: bold;
+            box-shadow: 0 0 18px currentColor;
+            transform: scale(1.02);
+            letter-spacing: 2px;
+        }
+        label:active { transform: scale(0.97); }
+        label::before { content: '> '; opacity: 0; transition: opacity 0.2s; }
+        label:hover::before { opacity: 1; animation: blink 0.7s infinite; }
+        @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
+        input[type="radio"] { display: none; }
+        .scene { display: none; animation: fadeIn 0.5s ease-out; }
+
+        /* STATE MACHINE */
+        #s0:checked ~ .game-container #scene0,
+        #s1_office:checked ~ .game-container #scene1_office,
+        #s1_alley:checked ~ .game-container #scene1_alley,
+        #s1_bar:checked ~ .game-container #scene1_bar,
+        #s2_check_file:checked ~ .game-container #scene2_check_file,
+        #s2_tail:checked ~ .game-container #scene2_tail,
+        #s2_interrogate:checked ~ .game-container #scene2_interrogate,
+        #s2_sneak:checked ~ .game-container #scene2_sneak,
+        #s3_lockpick:checked ~ .game-container #scene3_lockpick,
+        #s3_evidence:checked ~ .game-container #scene3_evidence,
+        #s3_confront:checked ~ .game-container #scene3_confront,
+        #s3_ambush_alley:checked ~ .game-container #scene3_ambush_alley,
+        #s4_boss:checked ~ .game-container #scene4_boss,
+        #s4_betrayal:checked ~ .game-container #scene4_betrayal,
+        #s4_truth:checked ~ .game-container #scene4_truth,
+        #s5_hardboiled:checked ~ .game-container #scene5_hardboiled,
+        #s5_shadows:checked ~ .game-container #scene5_shadows,
+        #s5_corrupt:checked ~ .game-container #scene5_corrupt,
+        #s5_dead_end:checked ~ .game-container #scene5_dead_end {
+            display: block;
+        }
+        @media (max-width: 500px) {
+            .game-container { padding: 16px 10px; min-height: 88vh; }
+            pre { font-size: 10px; }
+            .story-text { font-size: 0.95rem; }
+            label { width: 94%; padding: 11px 14px; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body>
+<a href="index.html" class="back-link" style="color: white;">Back to Home</a>
+    <input type="radio" name="cyoa" id="s0" checked>
+    <input type="radio" name="cyoa" id="s1_office">
+    <input type="radio" name="cyoa" id="s1_alley">
+    <input type="radio" name="cyoa" id="s1_bar">
+    <input type="radio" name="cyoa" id="s2_check_file">
+    <input type="radio" name="cyoa" id="s2_tail">
+    <input type="radio" name="cyoa" id="s2_interrogate">
+    <input type="radio" name="cyoa" id="s2_sneak">
+    <input type="radio" name="cyoa" id="s3_lockpick">
+    <input type="radio" name="cyoa" id="s3_evidence">
+    <input type="radio" name="cyoa" id="s3_confront">
+    <input type="radio" name="cyoa" id="s3_ambush_alley">
+    <input type="radio" name="cyoa" id="s4_boss">
+    <input type="radio" name="cyoa" id="s4_betrayal">
+    <input type="radio" name="cyoa" id="s4_truth">
+    <input type="radio" name="cyoa" id="s5_hardboiled">
+    <input type="radio" name="cyoa" id="s5_shadows">
+    <input type="radio" name="cyoa" id="s5_corrupt">
+    <input type="radio" name="cyoa" id="s5_dead_end">
+
+    <div class="game-container env-street" id="gameBox">
+
+        <!-- START -->
+        <div id="scene0" class="scene">
+            <pre>
+     /|
+    / |
+   /  |
+  /___|___
+ |   |   |
+ |   |   |
+ |___|___|
+    / \
+   /   \
+  /     \
+ /       \
+    </pre>
+            <div class="story-text">
+                Rain slashes across the neon skyline of Veridian City. You're a private eye with a dead-end case and an empty bottle of whiskey. A dame just walked out. Your office phone rings — a tip about the murder of city councilman Vance. The caller hangs up. Three leads: the case file on your desk, a shadowy alley where Vance was last seen, or a dive bar where his enemies drink.
+            </div>
+            <div class="choices">
+                <label for="s1_office">Reopen the Vance file on your desk</label>
+                <label for="s1_alley">Head to the rain-soaked alley</label>
+                <label for="s1_bar">Visit the Neon Dragon Bar</label>
+            </div>
+        </div>
+
+        <!-- OFFICE BRANCH -->
+        <div id="scene1_office" class="scene">
+            <pre>
+      .-------.
+      |  FILE  |
+      |  VANCE |
+      '-------'
+        | |
+        | |
+    </pre>
+            <div class="story-text">
+                The file reveals Vance was investigating police corruption. A photo shows him with a woman known as "Silk", a criminal informant. You find a matchbook from the Neon Dragon bar tucked in the folder. A clue, or a trap?
+            </div>
+            <div class="choices">
+                <label for="s2_check_file">Call Silk to set a meeting</label>
+                <label for="s2_tail">Tail the lead detective on the case, Detective Marlow</label>
+            </div>
+        </div>
+
+        <!-- ALLEY BRANCH -->
+        <div id="scene1_alley" class="scene">
+            <pre>
+     ~~~~ ~~~~
+     ~~~~~~~~
+     ~~~~~~~~
+     ~~~~|~~~~
+     ~~~~|~~~~
+     ~~~~|~~~~
+    </pre>
+            <div class="story-text">
+                Puddles reflect flickering neon. You find a spent bullet casing and a torn piece of a police uniform. Someone was here before you. Suddenly, a figure in a trench coat bolts deeper into the alley. Give chase or search for more evidence?
+            </div>
+            <div class="choices">
+                <label for="s2_sneak">Chase the mysterious figure</label>
+                <label for="s3_evidence">Scour the alley for more clues</label>
+            </div>
+        </div>
+
+        <!-- BAR BRANCH -->
+        <div id="scene1_bar" class="scene">
+            <pre>
+      .-------.
+      |  BAR  |
+      |  ~~~  |
+      '-------'
+        | |
+        | |
+    </pre>
+            <div class="story-text">
+                The Neon Dragon reeks of smoke and jazz. The bartender, a man called Fix, knows everything for a price. He hints that a corrupt cop named Bullock was Vance's last meeting. Bullock is here, drinking at the back table. Do you confront him or just observe?
+            </div>
+            <div class="choices">
+                <label for="s2_interrogate">Slide into Bullock's booth and ask hard questions</label>
+                <label for="s2_tail">Wait and tail Bullock when he leaves</label>
+            </div>
+        </div>
+
+        <!-- CHECK FILE / CALL SILK -->
+        <div id="scene2_check_file" class="scene">
+            <pre>
+      .-"""-.
+     /  RING \
+     |  RING |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                Silk agrees to meet at the pier, but she's edgy. She tells you Vance was killed because he had evidence that the police commissioner is taking bribes from the mob. She gives you a key to Vance's safety deposit box. Now you have a target.
+            </div>
+            <div class="choices">
+                <label for="s3_lockpick">Go to the bank and open the deposit box</label>
+                <label for="s3_confront">Confront the commissioner directly with the info</label>
+            </div>
+        </div>
+
+        <!-- TAIL MARLOW -->
+        <div id="scene2_tail" class="scene">
+            <pre>
+      .-.   .-.
+     /   \_/   \
+     |   O O   |
+     \_________/
+    </pre>
+            <div class="story-text">
+                You shadow Marlow to an abandoned warehouse. He meets with a mob boss and hands over a folder. Marlow is dirty. You can gather photographic evidence or call the commissioner for backup.
+            </div>
+            <div class="choices">
+                <label for="s3_evidence">Snap photos for proof</label>
+                <label for="s3_confront">Rush in and catch them red-handed</label>
+            </div>
+        </div>
+
+        <!-- INTERROGATE BULLOCK -->
+        <div id="scene2_interrogate" class="scene">
+            <pre>
+      ( )  ( )
+       |    |
+       |    |
+      / \  / \
+    </pre>
+            <div class="story-text">
+                Bullock snarls but you see the fear in his eyes. He admits he was ordered to clean up Vance's body. He gives you a lead: the murder weapon is hidden in the police evidence locker. You can use your lockpick skills or bluff your way in with a fake badge.
+            </div>
+            <div class="choices">
+                <label for="s3_lockpick">Use the lockpick to break into the evidence locker</label>
+                <label for="s3_ambush_alley">Create a distraction and grab the weapon</label>
+            </div>
+        </div>
+
+        <!-- CHASE FIGURE -->
+        <div id="scene2_sneak" class="scene">
+            <pre>
+      .-"""-.
+     /  RUN  \
+     |   |   |
+     \  / \  /
+      '-' '-'
+    </pre>
+            <div class="story-text">
+                You corner the figure — it's Silk, the informant. She's terrified and tells you the real killer is someone you trust. She gives you a bloodstained badge number. It belongs to your old partner, Detective Rourke. Now it's personal.
+            </div>
+            <div class="choices">
+                <label for="s3_confront">Find Rourke and confront him</label>
+                <label for="s3_evidence">Gather more evidence before making a move</label>
+            </div>
+        </div>
+
+        <!-- LOCKPICK / BANK -->
+        <div id="scene3_lockpick" class="scene">
+            <pre>
+      .-"""-.
+     /  KEY  \
+     |   ~   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                The deposit box contains a revolver and a signed confession from Vance naming the entire conspiracy. You now have the smoking gun. You can take it to the press or go straight to the District Attorney.
+            </div>
+            <div class="choices">
+                <label for="s4_truth">Leak the confession to the press</label>
+                <label for="s4_boss">Take it to the DA and risk police interference</label>
+            </div>
+        </div>
+
+        <!-- EVIDENCE GATHER -->
+        <div id="scene3_evidence" class="scene">
+            <pre>
+      .-"""-.
+     /  PHOTO \
+     |   []   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                You have crisp photos of Marlow's betrayal. You can use them to blackmail him for more names, or hand them to Internal Affairs and wash your hands.
+            </div>
+            <div class="choices">
+                <label for="s4_betrayal">Blackmail Marlow for the full conspiracy</label>
+                <label for="s4_truth">Hand evidence to Internal Affairs</label>
+            </div>
+        </div>
+
+        <!-- CONFRONT ROOKE/CAMPAIGN -->
+        <div id="scene3_confront" class="scene">
+            <pre>
+      \   /
+       \ /
+        O
+       / \
+      /   \
+    </pre>
+            <div class="story-text">
+                You find Rourke at his apartment. He admits he killed Vance under orders from the mob. He offers you a cut to walk away. Your finger tightens on the trigger. Shoot him or bring him in?
+            </div>
+            <div class="choices">
+                <label for="s4_boss">Pull the trigger — justice served</label>
+                <label for="s4_betrayal">Take the bribe and become part of the corruption</label>
+            </div>
+        </div>
+
+        <!-- AMBUSH ALLEY / DISTRACTION -->
+        <div id="scene3_ambush_alley" class="scene">
+            <pre>
+      .-"""-.
+     /  BANG \
+     |   *   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                The distraction works. You grab the murder weapon — a police-issue revolver with serial numbers filed. Ballistics will tie it to the commissioner. You now hold the entire case in your hands.
+            </div>
+            <div class="choices">
+                <label for="s4_truth">Go public with the evidence</label>
+                <label for="s4_boss">Confront the commissioner privately for a payoff</label>
+            </div>
+        </div>
+
+        <!-- BOSS / PULL TRIGGER -->
+        <div id="scene4_boss" class="scene">
+            <pre>
+      .-"""-.
+     /  DEAD \
+     |   |   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: HARD JUSTICE</strong><br><br>
+                You take down the corrupt powers that be, but the city doesn't change. You're a hero for a day, a target forever. Still, the rain sounds different now. Cleaner, somehow.
+            </div>
+            <div class="choices"><label for="s5_hardboiled">Continue</label></div>
+        </div>
+
+        <!-- BETRAYAL / BRIBE -->
+        <div id="scene4_betrayal" class="scene">
+            <pre>
+      .$$$  .$$$  .$$$
+      '---' '---' '---'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE DIRTY HAND</strong><br><br>
+                You take the money and bury the evidence. You become exactly what you once hunted. But the nightmares stop when you count the cash. The city stays the same. So do you.
+            </div>
+            <div class="choices"><label for="s5_corrupt">Continue</label></div>
+        </div>
+
+        <!-- TRUTH / PRESS -->
+        <div id="scene4_truth" class="scene">
+            <pre>
+      .-"""-.
+     /  NEWS \
+     |   *   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE FOURTH ESTATE</strong><br><br>
+                The headlines scream the truth. The commissioner resigns, the mob boss flees. You become a celebrated investigator, but you know there's another story around every corner. The neon never turns off.
+            </div>
+            <div class="choices"><label for="s5_hardboiled">Continue</label></div>
+        </div>
+
+        <!-- HARDBOILED FINAL -->
+        <div id="scene5_hardboiled" class="scene">
+            <pre>
+      ~~~~ ~~~~ ~~~~
+      ~~~~~~~~~~~~~
+      ~~~~~~~~~~~~~
+      ~~~~~~~~~~~~~
+    </pre>
+            <div class="story-text">
+                <strong>TRUE ENDING: NEON SHADOWS</strong><br><br>
+                You walk the streets of Veridian City, a legend in the rain. Every shadow holds a story, and you'll be the one to tell it. The case is closed, but the city never sleeps — and neither do you.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- CORRUPT FINAL -->
+        <div id="scene5_corrupt" class="scene">
+            <pre>
+      .-.   .-.
+     /   \_/   \
+     |  MONEY  |
+     \_________/
+    </pre>
+            <div class="story-text">
+                <strong>TRUE ENDING: THE PRICE OF SILENCE</strong><br><br>
+                You're rich and untouchable. But sometimes, late at night, you see Vance's face in the mirror. The rain still falls, but it sounds like judgment.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- DEAD END -->
+        <div id="scene5_dead_end" class="scene">
+            <pre>
+      .-"""-.
+     /  RIP  \
+     |   |   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: CASE UNSOLVED</strong><br><br>
+                The streets claim another one. Your case file ends up in a cold storage box. Veridian City keeps its secrets, and you become one of them.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+    </div>
+</body>
+</html>
