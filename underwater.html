@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depth Unknown</title>
+    <style>
+        :root {
+            --deep-blue: #1af;
+            --ocean-glow: rgba(17, 170, 255, 0.3);
+            --abyss-glow: rgba(0, 80, 180, 0.4);
+            --trench-glow: rgba(0, 40, 100, 0.6);
+            --danger-glow: rgba(255, 60, 60, 0.4);
+            --discovery-glow: rgba(10, 255, 180, 0.35);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #000a14;
+            color: #a0e0ff;
+            font-family: 'Courier New', monospace;
+            padding: 16px;
+            line-height: 1.55;
+            min-height: 100vh;
+            background-image:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(0, 40, 80, 0.03) 3px,
+                    rgba(0, 40, 80, 0.03) 6px);
+            background-size: 100% 6px;
+        }
+        .game-container {
+            max-width: 760px;
+            margin: 0 auto;
+            border: 2px solid var(--deep-blue);
+            padding: 28px 22px;
+            min-height: 82vh;
+            box-shadow: 0 0 25px var(--ocean-glow), inset 0 0 40px rgba(0, 100, 200, 0.04);
+            background: radial-gradient(ellipse at center,
+                    rgba(5, 25, 55, 0.75) 0%,
+                    rgba(0, 4, 10, 0.96) 70%);
+            transition: box-shadow 0.6s, border-color 0.6s, color 0.6s;
+        }
+        .env-abyss { box-shadow: 0 0 25px var(--abyss-glow); border-color: #06a; color: #c0e0ff; }
+        .env-trench { box-shadow: 0 0 25px var(--trench-glow); border-color: #048; color: #80c8ff; }
+        .env-danger { box-shadow: 0 0 25px var(--danger-glow); border-color: #b33; color: #ffaaaa; }
+        .env-discovery { box-shadow: 0 0 30px var(--discovery-glow); border-color: #0aa; color: #c0ffe0; }
+
+        pre {
+            font-size: 13px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 24px;
+            text-shadow: 0 0 6px currentColor;
+            letter-spacing: 0;
+            line-height: 1.25;
+            overflow-x: auto;
+            padding: 4px 0;
+            animation: flickerIn 1.2s ease-out;
+        }
+        @keyframes flickerIn {
+            0% { opacity: 0; text-shadow: 0 0 20px currentColor; }
+            15% { opacity: 0.4; text-shadow: 0 0 2px currentColor; }
+            25% { opacity: 0.7; text-shadow: 0 0 14px currentColor; }
+            35% { opacity: 0.5; }
+            50% { opacity: 0.9; text-shadow: 0 0 8px currentColor; }
+            100% { opacity: 1; text-shadow: 0 0 6px currentColor; }
+        }
+        .story-text {
+            font-size: 1.15rem;
+            margin-bottom: 28px;
+            text-align: center;
+            padding: 0 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .choices { display: flex; flex-direction: column; gap: 13px; align-items: center; }
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 26px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.25s;
+            width: 82%;
+            text-align: center;
+            background: #000a18;
+            font-weight: bold;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+        label:hover {
+            background-color: currentColor;
+            color: #000a18;
+            box-shadow: 0 0 18px currentColor;
+            transform: scale(1.02);
+            letter-spacing: 2px;
+        }
+        label:active { transform: scale(0.97); }
+        label::before { content: '> '; opacity: 0; transition: opacity 0.2s; }
+        label:hover::before { opacity: 1; animation: blink 0.7s infinite; }
+        @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
+
+        input[type="radio"] { display: none; }
+        .scene { display: none; animation: fadeIn 0.5s ease-out; }
+
+        /* STATE MACHINE */
+        #s0:checked ~ .game-container #scene0,
+        #s1_bell:checked ~ .game-container #scene1_bell,
+        #s1_ridge:checked ~ .game-container #scene1_ridge,
+        #s2_cave:checked ~ .game-container #scene2_cave,
+        #s2_trench:checked ~ .game-container #scene2_trench,
+        #s2_salvage:checked ~ .game-container #scene2_salvage,
+        #s3_search_cave:checked ~ .game-container #scene3_search_cave,
+        #s3_temple:checked ~ .game-container #scene3_temple,
+        #s3_descend:checked ~ .game-container #scene3_descend,
+        #s3_sonar:checked ~ .game-container #scene3_sonar,
+        #s3_leak:checked ~ .game-container #scene3_leak,
+        #s4_creature:checked ~ .game-container #scene4_creature,
+        #s4_relic:checked ~ .game-container #scene4_relic,
+        #s4_ancient:checked ~ .game-container #scene4_ancient,
+        #s4_secret_base:checked ~ .game-container #scene4_secret_base,
+        #s5_surface:checked ~ .game-container #scene5_surface,
+        #s5_lost:checked ~ .game-container #scene5_lost,
+        #s5_legacy:checked ~ .game-container #scene5_legacy,
+        #s5_deep:checked ~ .game-container #scene5_deep {
+            display: block;
+        }
+
+        @media (max-width: 500px) {
+            .game-container { padding: 16px 10px; min-height: 88vh; }
+            pre { font-size: 10px; }
+            .story-text { font-size: 0.95rem; }
+            label { width: 94%; padding: 11px 14px; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <input type="radio" name="cyoa" id="s0" checked>
+    <input type="radio" name="cyoa" id="s1_bell">
+    <input type="radio" name="cyoa" id="s1_ridge">
+    <input type="radio" name="cyoa" id="s2_cave">
+    <input type="radio" name="cyoa" id="s2_trench">
+    <input type="radio" name="cyoa" id="s2_salvage">
+    <input type="radio" name="cyoa" id="s3_search_cave">
+    <input type="radio" name="cyoa" id="s3_temple">
+    <input type="radio" name="cyoa" id="s3_descend">
+    <input type="radio" name="cyoa" id="s3_sonar">
+    <input type="radio" name="cyoa" id="s3_leak">
+    <input type="radio" name="cyoa" id="s4_creature">
+    <input type="radio" name="cyoa" id="s4_relic">
+    <input type="radio" name="cyoa" id="s4_ancient">
+    <input type="radio" name="cyoa" id="s4_secret_base">
+    <input type="radio" name="cyoa" id="s5_surface">
+    <input type="radio" name="cyoa" id="s5_lost">
+    <input type="radio" name="cyoa" id="s5_legacy">
+    <input type="radio" name="cyoa" id="s5_deep">
+
+    <div class="game-container env-abyss" id="gameBox">
+
+        <!-- START SCENE -->
+        <div id="scene0" class="scene">
+            <pre>
+     .   .   .   .
+       .   ~   .
+    .  ~~~  *  ~~~  .
+      ~~~~~ | ~~~~~
+     ~~~~~~ | ~~~~~~
+    ~~~~~~~~|~~~~~~~~
+    ~~~~~~~~|~~~~~~~~
+     ~~~~~ BATHY ~~~~
+      ~~~~~SPHERE~~~~
+       ~~~~~~~~~~~~
+    </pre>
+            <div class="story-text">
+                Your bathysphere settles on the ocean floor, 4,000 meters below the surface. The abyss presses against the thick steel. Sonar shows a cliff to the west and a jagged ridge to the east. Your oxygen supply is finite. The radio crackles — your support ship can only wait so long.
+            </div>
+            <div class="choices">
+                <label for="s1_bell">Explore the western cliff face</label>
+                <label for="s1_ridge">Head east toward the jagged ridge</label>
+            </div>
+        </div>
+
+        <!-- CLIFF BRANCH -->
+        <div id="scene1_bell" class="scene">
+            <pre>
+      .   .
+     .   .
+        .   .
+       .   .
+      .   .
+     .   .
+        .   .
+    </pre>
+            <div class="story-text">
+                The cliff plunges into deeper darkness. Bioluminescent creatures pulse along the rock face. You spot the entrance to an underwater cave, and just beyond it, a narrow trench that seems to swallow light itself.
+            </div>
+            <div class="choices">
+                <label for="s2_cave">Swim into the luminous cave</label>
+                <label for="s2_trench">Descend into the lightless trench</label>
+            </div>
+        </div>
+
+        <!-- RIDGE BRANCH -->
+        <div id="scene1_ridge" class="scene">
+            <pre>
+      ~~~  ~~~
+     ~~~~~~~~~
+    ~~~~~~~~~~~
+    ~~~~~~~~~~~
+     ~~~~~~~~~
+      ~~~~~~~
+    </pre>
+            <div class="story-text">
+                The ridge is littered with the skeletal remains of a World War II submarine. The hull is cracked open, but something metallic glints inside. Nearby, a low-frequency sonar signal emanates from beneath the seafloor.
+            </div>
+            <div class="choices">
+                <label for="s2_salvage">Enter the wreck to salvage the metal object</label>
+                <label for="s3_sonar">Investigate the mysterious sonar signal</label>
+            </div>
+        </div>
+
+        <!-- CAVE BRANCH -->
+        <div id="scene2_cave" class="scene">
+            <pre>
+      .-"""-.
+     /  o o  \
+     |  ~ ~  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                The cave glows with strange fungi. Carved into the wall are symbols that predate any known civilization. You can take a piece of glowing coral as a sample, or press deeper into the tunnel where you hear a rhythmic thrumming.
+            </div>
+            <div class="choices">
+                <label for="s3_search_cave">Take the coral and explore the symbols</label>
+                <label for="s3_temple">Follow the thrumming sound deeper</label>
+            </div>
+        </div>
+
+        <!-- TRENCH BRANCH -->
+        <div id="scene2_trench" class="scene">
+            <pre>
+      \   /
+       \ /
+        V
+       / \
+      /   \
+    </pre>
+            <div class="story-text">
+                The trench is impossibly deep. Your lights barely penetrate the gloom. Something enormous shifts below — a mass of tentacles and glowing eyes. You can try to communicate using the bathysphere's external lights, or flee back toward the cave.
+            </div>
+            <div class="choices">
+                <label for="s3_descend">Signal the creature with lights</label>
+                <label for="s3_leak">Retreat, but risk a hull leak from the pressure change</label>
+            </div>
+        </div>
+
+        <!-- SALVAGE BRANCH -->
+        <div id="scene2_salvage" class="scene">
+            <pre>
+      .-------.
+      | WRECK |
+      | BOX   |
+      '-------'
+    </pre>
+            <div class="story-text">
+                Inside the submarine you find a sealed naval dispatch case. It contains a map of a secret underwater base, labeled "Project Leviathan". The base should be nearby. Do you follow the map or report it?
+            </div>
+            <div class="choices">
+                <label for="s3_temple">Follow the map to the secret base</label>
+                <label for="s3_sonar">Head back to the sonar signal first</label>
+            </div>
+        </div>
+
+        <!-- CAVE EXPLORE -->
+        <div id="scene3_search_cave" class="scene">
+            <pre>
+      .-"""-.
+     /  RUNE  \
+     |   /\   |
+     \  /  \  /
+      '-'  '-'
+    </pre>
+            <div class="story-text">
+                The symbols tell the story of a civilization that built a city at the bottom of the ocean to escape the surface world. They created a device called the "Depth Key" that could raise the city back to the light. The key is hidden nearby.
+            </div>
+            <div class="choices">
+                <label for="s4_relic">Search for the Depth Key</label>
+                <label for="s4_creature">Use the coral to attract a giant creature for help</label>
+            </div>
+        </div>
+
+        <!-- TEMPLE / BASE -->
+        <div id="scene3_temple" class="scene">
+            <pre>
+      .-"""-.
+     /  BASE  \
+     |   __   |
+     \  /  \  /
+      '-'  '-'
+    </pre>
+            <div class="story-text">
+                The thrumming leads you to an ancient structure, half-buried in the silt. It's not human. A doorway pulses with energy. You can enter the structure or plant a beacon and return later.
+            </div>
+            <div class="choices">
+                <label for="s4_ancient">Step through the energy doorway</label>
+                <label for="s4_secret_base">Plant the beacon and explore the secret base instead</label>
+            </div>
+        </div>
+
+        <!-- DESCEND / CREATURE -->
+        <div id="scene3_descend" class="scene">
+            <pre>
+      \|/  \|/
+       O    O
+      /|\  /|\
+    </pre>
+            <div class="story-text">
+                The creature responds to your lights. It is a colossal cephalopod, but its skin ripples with patterns that mimic speech. It wraps a tentacle gently around the bathysphere and begins to carry you toward a glowing rift in the trench wall.
+            </div>
+            <div class="choices">
+                <label for="s4_ancient">Let it guide you into the rift</label>
+                <label for="s4_creature">Try to break free and escape</label>
+            </div>
+        </div>
+
+        <!-- SONAR -->
+        <div id="scene3_sonar" class="scene">
+            <pre>
+      ~~~   ~~~
+     ~~~~~~~~~
+     ~~~ o ~~~
+     ~~~~|~~~~
+     ~~~~|~~~~
+    </pre>
+            <div class="story-text">
+                The sonar signal is a distress call from a forgotten deep-sea station, still broadcasting after 80 years. It contains coordinates to a hidden cache of technology that could change the world — or destroy it.
+            </div>
+            <div class="choices">
+                <label for="s4_secret_base">Locate the secret base</label>
+                <label for="s4_relic">Dive deeper to find the source of the signal</label>
+            </div>
+        </div>
+
+        <!-- LEAK -->
+        <div id="scene3_leak" class="scene">
+            <pre>
+      .-"""-.
+     /  HULL  \
+     |  CRACK |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                A hairline crack hisses water. You manage to patch it, but you've lost precious oxygen. You must choose: make a desperate dash for the surface, or continue exploring knowing you have only minutes left.
+            </div>
+            <div class="choices">
+                <label for="s5_surface">Emergency ascent to the surface</label>
+                <label for="s4_ancient">Risk everything to discover the truth</label>
+            </div>
+        </div>
+
+        <!-- CREATURE -->
+        <div id="scene4_creature" class="scene">
+            <pre>
+      .-"""-.
+     /  GUARD \
+     |   o_o  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE GUARDIAN</strong><br><br>
+                The creature is the last guardian of the abyss. It spares you, but you surface with nothing but a tale of a living mountain in the deep. Scientists dismiss you, but you know the truth.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- RELIC -->
+        <div id="scene4_relic" class="scene">
+            <pre>
+      .-"""-.
+     /  KEY  \
+     |   *   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE DEPTH KEY</strong><br><br>
+                You find the key — a crystalline orb that hums with ancient power. When you raise it toward the surface, the seafloor trembles. The sunken city begins to rise. You become its first surface ambassador.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- ANCIENT -->
+        <div id="scene4_ancient" class="scene">
+            <pre>
+      .-"""-.
+     /  VAULT \
+     |  OF    |
+     \  AGES /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE FIRST ONES</strong><br><br>
+                You meet the architects of the abyss — beings of pure energy. They share the knowledge of millennia, and you return to the surface a changed person, carrying the wisdom of the deep.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SECRET BASE -->
+        <div id="scene4_secret_base" class="scene">
+            <pre>
+      .-------.
+      | LEVI- |
+      | ATHAN |
+      '-------'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: PROJECT LEVIATHAN</strong><br><br>
+                The base contains a prototype submarine that can reach the deepest trenches. You climb aboard and set course for uncharted abyssal plains, leaving the surface world behind forever.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SURFACE -->
+        <div id="scene5_surface" class="scene">
+            <pre>
+      *   *
+       *   *
+        * *
+         *
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: SURFACE AGAIN</strong><br><br>
+                You break through the waves, gasping. The support ship hauls you aboard. You survived, but the secrets of the abyss remain unknown. The ocean keeps its mysteries.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- LOST -->
+        <div id="scene5_lost" class="scene">
+            <pre>
+      ~~~~ ~~~~
+      ~~~~~~~~
+      ~~~~~~~~
+      ~~~~~~~~
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: CLAIMED BY THE DEEP</strong><br><br>
+                Your oxygen runs out. The bathysphere becomes your tomb. But the glowing life around you continues its eternal dance, indifferent to your passing.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- LEGACY -->
+        <div id="scene5_legacy" class="scene">
+            <pre>
+      .   .   .
+     .   .   .
+    .   .   .   .
+     .   .   .
+      .   .   .
+    </pre>
+            <div class="story-text">
+                <strong>TRUE ENDING: ECHOES OF THE DEEP</strong><br><br>
+                You transmit everything you learned before your systems fail. The world listens. They name the trench after you. Your voice becomes the echo that changes humanity's understanding of the ocean — and themselves.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- DEEP -->
+        <div id="scene5_deep" class="scene">
+            <pre>
+      ~~~~ ~~~~
+      ~~~~~~~~
+      ~~~~~~~~
+      ~~~~~~~~
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: INTO THE ABYSS</strong><br><br>
+                You choose to stay. The abyss accepts you. You become a story told by future divers — the one who never came back, but whose lights can still be seen, deep in the trench, guiding the curious forward.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
