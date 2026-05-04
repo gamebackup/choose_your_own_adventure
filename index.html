@@ -12,6 +12,7 @@
             --western-glow: #924A36;
             --detective-glow: #ff44aa;
             --underwater-glow: #11AAFF;
+            --prehistoric-glow: #8F6946;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -144,13 +145,18 @@
         }
         a.western {
         	color: var(--western-glow);
-            border-color: var(western-glow);
+            border-color: var(--western-glow);
             box-shadow: 0 0 15px rgba(146, 74, 54, 0.3)
         }
         a.detective {
         	color: var(--detective-glow);
-            border-color: var(detective-glow);
+            border-color: var(--detective-glow);
             box-shadow: 0 0 15px rgba(255, 68, 170, 0.3)
+        }
+        a.prehistoric {
+        	color: var(--prehistoric-glow);
+            border-color: var(--prehistoric-glow);
+            box-shadow: 0 0 15px rgba(143, 105, 70, 1)
         }
         a.game-btn:hover {
             transform: translateY(-3px);
@@ -162,6 +168,7 @@
         a.underwater:hover { background: rgba(17, 170, 255, 0.15); }
         a.western:hover { background: rgba(146,74,54,0.15); }
         a.detective:hover { background: rgba(255, 68, 170, 0.15); }
+        a.prehistoric:hover { background: rgba(143, 105, 70, 0.15); }
         a.game-btn:active { transform: scale(0.96); }
 
         @media (max-width: 500px) {
@@ -188,6 +195,7 @@
             <a href="western.html" class="game-btn western">Dust & Lead ~14</a>
             <a href="detective.html" class="game-btn detective">Neon Shadows ~12</a>
             <a href="underwater.html" class="game-btn underwater">Depth Unknown ~12</a>
+            <a href="prehistoric.html" class="game-btn prehistoric">Flint and Ember</a>
         </div>
     </div>
 </body>
