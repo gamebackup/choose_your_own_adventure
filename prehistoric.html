@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flint and Ember</title>
+    <style>
+        :root {
+            --ember: #ff9933;
+            --flint: #cc5500;
+            --glow-ember: rgba(255, 153, 51, 0.3);
+            --glow-danger: rgba(255, 60, 20, 0.4);
+            --glow-spirit: rgba(255, 200, 100, 0.35);
+            --glow-ice: rgba(150, 220, 255, 0.3);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0a0400;
+            color: #f0b060;
+            font-family: 'Courier New', monospace;
+            padding: 16px;
+            line-height: 1.55;
+            min-height: 100vh;
+            background-image:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(100, 40, 0, 0.04) 2px,
+                    rgba(100, 40, 0, 0.04) 4px);
+            background-size: 100% 4px;
+        }
+        .game-container {
+            max-width: 720px;
+            margin: 0 auto;
+            border: 2px solid var(--ember);
+            padding: 28px 22px;
+            min-height: 82vh;
+            box-shadow: 0 0 20px var(--glow-ember), inset 0 0 40px rgba(255, 100, 0, 0.03);
+            background: radial-gradient(ellipse at center,
+                    rgba(60, 20, 5, 0.8) 0%,
+                    rgba(5, 2, 0, 0.95) 70%);
+            transition: box-shadow 0.6s, border-color 0.6s, color 0.6s;
+        }
+        .env-spirit { box-shadow: 0 0 25px var(--glow-spirit); border-color: #aa6600; color: #f8d090; }
+        .env-danger { box-shadow: 0 0 25px var(--glow-danger); border-color: #aa3311; color: #ff9977; }
+        .env-ice { box-shadow: 0 0 25px var(--glow-ice); border-color: #5599bb; color: #c8e8ff; }
+
+        pre {
+            font-size: 13px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 24px;
+            text-shadow: 0 0 6px currentColor;
+            letter-spacing: 0;
+            line-height: 1.25;
+            overflow-x: auto;
+            padding: 4px 0;
+            animation: flickerIn 1.2s ease-out;
+        }
+        @keyframes flickerIn {
+            0% { opacity: 0; text-shadow: 0 0 20px currentColor; }
+            15% { opacity: 0.4; text-shadow: 0 0 2px currentColor; }
+            25% { opacity: 0.7; text-shadow: 0 0 14px currentColor; }
+            35% { opacity: 0.5; }
+            50% { opacity: 0.9; text-shadow: 0 0 8px currentColor; }
+            100% { opacity: 1; text-shadow: 0 0 6px currentColor; }
+        }
+        .story-text {
+            font-size: 1.15rem;
+            margin-bottom: 28px;
+            text-align: center;
+            padding: 0 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .choices { display: flex; flex-direction: column; gap: 13px; align-items: center; }
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 26px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.25s;
+            width: 82%;
+            text-align: center;
+            background: #150600;
+            font-weight: bold;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+        label:hover {
+            background-color: currentColor;
+            color: #150600;
+            box-shadow: 0 0 18px currentColor;
+            transform: scale(1.02);
+            letter-spacing: 2px;
+        }
+        label:active { transform: scale(0.97); }
+        label::before { content: '> '; opacity: 0; transition: opacity 0.2s; }
+        label:hover::before { opacity: 1; animation: blink 0.7s infinite; }
+        @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
+        input[type="radio"] { display: none; }
+        .scene { display: none; animation: fadeIn 0.5s ease-out; }
+
+        /* State machine rules – 32 scenes */
+        #s0:checked ~ .game-container #scene0,
+        #s1_hunt:checked ~ .game-container #scene1_hunt,
+        #s1_gather:checked ~ .game-container #scene1_gather,
+        #s2_spear:checked ~ .game-container #scene2_spear,
+        #s2_trap:checked ~ .game-container #scene2_trap,
+        #s2_berries:checked ~ .game-container #scene2_berries,
+        #s2_medicinal:checked ~ .game-container #scene2_medicinal,
+        #s3_fight_cat:checked ~ .game-container #scene3_fight_cat,
+        #s3_cornered:checked ~ .game-container #scene3_cornered,
+        #s3_pit:checked ~ .game-container #scene3_pit,
+        #s3_mammoth:checked ~ .game-container #scene3_mammoth,
+        #s3_cave_poison:checked ~ .game-container #scene3_cave_poison,
+        #s3_heal:checked ~ .game-container #scene3_heal,
+        #s3_river:checked ~ .game-container #scene3_river,
+        #s4_chief:checked ~ .game-container #scene4_chief,
+        #s4_spirit:checked ~ .game-container #scene4_spirit,
+        #s4_fire:checked ~ .game-container #scene4_fire,
+        #s4_exile:checked ~ .game-container #scene4_exile,
+        #s4_tusk:checked ~ .game-container #scene4_tusk,
+        #s4_ice_path:checked ~ .game-container #scene4_ice_path,
+        #s4_poison_end:checked ~ .game-container #scene4_poison_end,
+        #s4_trade:checked ~ .game-container #scene4_trade,
+        #s5_legend:checked ~ .game-container #scene5_legend,
+        #s5_new_home:checked ~ .game-container #scene5_new_home,
+        #s5_shaman:checked ~ .game-container #scene5_shaman,
+        #s5_frozen:checked ~ .game-container #scene5_frozen,
+        #s5_honor:checked ~ .game-container #scene5_honor,
+        #s5_starve:checked ~ .game-container #scene5_starve,
+        #s5_discover:checked ~ .game-container #scene5_discover,
+        #s5_volcano:checked ~ .game-container #scene5_volcano,
+        #s5_tribe:checked ~ .game-container #scene5_tribe {
+            display: block;
+        }
+
+        @media (max-width: 500px) {
+            .game-container { padding: 16px 10px; min-height: 88vh; }
+            pre { font-size: 10px; }
+            .story-text { font-size: 0.95rem; }
+            label { width: 94%; padding: 11px 14px; font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <input type="radio" name="cyoa" id="s0" checked>
+    <input type="radio" name="cyoa" id="s1_hunt">
+    <input type="radio" name="cyoa" id="s1_gather">
+    <input type="radio" name="cyoa" id="s2_spear">
+    <input type="radio" name="cyoa" id="s2_trap">
+    <input type="radio" name="cyoa" id="s2_berries">
+    <input type="radio" name="cyoa" id="s2_medicinal">
+    <input type="radio" name="cyoa" id="s3_fight_cat">
+    <input type="radio" name="cyoa" id="s3_cornered">
+    <input type="radio" name="cyoa" id="s3_pit">
+    <input type="radio" name="cyoa" id="s3_mammoth">
+    <input type="radio" name="cyoa" id="s3_cave_poison">
+    <input type="radio" name="cyoa" id="s3_heal">
+    <input type="radio" name="cyoa" id="s3_river">
+    <input type="radio" name="cyoa" id="s4_chief">
+    <input type="radio" name="cyoa" id="s4_spirit">
+    <input type="radio" name="cyoa" id="s4_fire">
+    <input type="radio" name="cyoa" id="s4_exile">
+    <input type="radio" name="cyoa" id="s4_tusk">
+    <input type="radio" name="cyoa" id="s4_ice_path">
+    <input type="radio" name="cyoa" id="s4_poison_end">
+    <input type="radio" name="cyoa" id="s4_trade">
+    <input type="radio" name="cyoa" id="s5_legend">
+    <input type="radio" name="cyoa" id="s5_new_home">
+    <input type="radio" name="cyoa" id="s5_shaman">
+    <input type="radio" name="cyoa" id="s5_frozen">
+    <input type="radio" name="cyoa" id="s5_honor">
+    <input type="radio" name="cyoa" id="s5_starve">
+    <input type="radio" name="cyoa" id="s5_discover">
+    <input type="radio" name="cyoa" id="s5_volcano">
+    <input type="radio" name="cyoa" id="s5_tribe">
+
+    <div class="game-container" id="gameBox">
+
+        <!-- SCENE 0 - START -->
+        <div id="scene0" class="scene">
+            <pre>
+       (   )
+      (     )
+     (  O O  )
+      (  ^  )
+       (___)
+        | |
+        | |
+       /   \
+      /     \
+    </pre>
+            <div class="story-text">
+                You are a young hunter of the Red Elk clan. The elders speak of a vision: a land where the sun never sets and game is plenty. But the journey is dangerous. Wakai, the shaman, gives you a flint knife and a pouch of dried meat. Two paths lie beyond the camp: the hunting trail to the north, where mammoths roam, or the berry thickets to the south, where wise women gather herbs.
+            </div>
+            <div class="choices">
+                <label for="s1_hunt">Take the hunting trail north</label>
+                <label for="s1_gather">Go south to the berry thickets</label>
+            </div>
+        </div>
+
+        <!-- SCENE 1 - HUNT -->
+        <div id="scene1_hunt" class="scene">
+            <pre>
+      .   .
+     . ~ . ~ .
+    . ~~~~~ .
+     . ~~~ .
+      . ~ .
+        |
+        |
+    </pre>
+            <div class="story-text">
+                The trail winds through tall grass. You spot a herd of mammoths, but also the tracks of a saber‑toothed cat. You can try to craft a spear from a nearby sapling, or dig a pit trap to catch the cat off guard.
+            </div>
+            <div class="choices">
+                <label for="s2_spear">Craft a spear and prepare for a fight</label>
+                <label for="s2_trap">Dig a pit trap to ambush the cat</label>
+            </div>
+        </div>
+
+        <!-- SCENE 1 - GATHER -->
+        <div id="scene1_gather" class="scene">
+            <pre>
+      .  .  .
+      . WWW .
+      . WWW .
+      .  .  .
+    </pre>
+            <div class="story-text">
+                The thickets are rich with berries, but some plants have a dark, oily sheen. You can collect sweet, safe berries or search for medicinal herbs that might help your clan.
+            </div>
+            <div class="choices">
+                <label for="s2_berries">Pick the safe berries</label>
+                <label for="s2_medicinal">Search for medicinal herbs</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2 - SPEAR -->
+        <div id="scene2_spear" class="scene">
+            <pre>
+      .-"""-.
+     /  FLINT \
+     |   ||   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                Your spear is ready. You climb a rocky outcrop and see the cat stalking a young mammoth. You can throw the spear now, or wait and try to scare it away with a war cry.
+            </div>
+            <div class="choices">
+                <label for="s3_fight_cat">Hurl the spear at the cat</label>
+                <label for="s3_cornered">Let out a war cry and bluff</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2 - TRAP -->
+        <div id="scene2_trap" class="scene">
+            <pre>
+      .--.
+      |  |_
+      |    |
+      |____|
+    </pre>
+            <div class="story-text">
+                The pit trap is deep. You cover it with branches and smear mammoth blood to lure the cat. From a safe distance, you wait. Hours pass. Then, a rumble — not from the cat, but a stampede of mammoths!
+            </div>
+            <div class="choices">
+                <label for="s3_pit">Hide near the trap and hope the cat falls in</label>
+                <label for="s3_mammoth">Run toward the mammoth herd to escape the stampede</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2 - BERRIES -->
+        <div id="scene2_berries" class="scene">
+            <pre>
+      .-. .-. .-.
+      |B| |B| |B|
+      '-' '-' '-'
+    </pre>
+            <div class="story-text">
+                You fill your pouch with juicy berries. As you turn back, you see smoke rising from a cave in the distance. It could be a rival tribe — or a spirit. You can investigate the cave or return to camp.
+            </div>
+            <div class="choices">
+                <label for="s3_cave_poison">Investigate the smoky cave</label>
+                <label for="s3_heal">Return to camp and share the berries</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2 - MEDICINAL -->
+        <div id="scene2_medicinal" class="scene">
+            <pre>
+      .-.   .-.
+      |H|   |H|
+      '-'   '-'
+    </pre>
+            <div class="story-text">
+                You find rare healing leaves used to cure fever. A wounded fox lies nearby, its leg caught in a snare. You can free the fox, hoping it will lead you to something, or leave it and hurry back.
+            </div>
+            <div class="choices">
+                <label for="s3_heal">Free the fox and follow it</label>
+                <label for="s3_river">Ignore the fox and head toward the river</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - FIGHT CAT -->
+        <div id="scene3_fight_cat" class="scene">
+            <pre>
+      ( )   ( )
+       |     |
+      / \   / \
+    </pre>
+            <div class="story-text">
+                The spear flies true and wounds the cat. It retreats, but you are left with a choice: track it to finish the kill, or claim the mammoth calf it was stalking as your prize.
+            </div>
+            <div class="choices">
+                <label for="s4_chief">Finish the cat and prove your bravery</label>
+                <label for="s4_tusk">Take the mammoth calf back to camp</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - CORNERED -->
+        <div id="scene3_cornered" class="scene">
+            <pre>
+      \   /
+       \ /
+        O
+       / \
+      /   \
+    </pre>
+            <div class="story-text">
+                Your war cry only enrages the cat. It charges, and you are forced to climb a boulder. The cat circles below. You can try to leap onto its back, or wait for a chance to escape.
+            </div>
+            <div class="choices">
+                <label for="s4_spirit">Leap onto the cat's back and wrestle it</label>
+                <label for="s4_exile">Wait until it leaves, but risk losing your way</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - PIT -->
+        <div id="scene3_pit" class="scene">
+            <pre>
+      .-"""-.
+     /  PIT  \
+     |       |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                The cat falls into the trap, and the mammoths thunder past. You have a live, angry predator in your hole. You can kill it with spears, or try to tame it with food.
+            </div>
+            <div class="choices">
+                <label for="s4_chief">Kill the cat and wear its pelt</label>
+                <label for="s4_spirit">Try to befriend the cat</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - MAMMOTH -->
+        <div id="scene3_mammoth" class="scene">
+            <pre>
+       ___
+      /   \
+     |  O  |
+      \___/
+       / \
+      /   \
+    </pre>
+            <div class="story-text">
+                You run with the mammoths and find an ancient migration trail that leads to a hidden valley — the very place from the elders' vision. Do you explore the valley, or mark the path and return to guide your clan?
+            </div>
+            <div class="choices">
+                <label for="s5_new_home">Explore the hidden valley</label>
+                <label for="s5_legend">Return to your clan and lead them here</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - CAVE POISON -->
+        <div id="scene3_cave_poison" class="scene">
+            <pre>
+      .-"""-.
+     /  GAS  \
+     |   !!  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                Inside the cave, you find a bubbling pool of glowing liquid and strange carvings. Breathing the fumes makes you dizzy. You can scoop up some liquid as a weapon, or retreat before you pass out.
+            </div>
+            <div class="choices">
+                <label for="s4_fire">Collect the glowing poison</label>
+                <label for="s4_poison_end">Quickly escape the cave</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - HEAL -->
+        <div id="scene3_heal" class="scene">
+            <pre>
+      .-.   .-.
+      |F|   |F|
+      '-'   '-'
+    </pre>
+            <div class="story-text">
+                You free the fox. It limps toward a sacred grove, where a stone altar holds a necklace of mammoth ivory — a symbol of leadership. The fox disappears into the undergrowth. You can take the necklace, or leave it as an offering.
+            </div>
+            <div class="choices">
+                <label for="s4_chief">Take the ivory necklace</label>
+                <label for="s4_spirit">Leave the necklace and thank the spirits</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3 - RIVER -->
+        <div id="scene3_river" class="scene">
+            <pre>
+      ~~~~ ~~~~
+      ~~~~~~~~
+      ~~~~~~~~
+    </pre>
+            <div class="story-text">
+                At the river, you meet a fisher from the Pale Shell tribe. He offers you a trade: a strong fishing net for your flint knife. With the net, you could feed many. Without the knife, you are vulnerable.
+            </div>
+            <div class="choices">
+                <label for="s4_trade">Trade your knife for the net</label>
+                <label for="s4_exile">Refuse and keep your knife</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4 - CHIEF -->
+        <div id="scene4_chief" class="scene">
+            <pre>
+      .-"""-.
+     /  CROWN \
+     |   ^_^  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE CHIEF</strong><br><br>
+                Your courage earns you the title of chief. You lead the Red Elk clan to prosperity, and your name is spoken in every campfire story for generations.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 4 - SPIRIT -->
+        <div id="scene4_spirit" class="scene">
+            <pre>
+      .-"""-.
+     /  WISDOM \
+     |   ~_~  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE SHAMAN'S PATH</strong><br><br>
+                You learn to speak with the beasts and become the new shaman. The spirits guide your clan through hard winters, and you are remembered as a wise protector.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 4 - FIRE -->
+        <div id="scene4_fire" class="scene">
+            <pre>
+      .-"""-.
+     /  FIRE  \
+     |   *   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: FIRE BRINGER</strong><br><br>
+                The glowing poison is volatile — you discover how to ignite it. You bring the secret of fire to your people, becoming a figure of myth.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 4 - EXILE -->
+        <div id="scene4_exile" class="scene">
+            <pre>
+      .-"""-.
+     /  LOST  \
+     |   ;_;  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE EXILE</strong><br><br>
+                You wander alone, unable to return. The valley remains a dream. But even in solitude, you find peace with the wild. Your bones will rest among the stars.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 4 - TUSK -->
+        <div id="scene4_tusk" class="scene">
+            <pre>
+      .-"""-.
+     /  TUSK  \
+     |   | |  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE PROVIDER</strong><br><br>
+                The mammoth calf provides meat for the whole clan. You are celebrated as a master hunter, and the clan grows strong under your stewardship.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 4 - ICE PATH (from mammoth - but we have ice path? we'll use as a deeper fork) -->
+        <div id="scene4_ice_path" class="scene">
+            <pre>
+      .-"""-.
+     /  COLD  \
+     |   >_<  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                The mammoths lead you to a frozen pass. Beyond it, a green valley steams with warm springs. You have found a new home, but the journey back to tell your clan may be impossible. Do you stay, or risk the return?
+            </div>
+            <div class="choices">
+                <label for="s5_new_home">Stay and build a shelter</label>
+                <label for="s5_frozen">Try to cross the ice again</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4 - POISON END -->
+        <div id="scene4_poison_end" class="scene">
+            <pre>
+      .-"""-.
+     /  SICK  \
+     |   x_x  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE POISON CAVE</strong><br><br>
+                You escape, but the fumes have weakened you. You make it back to camp, only to fall into a deep sleep. You dream of the cave forever.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 4 - TRADE -->
+        <div id="scene4_trade" class="scene">
+            <pre>
+      .-"""-.
+     /  NET   \
+     |   ~_~  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE ALLIANCE</strong><br><br>
+                You trade and form an alliance with the Pale Shell tribe. Together, your peoples thrive. You become known as a peacemaker, and your clans never hunger again.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - LEGEND -->
+        <div id="scene5_legend" class="scene">
+            <pre>
+      * * * * *
+       *  *  *
+        *   *
+         * *
+          *
+    </pre>
+            <div class="story-text">
+                <strong>TRUE ENDING: THE GUIDING STAR</strong><br><br>
+                You lead your entire clan to the hidden valley. The vision is fulfilled. You carve your symbol into the cave wall, and your descendants flourish for a thousand years.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - NEW HOME -->
+        <div id="scene5_new_home" class="scene">
+            <pre>
+      .-. .-. .-.
+      |H| |H| |H|
+      '-' '-' '-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE PIONEER</strong><br><br>
+                You build a new life in the valley alone, becoming the first of a new tribe. The land provides. You never see your old clan again, but you are content.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - SHAMAN (special) -->
+        <div id="scene5_shaman" class="scene">
+            <pre>
+      .-"""-.
+     /  SPIRIT \
+     |   *_*  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>TRUE ENDING: THE SPIRIT TALKER</strong><br><br>
+                You unlock the ancient language of the beasts. The valley becomes a sanctuary where animals and humans live in harmony. You are remembered as the founder of the Spirit Clan.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - FROZEN -->
+        <div id="scene5_frozen" class="scene">
+            <pre>
+      .-"""-.
+     /  ICE   \
+     |   X_X  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE FROZEN PASS</strong><br><br>
+                The ice claims you. Your body is found generations later, perfectly preserved, a mystery to those who come after.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - HONOR (dead but honorable) -->
+        <div id="scene5_honor" class="scene">
+            <pre>
+      .-"""-.
+     /  HONOR \
+     |   T_T  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE MARTYR</strong><br><br>
+                You die protecting your clan from the saber‑toothed cat. Your sacrifice is never forgotten. A stone cairn marks your resting place, and your name is the first spoken in every feast.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - STARVE -->
+        <div id="scene5_starve" class="scene">
+            <pre>
+      .-"""-.
+     /  HUNGER \
+     |   ;_;  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE HUNGRY WINTER</strong><br><br>
+                Without enough food, the clan struggles. You learn a harsh lesson: nature gives, but nature also takes away. Your people survive, but barely.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - DISCOVER -->
+        <div id="scene5_discover" class="scene">
+            <pre>
+      .-"""-.
+     /  CAVE  \
+     |   O_O  |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE CAVE OF SECRETS</strong><br><br>
+                You find ancient paintings that tell the story of the first humans. You become a keeper of history, and your clan's wisdom grows beyond all others.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - VOLCANO -->
+        <div id="scene5_volcano" class="scene">
+            <pre>
+      .-"""-.
+     /  FIRE  \
+     |   *   |
+     \       /
+      '-...-'
+    </pre>
+            <div class="story-text">
+                <strong>ENDING: THE VOLCANO'S WRATH</strong><br><br>
+                A volcano erupts. You lead your clan to safety through the ash, earning their eternal gratitude. The land is scarred, but your people survive.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+        <!-- SCENE 5 - TRIBE -->
+        <div id="scene5_tribe" class="scene">
+            <pre>
+      .-. .-. .-.
+      |C| |C| |C|
+      '-' '-' '-'
+    </pre>
+            <div class="story-text">
+                <strong>TRUE ENDING: THE FIRST TRIBE</strong><br><br>
+                You unite the scattered bands of the region. For the first time, many clans become one. You are named the First Elder, and the age of cooperation begins.
+            </div>
+            <div class="choices"><label for="s0">Restart Adventure</label></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
