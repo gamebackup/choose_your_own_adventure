@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Your Adventure</title>
+    <title>Choose Your Own Adventure</title>
     <style>
         :root {
             --fantasy-glow: #33ff33;
@@ -11,6 +11,7 @@
             --pirate-glow: #ffb000;
             --western-glow: #924A36;
             --detective-glow: #ff44aa;
+            --underwater-glow: #11AAFF;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -24,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* ---- Starfield layers (pure CSS, no JS) ---- */
         .stars {
             position: fixed;
             top: 0;
@@ -159,6 +159,7 @@
         a.fantasy:hover { background: rgba(51,255,51,0.15); }
         a.scifi:hover { background: rgba(51,238,255,0.15); }
         a.pirates:hover { background: rgba(255,176,0,0.15); }
+        a.underwater:hover { background: rgba(17, 170, 255, 0.15); }
         a.western:hover { background: rgba(146,74,54,0.15); }
         a.detective:hover { background: rgba(255, 68, 170, 0.15); }
         a.game-btn:active { transform: scale(0.96); }
@@ -186,6 +187,7 @@
             <a href="pirates.html" class="game-btn pirates">Isla Calavera</a>
             <a href="western.html" class="game-btn western">Dust & Lead</a>
             <a href="detective.html" class="game-btn detective">Neon Shadows</a>
+            <a href="underwater.html" class="game-btn underwater">Depth Unknown<
         </div>
     </div>
 </body>
