@@ -1,236 +1,439 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Your Adventure</title>
+
+    <title>Choose Your Own Adventure</title>
+
     <style>
+
         :root {
+
             --fantasy-glow: #33ff33;
+
             --scifi-glow: #33eeff;
+
             --pirate-glow: #ffb000;
+
             --western-glow: #924A36;
+
             --detective-glow: #ff44aa;
+
             --underwater-glow: #11AAFF;
+
             --prehistoric-glow: #8F6946;
+
             --newvegas-glow: #ffb000;
+
             --gothic-glow: #cc2222;
+
             --spy-glow: #c8a84b;
+
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
+
             background: #050510;
+
             font-family: 'Courier New', monospace;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             min-height: 100vh;
+
             text-align: center;
-            overflow-x: hidden;
-            overflow-y: auto;
+
+            overflow-x: hidden;  
+
+            overflow-y: auto; 
+
         }
+
+
+
         .star-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 1px;
-            height: 1px;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .star-layer1 {
-            box-shadow:
-                10vw 15vh 2px #fff, 45vw 23vh 1px #fff, 70vw 10vh 3px #fff,
-                25vw 65vh 1px #fff, 60vw 75vh 2px #fff, 85vw 45vh 1px #fff,
-                15vw 85vh 3px #fff, 40vw 40vh 2px #fff, 90vw 80vh 1px #fff,
-                5vw 50vh 2px #fff, 55vw 8vh 1px #fff, 75vw 55vh 3px #fff,
-                33vw 33vh 1px #fff, 68vw 68vh 2px #fff, 82vw 20vh 1px #fff,
-                20vw 5vh 2px #fff, 95vw 60vh 1px #fff, 48vw 90vh 3px #fff,
-                12vw 72vh 1px #fff, 88vw 35vh 2px #fff;
-            animation: twinkle1 3s infinite alternate;
-        }
-        .star-layer2 {
-            box-shadow:
-                2vw 30vh 1px #fff, 38vw 12vh 2px #fff, 65vw 28vh 1px #fff,
-                80vw 5vh 3px #fff, 18vw 55vh 2px #fff, 52vw 80vh 1px #fff,
-                72vw 62vh 2px #fff, 8vw 40vh 1px #fff, 95vw 85vh 3px #fff,
-                30vw 75vh 1px #fff, 58vw 45vh 2px #fff, 78vw 18vh 1px #fff,
-                42vw 3vh 2px #fff, 62vw 90vh 1px #fff, 85vw 72vh 2px #fff,
-                10vw 20vh 3px #fff, 25vw 50vh 1px #fff, 70vw 38vh 2px #fff,
-                50vw 95vh 1px #fff, 92vw 15vh 2px #fff;
-            animation: twinkle2 4s infinite alternate;
-        }
-        .star-layer3 {
-            box-shadow:
-                5vw 8vh 2px #fff, 35vw 18vh 1px #fff, 60vw 5vh 2px #fff,
-                75vw 40vh 1px #fff, 15vw 45vh 3px #fff, 48vw 75vh 1px #fff,
-                68vw 58vh 2px #fff, 85vw 68vh 1px #fff, 22vw 80vh 2px #fff,
-                55vw 28vh 1px #fff, 80vw 85vh 3px #fff, 12vw 60vh 2px #fff,
-                32vw 95vh 1px #fff, 88vw 22vh 2px #fff, 95vw 50vh 1px #fff,
-                42vw 42vh 3px #fff, 72vw 15vh 1px #fff, 8vw 32vh 2px #fff,
-                28vw 68vh 1px #fff, 65vw 88vh 2px #fff;
-            animation: twinkle3 5s infinite alternate;
-        }
-        @keyframes twinkle1 { 0% { opacity: 0.3; } 100% { opacity: 1; } }
-        @keyframes twinkle2 { 0% { opacity: 0.5; } 100% { opacity: 0.9; } }
-        @keyframes twinkle3 { 0% { opacity: 0.4; } 100% { opacity: 0.85; } }
+
+        position: fixed;
+
+        top: 0;
+
+        left: 0;
+
+        width: 1px;
+
+        height: 1px;
+
+        pointer-events: none;
+
+        z-index: 0;
+
+    }
+
+    .star-layer1 {
+
+        box-shadow:
+
+            10vw 15vh 2px #fff, 45vw 23vh 1px #fff, 70vw 10vh 3px #fff,
+
+            25vw 65vh 1px #fff, 60vw 75vh 2px #fff, 85vw 45vh 1px #fff,
+
+            15vw 85vh 3px #fff, 40vw 40vh 2px #fff, 90vw 80vh 1px #fff,
+
+            5vw 50vh 2px #fff, 55vw 8vh 1px #fff, 75vw 55vh 3px #fff,
+
+            33vw 33vh 1px #fff, 68vw 68vh 2px #fff, 82vw 20vh 1px #fff,
+
+            20vw 5vh 2px #fff, 95vw 60vh 1px #fff, 48vw 90vh 3px #fff,
+
+            12vw 72vh 1px #fff, 88vw 35vh 2px #fff;
+
+        animation: twinkle1 3s infinite alternate;
+
+    }
+
+    .star-layer2 {
+
+        box-shadow:
+
+            2vw 30vh 1px #fff, 38vw 12vh 2px #fff, 65vw 28vh 1px #fff,
+
+            80vw 5vh 3px #fff, 18vw 55vh 2px #fff, 52vw 80vh 1px #fff,
+
+            72vw 62vh 2px #fff, 8vw 40vh 1px #fff, 95vw 85vh 3px #fff,
+
+            30vw 75vh 1px #fff, 58vw 45vh 2px #fff, 78vw 18vh 1px #fff,
+
+            42vw 3vh 2px #fff, 62vw 90vh 1px #fff, 85vw 72vh 2px #fff,
+
+            10vw 20vh 3px #fff, 25vw 50vh 1px #fff, 70vw 38vh 2px #fff,
+
+            50vw 95vh 1px #fff, 92vw 15vh 2px #fff;
+
+        animation: twinkle2 4s infinite alternate;
+
+    }
+
+    .star-layer3 {
+
+        box-shadow:
+
+            5vw 8vh 2px #fff, 35vw 18vh 1px #fff, 60vw 5vh 2px #fff,
+
+            75vw 40vh 1px #fff, 15vw 45vh 3px #fff, 48vw 75vh 1px #fff,
+
+            68vw 58vh 2px #fff, 85vw 68vh 1px #fff, 22vw 80vh 2px #fff,
+
+            55vw 28vh 1px #fff, 80vw 85vh 3px #fff, 12vw 60vh 2px #fff,
+
+            32vw 95vh 1px #fff, 88vw 22vh 2px #fff, 95vw 50vh 1px #fff,
+
+            42vw 42vh 3px #fff, 72vw 15vh 1px #fff, 8vw 32vh 2px #fff,
+
+            28vw 68vh 1px #fff, 65vw 88vh 2px #fff;
+
+        animation: twinkle3 5s infinite alternate;
+
+    }
+
+
+
+    @keyframes twinkle1 { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    @keyframes twinkle2 { 0% { opacity: 0.5; } 100% { opacity: 0.9; } }
+
+    @keyframes twinkle3 { 0% { opacity: 0.4; } 100% { opacity: 0.85; } }
+
+
+
+        /* ---- Hub content ---- */
 
         .hub {
+
             position: relative;
+
             z-index: 10;
+
             display: flex;
+
             flex-direction: column;
+
             align-items: center;
+
             gap: 2rem;
+
         }
-        h1 { color: #fff; font-size: 2.8rem; text-shadow: 0 0 20px rgba(255,255,255,0.4); letter-spacing: 3px; }
-        .subtitle { color: #aaa; font-size: 1.3rem; letter-spacing: 2px; }
-        .button-group { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
-        a.game-btn {
-            text-decoration: none;
-            border: 2px solid;
-            padding: 1.2rem 2.8rem;
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-transform: uppercase;
+
+        h1 {
+
+            color: #fff;
+
+            font-size: 2.8rem;
+
+            text-shadow: 0 0 20px rgba(255,255,255,0.4);
+
             letter-spacing: 3px;
-            background: rgba(0,0,0,0.5);
-            transition: all 0.3s;
-            display: inline-block;
-            cursor: pointer;
-        }
-        a.game-btn:hover { transform: translateY(-3px); box-shadow: 0 0 30px currentColor; }
-        a.game-btn:active { transform: scale(0.96); }
-        a.fantasy { color: var(--fantasy-glow); border-color: var(--fantasy-glow); }
-        a.scifi { color: var(--scifi-glow); border-color: var(--scifi-glow); }
-        a.pirates { color: var(--pirate-glow); border-color: var(--pirate-glow); }
-        a.western { color: var(--western-glow); border-color: var(--western-glow); }
-        a.underwater { color: var(--underwater-glow); border-color: var(--underwater-glow); }
-        a.detective { color: var(--detective-glow); border-color: var(--detective-glow); }
-        a.prehistoric { color: var(--prehistoric-glow); border-color: var(--prehistoric-glow); }
-        a.newvegas { color: var(--newvegas-glow); border-color: var(--newvegas-glow); }
-        a.gothic { color: var(--gothic-glow); border-color: var(--gothic-glow); }
-        a.spy { color: var(--spy-glow); border-color: var(--spy-glow); }
-        @media (max-width: 500px) {
-            h1 { font-size: 1.8rem; }
-            .subtitle { font-size: 1rem; }
-            a.game-btn { padding: 1rem 1.8rem; font-size: 1.1rem; }
+
         }
 
-        #story-container {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
+        .subtitle {
+
+            color: #aaa;
+
+            font-size: 1.3rem;
+
+            letter-spacing: 2px;
+
         }
-        .back-to-hub {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 8px 16px;
+
+        .button-group {
+
+            display: flex;
+
+            gap: 2rem;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+        }
+
+        a.game-btn {
+
             text-decoration: none;
-            font-family: monospace;
-            border: 1px solid white;
-            z-index: 1000;
-            cursor: pointer;
-        }
-        .back-to-hub:hover { background: white; color: black; }
 
-        .loading {
-            color: white;
-            text-align: center;
-            padding: 50px;
-            font-size: 1.5rem;
+            border: 2px solid;
+
+            padding: 1.2rem 2.8rem;
+
+            font-size: 1.4rem;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+            letter-spacing: 3px;
+
+            background: rgba(0,0,0,0.5);
+
+            transition: all 0.3s;
+
+            display: inline-block;
+
         }
+
+        a.fantasy {
+
+            color: var(--fantasy-glow);
+
+            border-color: var(--fantasy-glow);
+
+            box-shadow: 0 0 15px rgba(51,255,51,0.3);
+
+        }
+
+        a.scifi {
+
+            color: var(--scifi-glow);
+
+            border-color: var(--scifi-glow);
+
+            box-shadow: 0 0 15px rgba(51,238,255,0.3);
+
+        }
+
+        a.pirates {
+
+            color: var(--pirate-glow);
+
+            border-color: var(--pirate-glow);
+
+            box-shadow: 0 0 15px rgba(255,176,0,0.3);
+
+        }
+
+        a.western {
+
+        	color: var(--western-glow);
+
+            border-color: var(--western-glow);
+
+            box-shadow: 0 0 15px rgba(146, 74, 54, 0.3)
+
+        }
+
+        a.underwater {
+
+        	color: var(--underwater-glow);
+
+            border-color: var(--underwaters-glow);
+
+            box-shadow: 0 0 15px rgba(17, 170, 255, 0.3)
+
+        }
+
+        a.detective {
+
+        	color: var(--detective-glow);
+
+            border-color: var(--detective-glow);
+
+            box-shadow: 0 0 15px rgba(255, 68, 170, 0.3)
+
+        }        
+
+        a.prehistoric {
+
+        	color: var(--prehistoric-glow);
+
+            border-color: var(--prehistoric-glow);
+
+            box-shadow: 0 0 15px rgba(143, 105, 70, 0.3)
+
+        }
+
+        a.newvegas {
+
+            color: var(--newvegas-glow);
+
+            border-color: var(--newvegas-glow);
+
+            box-shadow: 0 0 15px rgba(255, 176, 0, 0.3)
+
+        }
+
+        a.gothic {
+
+            color: var(--gothic-glow);
+
+            bord-color: var(--gothic-glow);
+
+            box-shadow: 0 0 15px rgba(204, 34, 34, 0.3)
+
+        }
+
+        a.spy {
+
+            color: var(--spy-glow);
+
+            bord-color: var(--spy-glow);
+
+            box-shadow: 0 0 15px rgba(200, 168, 75, 0.3)
+
+        }
+
+        a.game-btn:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 0 30px currentColor;
+
+        }
+
+        a.fantasy:hover { background: rgba(51,255,51,0.15); }
+
+        a.scifi:hover { background: rgba(51,238,255,0.15); }
+
+        a.pirates:hover { background: rgba(255,176,0,0.15); }
+
+        a.underwater:hover { background: rgba(17, 170, 255, 0.15); }
+
+        a.western:hover { background: rgba(146,74,54,0.15); }
+
+        a.detective:hover { background: rgba(255, 68, 170, 0.15); }
+
+        a.prehistoric:hover { background: rgba(143, 105, 70, 0.15); }
+
+        a.newvegas:hover { background: rgba(255, 176, 0, 0.15); }
+
+        a.gothic:hover { background: rgba(204, 34, 34, 0.15); }
+
+        a.spy:hover { background: rgba(200, 168, 75, 0.15); }
+
+        a.game-btn:active { transform: scale(0.96); }
+
+
+
+        @media (max-width: 500px) {
+
+            h1 { font-size: 1.8rem; }
+
+            .subtitle { font-size: 1rem; }
+
+            a.game-btn { padding: 1rem 1.8rem; font-size: 1.1rem; }
+
+        }
+
     </style>
+
 </head>
+
 <body>
+
     <div class="stars">
+
         <div class="star-layer star-layer1"></div>
+
         <div class="star-layer star-layer2"></div>
+
         <div class="star-layer star-layer3"></div>
+
     </div>
 
-    <div id="hub" class="hub">
+
+
+    <div class="hub">
+
         <h1>CHOOSE YOUR ADVENTURE</h1>
-        <p class="subtitle">Select a story to begin<br> To pick a new story, refresh the page<br>Each story has the approximate 100% completion (all endings) time in minutes next to it</p>        <div class="button-group">
-            <a class="game-btn newvegas" onclick="showStory('newvegas')">Nexus Station, New Vegas ~80</a>
-            <a class="game-btn spy" onclick="showStory('spy')">The Berlin Cipher ~76</a>
-            <a class="game-btn gothic" onclick="showStory('gothic')">Castle Sanguine ~41</a>
-            <a class="game-btn fantasy" onclick="showStory('fantasy')">The Eldritch Valley ~18</a>
-            <a class="game-btn scifi" onclick="showStory('scifi')">Space Station Omega-7 ~18</a>
-            <a class="game-btn pirates" onclick="showStory('pirates')">Isla Calavera ~17</a>
-            <a class="game-btn western" onclick="showStory('western')">Dust & Lead ~16</a>
-            <a class="game-btn detective" onclick="showStory('detective')">Neon Shadows ~14</a>
-            <a class="game-btn underwater" onclick="showStory('underwater')">Depth Unknown ~14</a>
-            <a class="game-btn prehistoric" onclick="showStory('prehistoric')">Flint and Ember ~12</a>
+
+        <p class="subtitle">Select a story to begin<br> To pick a new story, refresh the page<br>Each story has the approximate 100% completion (all endings) time in minutes next to it</p>
+
+        <div class="button-group">
+
+
+            <a href="fallout-nv.html" class="game-btn newvegas">Nexus Station, New Vegas ~80</a>
+
+
+            <a href="spy.html" class="game-btn spy">The Berlin Cipher ~76</a>
+
+
+            <a href="gothic.html" class="game-btn gothic">Castle Sanguine ~41</a>
+
+
+            <a href="fantasy.html" class="game-btn fantasy">The Eldritch Valley ~18</a>
+
+
+            <a href="scifi.html" class="game-btn scifi">Space Station Omega-7 ~18</a>
+
+
+            <a href="pirates.html" class="game-btn pirates">Isla Calavera ~17</a>
+
+
+            <a href="western.html" class="game-btn western">Dust & Lead ~16</a>
+
+
+            <a href="detective.html" class="game-btn detective">Neon Shadows ~14</a>
+
+
+            <a href="underwater.html" class="game-btn underwater">Depth Unknown ~14</a>
+
+
+            <a href="prehistoric.html" class="game-btn prehistoric">Flint and Ember ~12</a>
+
         </div>
+
     </div>
 
-    <div id="story-container"></div>
-
-    <script>
-        
-        const STORY_BASE_URL = 'https://cdn.jsdelivr.net/gh/gamebackup/choose_your_own_adventure/stories/'; 
-
-        async function showStory(storyId) {
-            const hub = document.getElementById('hub');
-            const container = document.getElementById('story-container');
-            
-            // Show loading indicator
-            container.innerHTML = '<div class="loading">Loading your adventure...</div>';
-            container.style.display = 'block';
-            hub.style.display = 'none';
-
-            try {
-                // Dynamically import the story module
-                const module = await import(`${STORY_BASE_URL}${storyId}.js`);
-                const storyHTML = module.html;
-                const storyCSS = module.css;
-
-                // Clear container and inject story HTML + CSS
-                container.innerHTML = '';
-                
-                // Add story-specific styles
-                const styleEl = document.createElement('style');
-                styleEl.textContent = storyCSS;
-                container.appendChild(styleEl);
-                
-                // Create a wrapper div for the story content
-                const storyDiv = document.createElement('div');
-                storyDiv.innerHTML = storyHTML;
-                container.appendChild(storyDiv);
-                
-                // Ensure the story has a "Back to Hub" button.
-                // If the story doesn't already include one, we add it.
-                if (!storyDiv.querySelector('.back-to-hub')) {
-                    const backBtn = document.createElement('a');
-                    backBtn.className = 'back-to-hub';
-                    backBtn.textContent = '← Back to Hub';
-                    backBtn.onclick = showHub;
-                    container.appendChild(backBtn);
-                } else {
-                    // If the story already has a back button, ensure its onclick works.
-                    storyDiv.querySelectorAll('.back-to-hub').forEach(btn => {
-                        btn.onclick = showHub;
-                    });
-                }
-            } catch (error) {
-                console.error('Failed to load story:', error);
-                container.innerHTML = `<div class="loading">Error loading story. Make sure the story file exists at ${STORY_BASE_URL}${storyId}.js</div>`;
-            }
-        }
-
-        function showHub() {
-            const hub = document.getElementById('hub');
-            const container = document.getElementById('story-container');
-            container.style.display = 'none';
-            hub.style.display = 'flex';
-            container.innerHTML = '';
-        }
-    </script>
 </body>
+
 </html>
