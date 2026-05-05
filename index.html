@@ -14,6 +14,7 @@
             --underwater-glow: #11AAFF;
             --prehistoric-glow: #8F6946;
             --newvegas-glow: #ffb000;
+            --gothic-glow: #cc2222;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -148,6 +149,11 @@
             border-color: var(--newvegas-glow);
             box-shadow: 0 0 15px rgba(255, 176, 0, 0.3)
         }
+        a.gothic {
+            color: var(--gothic-glow);
+            bord-color: var(--gothic-glow);
+            box-shadow: 0 0 15px rgba(204, 34, 34, 0.3)
+        }
         a.game-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 0 30px currentColor;
@@ -160,6 +166,7 @@
         a.detective:hover { background: rgba(255, 68, 170, 0.15); }
         a.prehistoric:hover { background: rgba(143, 105, 70, 0.15); }
         a.newvegas:hover { background: rgba(255, 176, 0, 0.15); }
+        a.gothic:hover { background: rgba(204, 34, 34, 0.15); }
         a.game-btn:active { transform: scale(0.96); }
 
         @media (max-width: 500px) {
@@ -181,6 +188,7 @@
         <p class="subtitle">Select a story to begin<br> To pick a new story, refresh the page<br>Each story has the approximate 100% completion time in minutes next to it</p>
         <div class="button-group">
             <a href="fallout-nv.html" class="game-btn newvegas">Nexus Station, New Vegas ~78</a>
+            <a href="gothic.html" class="game-btn gothic">Castle Sanguine ~41</a>
             <a href="fantasy.html" class="game-btn fantasy">The Eldritch Valley ~15</a>
             <a href="scifi.html" class="game-btn scifi">Station Omega-7 ~14</a>
             <a href="pirates.html" class="game-btn pirates">Isla Calavera ~14</a>
