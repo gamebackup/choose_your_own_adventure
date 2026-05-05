@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Castle Sanguine — A Gothic Tale</title>
+    <style>
+        :root {
+            --blood: #cc2222;
+            --blood-bright: #ff4444;
+            --blood-dim: #661111;
+            --candle: #ff9933;
+            --candle-dim: #885511;
+            --shadow: #0a0202;
+            --parchment: #ddbb88;
+            --silver: #aaaacc;
+            --glow-blood: rgba(204, 34, 34, 0.35);
+            --glow-candle: rgba(255, 153, 51, 0.25);
+            --glow-crypt: rgba(150, 40, 40, 0.4);
+            --glow-garden: rgba(180, 60, 60, 0.3);
+            --glow-tower: rgba(200, 80, 80, 0.35);
+            --glow-dawn: rgba(255, 180, 140, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #050101;
+            color: var(--blood-bright);
+            font-family: 'Courier New', 'Courier', 'Lucida Console', monospace;
+            padding: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(30, 2, 2, 0.04) 3px,
+                    rgba(30, 2, 2, 0.04) 6px);
+            background-size: 100% 6px;
+            background-attachment: fixed;
+        }
+
+        .game-container {
+            max-width: 740px;
+            margin: 0 auto;
+            border: 2px solid var(--blood);
+            padding: 30px 24px;
+            min-height: 84vh;
+            box-shadow: 0 0 30px var(--glow-blood), inset 0 0 50px rgba(180, 20, 20, 0.04);
+            background: radial-gradient(ellipse at center,
+                    rgba(30, 8, 8, 0.7) 0%,
+                    rgba(5, 1, 1, 0.97) 72%);
+            transition: box-shadow 0.6s ease, border-color 0.6s ease, color 0.6s ease;
+        }
+
+        .env-candle {
+            box-shadow: 0 0 28px var(--glow-candle);
+            border-color: var(--candle);
+            color: #f0c080;
+        }
+        .env-crypt {
+            box-shadow: 0 0 28px var(--glow-crypt);
+            border-color: #993333;
+            color: #dd8888;
+        }
+        .env-garden {
+            box-shadow: 0 0 28px var(--glow-garden);
+            border-color: #aa4444;
+            color: #e0a0a0;
+        }
+        .env-tower {
+            box-shadow: 0 0 28px var(--glow-tower);
+            border-color: #bb5555;
+            color: #f0b0b0;
+        }
+        .env-dawn {
+            box-shadow: 0 0 28px var(--glow-dawn);
+            border-color: #ddaa88;
+            color: #ffe0c8;
+        }
+
+        pre {
+            font-size: 12px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 24px;
+            text-shadow: 0 0 7px currentColor;
+            line-height: 1.25;
+            overflow-x: auto;
+            letter-spacing: 0;
+            animation: flickerIn 1s ease-out;
+            padding: 2px 0;
+        }
+
+        @keyframes flickerIn {
+            0% {
+                opacity: 0;
+                text-shadow: 0 0 35px currentColor;
+            }
+            18% {
+                opacity: 0.35;
+            }
+            30% {
+                opacity: 0.8;
+                text-shadow: 0 0 15px currentColor;
+            }
+            45% {
+                opacity: 0.5;
+            }
+            60% {
+                opacity: 0.9;
+            }
+            78% {
+                opacity: 0.55;
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 7px currentColor;
+            }
+        }
+
+        .scene-tag {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--blood-dim);
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .story-text {
+            font-size: 1.1rem;
+            margin-bottom: 28px;
+            padding: 0 4px;
+            line-height: 1.75;
+            animation: fadeIn 0.55s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .story-text p {
+            margin-bottom: 13px;
+        }
+        .story-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        strong {
+            color: var(--blood-bright);
+            font-weight: bold;
+        }
+        em {
+            color: var(--candle);
+            font-style: italic;
+        }
+        .silver {
+            color: var(--silver);
+        }
+        .dim {
+            color: var(--blood-dim);
+        }
+        .warn {
+            color: #ff6666;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--blood-dim);
+            margin: 20px 0;
+            opacity: 0.4;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(10, 2, 2, 0.6);
+            font-weight: bold;
+            font-size: 0.82rem;
+            width: 86%;
+            text-align: center;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+            user-select: none;
+            position: relative;
+        }
+
+        label::before {
+            content: '> ';
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        label:hover::before {
+            opacity: 1;
+            animation: blink 0.65s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        label:hover {
+            background: currentColor;
+            color: #0a0202 !important;
+            box-shadow: 0 0 22px currentColor;
+            transform: scale(1.025);
+        }
+
+        label:active {
+            transform: scale(0.97);
+            transition: transform 0.08s;
+        }
+
+        .ending-title {
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 18px;
+            text-shadow: 0 0 12px currentColor;
+        }
+
+        .note {
+            font-size: 0.76rem;
+            color: var(--blood-dim);
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+        .scene {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* STATE MACHINE */
+        #s0:checked~.game-container #scene0,
+        #s1_gate:checked~.game-container #scene1_gate,
+        #s1_balcony:checked~.game-container #scene1_balcony,
+        #s1_grounds:checked~.game-container #scene1_grounds,
+        #s2_hall:checked~.game-container #scene2_hall,
+        #s2_chamber:checked~.game-container #scene2_chamber,
+        #s2_garden:checked~.game-container #scene2_garden,
+        #s3_accept:checked~.game-container #scene3_accept,
+        #s3_refuse:checked~.game-container #scene3_refuse,
+        #s3_free:checked~.game-container #scene3_free,
+        #s3_suspicious:checked~.game-container #scene3_suspicious,
+        #s3_crypt:checked~.game-container #scene3_crypt,
+        #s3_servants:checked~.game-container #scene3_servants,
+        #s4_feast:checked~.game-container #scene4_feast,
+        #s4_library:checked~.game-container #scene4_library,
+        #s4_betrayal:checked~.game-container #scene4_betrayal,
+        #s4_ally:checked~.game-container #scene4_ally,
+        #s4_sarcophagus:checked~.game-container #scene4_sarcophagus,
+        #s4_passage:checked~.game-container #scene4_passage,
+        #s5_tower_key:checked~.game-container #scene5_tower_key,
+        #s5_cellar:checked~.game-container #scene5_cellar,
+        #s5_tower_climb:checked~.game-container #scene5_tower_climb,
+        #s5_relic_room:checked~.game-container #scene5_relic_room,
+        #s5_confront:checked~.game-container #scene5_confront,
+        #s5_escape_run:checked~.game-container #scene5_escape_run,
+        #e_thrall:checked~.game-container #scene_e_thrall,
+        #e_trapped:checked~.game-container #scene_e_trapped,
+        #e_relic_cost:checked~.game-container #scene_e_relic_cost,
+        #e_slain:checked~.game-container #scene_e_slain,
+        #e_true:checked~.game-container #scene_e_true,
+        #e_escape:checked~.game-container #scene_e_escape {
+            display: block;
+        }
+
+        @media (max-width: 520px) {
+            .game-container {
+                padding: 18px 12px;
+            }
+            pre {
+                font-size: 10px;
+            }
+            .story-text {
+                font-size: 0.95rem;
+            }
+            label {
+                width: 94%;
+                font-size: 0.76rem;
+                padding: 11px 14px;
+                letter-spacing: 1px;
+            }
+            .ending-title {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STATE INPUTS -->
+    <input type="radio" name="game" id="s0" checked>
+    <input type="radio" name="game" id="s1_gate">
+    <input type="radio" name="game" id="s1_balcony">
+    <input type="radio" name="game" id="s1_grounds">
+    <input type="radio" name="game" id="s2_hall">
+    <input type="radio" name="game" id="s2_chamber">
+    <input type="radio" name="game" id="s2_garden">
+    <input type="radio" name="game" id="s3_accept">
+    <input type="radio" name="game" id="s3_refuse">
+    <input type="radio" name="game" id="s3_free">
+    <input type="radio" name="game" id="s3_suspicious">
+    <input type="radio" name="game" id="s3_crypt">
+    <input type="radio" name="game" id="s3_servants">
+    <input type="radio" name="game" id="s4_feast">
+    <input type="radio" name="game" id="s4_library">
+    <input type="radio" name="game" id="s4_betrayal">
+    <input type="radio" name="game" id="s4_ally">
+    <input type="radio" name="game" id="s4_sarcophagus">
+    <input type="radio" name="game" id="s4_passage">
+    <input type="radio" name="game" id="s5_tower_key">
+    <input type="radio" name="game" id="s5_cellar">
+    <input type="radio" name="game" id="s5_tower_climb">
+    <input type="radio" name="game" id="s5_relic_room">
+    <input type="radio" name="game" id="s5_confront">
+    <input type="radio" name="game" id="s5_escape_run">
+    <input type="radio" name="game" id="e_thrall">
+    <input type="radio" name="game" id="e_trapped">
+    <input type="radio" name="game" id="e_relic_cost">
+    <input type="radio" name="game" id="e_slain">
+    <input type="radio" name="game" id="e_true">
+    <input type="radio" name="game" id="e_escape">
+
+    <!-- GAME CONTAINER -->
+    <div class="game-container" id="gameBox">
+
+        <!-- ============ SCENE 0 — ARRIVAL ============ -->
+        <div id="scene0" class="scene">
+            <pre>
+        .    *    .
+      .   . | .   .
+    .   .   |   .   .
+      .   . | .   .
+        .   |   .
+    ---+---+---+---
+       /    |    \
+      /     |     \
+     /      |      \
+    /       |       \
+   /    __  |  __    \
+  /    /  \ | /  \    \
+ /____/    \|/    \____\
+      |     |     |
+      |  CASTLE   |
+      | SANGUINE  |
+      |_____|_____|
+    </pre>
+            <span class="scene-tag">// CARPATHIAN FOOTHILLS — NIGHT OF THE HUNTER'S MOON //</span>
+            <div class="story-text">
+                <p>The castle rises against the moon like a blade held to the sky. You've been walking since dusk, following the old road that winds through the Carpathian foothills — a road the villagers back home swore was cursed. <em>"Nobody who goes to Castle Sanguine comes back the same,"</em> they said. <em>"Most don't come back at all."</em></p>
+
+                <p>But your village is dying. The <strong>Crimson Plague</strong> has taken thirty-seven souls this winter alone. The healers have tried everything. The priests have prayed. Nothing works. Then Elder Vasile, on his deathbed, whispered about the castle — about a relic hidden within, the <strong>Heart of Sanguine</strong>, a crystalline object said to purify blood and cure any ailment. He described it in detail before the fever took him: a fist-sized gem the color of fresh arterial blood, warm to the touch, kept in the highest tower behind a door that only opens under moonlight.</p>
+
+                <p>You volunteered. Someone had to. Now, standing before the iron gates with your lantern flickering in the mountain wind, you're not sure whether you were brave or just desperate.</p>
+
+                <p>The castle is enormous — black stone, gothic spires, narrow windows that glow faintly from within. The front gate is slightly ajar, rust flaking from the hinges. To the left, ivy climbs the wall toward a balconied window on the second floor. To the right, a low stone wall encloses what appears to be an overgrown garden, its iron gate hanging loose.</p>
+
+                <p class="dim">// Three ways in. Each holds its own peril. Choose quickly — the moon is rising, and something inside this castle knows you're here. //</p>
+            </div>
+            <div class="choices">
+                <label for="s1_gate">Enter through the main gate — bold and direct</label>
+                <label for="s1_balcony">Climb the ivy to the balconied window above</label>
+                <label for="s1_grounds">Slip into the overgrown garden through the side gate</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 1A — MAIN GATE ============ -->
+        <div id="scene1_gate" class="scene">
+            <pre>
+      /\    /\    /\
+     /  \  /  \  /  \
+    /    \/    \/    \
+    |    /\    /\    |
+    |   /  \  /  \   |
+    |  /    \/    \  |
+    | /     /\     \ |
+    |/     /  \     \|
+    [   GREAT HALL   ]
+    [   candles lit  ]
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — GREAT HALL — THE HOUR OF WELCOME //</span>
+            <div class="story-text">
+                <p>The main gate groans as you push it open, the sound echoing through stone corridors like a long-held breath finally released. Beyond is the great hall — vast, arched ceilings lost in shadow, tall windows draped in burgundy velvet, and a long dining table set for one. Candles flicker in iron sconces, their flames a warm amber that feels almost inviting after the cold climb up the mountain.</p>
+
+                <p>At the far end of the table, a figure rises from a high-backed chair. He is tall, lean, dressed in a black velvet coat with silver buttons. His face is pale — not the pallor of illness, but the polished white of marble. His eyes are dark and deep-set, and when he smiles, it doesn't quite reach them. <em>"A guest,"</em> he says, his voice smooth as old silk. <em>"How rare. How delightful. Please — sit. Eat. You must be exhausted."</em> He gestures to the table, where a covered platter steams faintly.</p>
+
+                <p>Behind him, partially concealed by a curtain, you glimpse a narrow stone staircase spiraling upward. A faint reddish glow pulses from somewhere above — rhythmic, like a heartbeat made visible.</p>
+
+                <p class="dim">// The man has not introduced himself. The food smells incredible. The glow from upstairs is exactly the color Elder Vasile described. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_accept">Accept the stranger's hospitality — sit, eat, learn what you can</label>
+                <label for="s3_refuse">Politely decline — something about this feast feels wrong</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 1B — BALCONY ============ -->
+        <div id="scene1_balcony" class="scene">
+            <pre>
+      |   |
+      |   |
+      |   |
+     /     \
+    /       \
+   /    _    \
+  /    / \    \
+ /    /   \    \
+|    /     \    |
+|   /       \   |
+|  /  CHAMBER \  |
+| /_____________\ |
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — UPPER CHAMBER — THE PRISONER'S WINDOW //</span>
+            <div class="story-text">
+                <p>The ivy is thick and ancient — your hands find purchase easily, and within a few tense minutes you're pulling yourself onto a stone balcony. The window beyond is cracked open, lace curtains stirring in the cold breeze. You slip inside.</p>
+
+                <p>The chamber is unexpectedly warm. A fire crackles in a marble hearth. Bookshelves line one wall, filled with leather-bound volumes in languages you don't recognize. And against the far wall, chained by one ankle to an iron ring set in the stone, sits a young woman in a simple gray dress. Her hair is dark, her eyes are tired, and when she sees you, she flinches — then leans forward with desperate hope.</p>
+
+                <p><em>"Please,"</em> she whispers, <em>"you have to get me out of here. The key is on the mantle. Please — he'll be back soon. He's not what he seems. None of this is what it seems."</em> She points to a small iron key resting on the fireplace mantle. <em>"My name is Anna. I was a traveler, like you. He's kept me here for months. Please."</em></p>
+
+                <p>Through the chamber door, you hear footsteps — slow, deliberate, ascending stone stairs. You have maybe two minutes.</p>
+
+                <p class="dim">// Her story makes sense. But there's something about the way she watches you — too focused, too calm for someone who's been imprisoned for months. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_free">Take the key and free her — no one deserves to be chained</label>
+                <label for="s3_suspicious">Something's off — leave her and investigate the room yourself</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 1C — GARDEN ============ -->
+        <div id="scene1_grounds" class="scene">
+            <pre>
+      \|/  \|/  \|/
+       O    O    O
+        \   |   /
+         \  |  /
+          \ | /
+     .-"""-|-"""-.
+    /  o o  |  o o  \
+    |   ~   |   ~   |
+    \       |       /
+     '-...- | -...-'
+            |
+      [ IRON GATE ]
+      [ creaking  ]
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — OVERGROWN GARDEN — THE ROSE COURT //</span>
+            <div class="story-text">
+                <p>The garden gate swings open with a sound like a whispered complaint. Inside, the garden has gone wild — rose bushes grown into tangled walls, their blooms a deep, unsettling red that looks almost black in the moonlight. The air is thick with their scent, cloying and sweet, layered over something earthier beneath. Stone benches sit half-buried in moss. A dry fountain stands at the center, its basin cracked.</p>
+
+                <p>At the far end of the garden, a stone staircase descends into the earth — the <strong>family crypt</strong>, its entrance framed by two weathered statues of hooded figures with clasped hands. Beside it, a smaller building with a chimney — the <strong>servants' quarters</strong> — leans tiredly against the outer wall, its door hanging open.</p>
+
+                <p>You notice that the roses nearest the crypt are different — they glow very faintly, a soft red luminescence that pulses in time with something you can't quite feel. The same rhythmic pattern the Elder described when he spoke of the Heart of Sanguine.</p>
+
+                <p class="dim">// The crypt promises answers. The servants' quarters promise information. The roses promise nothing but secrets. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_crypt">Descend into the family crypt — the roses point the way</label>
+                <label for="s3_servants">Enter the servants' quarters — learn who tends this place</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3A — ACCEPT HOSPITALITY ============ -->
+        <div id="scene3_accept" class="scene">
+            <pre>
+   +-------------------+
+   |  [covered platter] |
+   |  [wine goblet]     |
+   |  [stranger smiles] |
+   +-------------------+
+         \     /
+          \   /
+           \ /
+            *
+    </pre>
+            <span class="scene-tag">// GREAT HALL — THE FEAST //</span>
+            <div class="story-text">
+                <p>You sit. The stranger's smile deepens. <em>"Wise,"</em> he murmurs, and pours you a glass of wine so dark it's nearly black. <em>"I am Count Mircalla Sanguine. This castle has been my family's home for — well. A very long time."</em> He doesn't specify how long. The wine tastes of blackberries and something metallic, like iron or old blood.</p>
+
+                <p>As you eat, he talks. About the castle's history, about the valley below, about the plague that's been sweeping through the villages. He mentions it casually, the way one might mention the weather, but his dark eyes watch your reaction with unsettling intensity. <em>"The Crimson Plague is a tragedy,"</em> he says. <em>"But not a natural one. Someone designed it. Someone who wanted to test whether a population under extreme duress would produce — interesting results."</em> He swirls his wine. <em>"I know who. And I know where the cure is kept."</em></p>
+
+                <p>He leans forward. <em>"The Heart of Sanguine. It's real. It's in my tower. I can give it to you — but I need something in return. A small thing. A vial of your blood. Just one. For my... research."</em></p>
+
+                <p class="dim">// The Count's eyes have not blinked once during this entire conversation. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_tower_key">Agree — give the Count a vial of your blood and take the Heart</label>
+                <label for="s4_library">Stall — ask to see his research first, learn more before committing</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3B — REFUSE HOSPITALITY ============ -->
+        <div id="scene3_refuse" class="scene">
+            <pre>
+      .-"""-.
+     /  NO   \
+     |   !   |
+     \       /
+      '-...-'
+       /   \
+      /     \
+    </pre>
+            <span class="scene-tag">// GREAT HALL — THE REFUSAL //</span>
+            <div class="story-text">
+                <p><em>"I'd rather not eat,"</em> you say, keeping your voice steady. <em>"But I'd appreciate information. I'm looking for something."</em></p>
+
+                <p>The stranger's smile freezes for just a moment — a flicker of something cold passing behind his eyes — then returns. <em>"Of course,"</em> he says, though his tone has cooled. <em>"You're here for the Heart. They always are."</em> He sets down his goblet and rises. <em>"I won't stop you from seeking it. The tower door is at the top of the staircase behind me. It opens only under direct moonlight, which you'll find streaming through the upper window in approximately twelve minutes."</em> He pauses. <em>"But I should warn you — the Heart is guarded. Not by me. By something older than me, and considerably less polite."</em></p>
+
+                <p>He gestures toward a side door. <em>"If you want to understand what you're walking into, visit my library first. First door on the left. The records there go back three hundred years. They'll tell you everything you need to know about the Heart — and about me."</em></p>
+
+                <p class="dim">// He's being unusually helpful for someone who clearly doesn't want you here. Either he's confident you'll fail, or he's testing you. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_library">Go to the library — knowledge is a weapon</label>
+                <label for="s5_tower_key">Head straight for the tower — you've wasted enough time</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3C — FREE THE PRISONER ============ -->
+        <div id="scene3_free" class="scene">
+            <pre>
+      .-"""-.
+     /  KEY  \
+     |   ~   |
+     \       /
+      '-...-'
+       |   |
+       |   |
+    </pre>
+            <span class="scene-tag">// UPPER CHAMBER — THE UNCHAINING //</span>
+            <div class="story-text">
+                <p>You grab the key and unlock the shackle. Anna gasps, rubbing her ankle, and stands on unsteady legs. <em>"Thank you,"</em> she breathes. <em>"Thank you — we don't have much time. He'll be here any minute."</em></p>
+
+                <p>She leads you through a servant's corridor behind the bookcase — a narrow passage you never would have found alone — and down a spiraling stairwell into the bowels of the castle. <em>"The Heart of Sanguine is real,"</em> she says as you descend. <em>"But the Count lied about what it does. It doesn't just cure the plague. It creates it. The plague is his design — a modified version of an older disease, something alchemical. He spreads it, then waits for desperate people to come looking for the cure. And when they do..."</em> She stops at a heavy oak door. <em>"He offers them a choice. Their blood for the Heart. But the Heart doesn't cure anything. It just makes them carriers. They go home, the plague stops in their village, and starts in the next one. He's been doing it for centuries."</em></p>
+
+                <p>She turns to face you. Her eyes are strange in the torchlight — too reflective, almost luminous. <em>"The real cure is in the crypt,"</em> she says. <em>"But you'll need me to get past the guardian. I can help you — if you trust me."</em></p>
+
+                <p class="dim">// She knows an awful lot for someone who was supposedly chained up for months. But her information matches too many details to be entirely false. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_cellar">Follow Anna to the crypt — she seems to know the way</label>
+                <label for="s4_betrayal">Stop here — demand to know who she really is before going further</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3D — SUSPICIOUS OF ANNA ============ -->
+        <div id="scene3_suspicious" class="scene">
+            <pre>
+      .-"""-.
+     /  ? ?  \
+     |   ~   |
+     \       /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// UPPER CHAMBER — TRUST YOUR INSTINCTS //</span>
+            <div class="story-text">
+                <p>You leave the key on the mantle and instead examine the room. Anna's expression shifts — the desperate hope flickers, replaced by something colder. <em>"You're making a mistake,"</em> she says, but her voice is different now, lower, and the chains rattle as she shifts her weight in a way that doesn't look uncomfortable at all.</p>
+
+                <p>You search the bookshelves and find a journal — handwritten, in elegant script. It details the castle's residents: Count Mircalla Sanguine, his sister <strong>Lady Annelise</strong>, and their retainers. The journal is dated 1743. A pressed rose falls from its pages, perfectly preserved, the same deep crimson as the ones blooming in the garden outside.</p>
+
+                <p>A bookmark notes: <em>"Annelise was bitten in the spring of 1739. She retains her faculties but cannot leave the castle. She hungers. The Count keeps her in the upper chamber during daylight hours for her own protection — and for the protection of visitors. She is not dangerous unless freed by moonlight. She is very dangerous then."</em></p>
+
+                <p>The footsteps in the hallway are closer now. Anna — Annelise — is smiling at you from her chains, and it's not a grateful smile. It's the smile of something that has been waiting a very long time for someone to make the wrong choice.</p>
+
+                <p class="dim">// You made the right call. Now you need to get out of this room before the Count — or his sister — decides you've overstayed your welcome. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_ally">Wait for the Count — if Annelise is the danger, he may be an ally</label>
+                <label for="s5_escape_run">Flee through the servant's passage behind the bookcase</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3E — CRYPT ============ -->
+        <div id="scene3_crypt" class="scene">
+            <pre>
+      .-"""-.
+     /  REST \
+     |   IN  |
+     \  PEACE/
+      '-...-'
+       |   |
+       |   |
+      /     \
+     /       \
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — FAMILY CRYPT — BELOW THE ROSE COURT //</span>
+            <div class="story-text">
+                <p>The crypt stairs are worn smooth by centuries of footsteps. At the bottom, a heavy stone chamber opens before you — lined with sarcophagi, each carved with the Sanguine family crest: a rose with a dagger through its stem. Candles burn in alcoves, though you can't imagine who lit them. The air is cold and smells of old stone and dried flowers.</p>
+
+                <p>At the center of the crypt, on a raised stone bier, lies a sarcophagus larger than the others — the lid carved with the likeness of a woman in medieval dress, her hands folded over her chest, a serene expression on her stone face. At her feet, a small iron chest sits unopened. The lock is shaped like a rose.</p>
+
+                <p>An inscription on the sarcophagus reads: <em>"Here lies Lenora Sanguine, First of the Line. She gave her blood that others might live. She gave her life that the Rose might bloom. The cure she carried sleeps with her still."</em></p>
+
+                <p>The iron chest at her feet pulses with that same faint red glow you saw in the garden roses — slow, rhythmic, like a sleeping heartbeat.</p>
+
+                <p class="dim">// Lenora Sanguine. The first vampire of this line. And according to this inscription, she carried the cure — not the plague. The story is more complicated than the villagers knew. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_sarcophagus">Open the sarcophagus — the cure may be inside with her</label>
+                <label for="s4_passage">Take the iron chest — it's pulsing with the same light as the Heart</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3F — SERVANTS' QUARTERS ============ -->
+        <div id="scene3_servants" class="scene">
+            <pre>
+      .-"""-.
+     /  DUST \
+     |   &   |
+     \  ASH  /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — SERVANTS' QUARTERS — ABANDONED BUT NOT EMPTY //</span>
+            <div class="story-text">
+                <p>The servants' quarters are small and sparse — a kitchen, a pantry, two sleeping rooms. Everything is covered in a fine layer of dust, but there are signs of recent use: a half-burned candle, a bowl of water still clean, a wool blanket folded neatly on a cot. Someone lives here. Or something.</p>
+
+                <p>On the kitchen table, you find a letter, written in a shaky hand. It's addressed to no one — or perhaps to anyone who might find it:</p>
+
+                <p><em>"To whomever reads this — My name was Grigore. I served the Sanguine family for forty-seven years. The Count is not evil. He is cursed, as all his line are cursed, but he has spent three centuries trying to undo what his ancestor Lenora created. The Heart of Sanguine is not a relic — it is a prison. It contains the original strain of the plague, bound in crystal so it could never be released. The Count keeps it locked in the tower to protect the world from it. The plague in the villages is not his doing — it is the work of his sister Annelise, who was turned against her will and has spent two hundred years trying to perfect and spread the disease in revenge. The Count keeps her chained in the upper chamber. He is not your enemy. Annelise is. Take this information and use it wisely. — G."</em></p>
+
+                <p>At the bottom of the letter, a key is pressed into the paper with wax — a small iron key labeled <strong>TOWER</strong>.</p>
+
+                <p class="dim">// Grigore's letter changes everything. The Count is a jailer, not a monster. Annelise is the threat. And the Heart is a prison for the plague, not a cure for it. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_tower_key">Take the tower key — confront the Count with what you know</label>
+                <label for="s5_cellar">Go to the crypt — if the Heart is a prison, the real cure must be elsewhere</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4A — FEAST (Count's Bargain) ============ -->
+        <div id="scene4_feast" class="scene">
+            <pre>
+      .-"""-.
+     /  RED  \
+     |  WINE  |
+     \       /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// GREAT HALL — THE COUNT'S BARGAIN ACCEPTED //</span>
+            <div class="story-text">
+                <p>You let the Count draw a small vial of blood from your arm. The process is quick, almost clinical — he uses a silver lancet and a glass vial, handling both with the practiced ease of someone who has done this many, many times before. <em>"Thank you,"</em> he says, and for a moment he sounds almost sincere. <em>"You'd be surprised how few people agree. Most would rather fight, or run, or try to steal the Heart without understanding what it is."</em></p>
+
+                <p>He leads you up the spiral staircase. The red glow intensifies with every step, and you feel it now — a pressure behind your eyes, a warmth in your chest. At the top, a heavy stone door stands open, moonlight pouring through a circular window directly onto a crystal pedestal. On the pedestal rests the <strong>Heart of Sanguine</strong> — exactly as Elder Vasile described it, a fist-sized gem the color of arterial blood, warm to the touch, pulsing with its own inner light.</p>
+
+                <p><em>"Take it,"</em> the Count says. <em>"It will cure your village. But you should know — you will become a carrier. Not of the plague. Of the cure. Wherever you go, the plague will recede. But you will never be able to stay anywhere for long, because people will notice. People will ask questions. The life of a wandering healer is lonely."</em> He pauses. <em>"I should know. I've been doing it for three hundred years."</em></p>
+
+                <p class="dim">// The Count isn't what you expected. He's not a monster — he's a man carrying an impossible burden. And now he's offering you the same burden. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_relic_cost">Take the Heart — accept the burden and save your village</label>
+                <label for="e_true">Ask the Count about Lenora — understand the full story before deciding</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4B — LIBRARY ============ -->
+        <div id="scene4_library" class="scene">
+            <pre>
+      .-"""-.
+     / BOOKS \
+     |  ~~~  |
+     \  ___  /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — THE LIBRARY — THREE HUNDRED YEARS OF RECORDS //</span>
+            <div class="story-text">
+                <p>The library is a scholar's dream and a mortal's nightmare — shelves stretching up into darkness, ladders on rails, the smell of old leather and older paper. You light a candle and begin reading.</p>
+
+                <p>The Sanguine family history unfolds across centuries. Lenora Sanguine, the matriarch, was an alchemist and physician in the 1600s. When a plague swept through the Carpathians — an earlier, more lethal version of the Crimson Plague — she experimented on herself with a combination of alchemical compounds and something the records call <em>"the sanguine infusion,"</em> derived from a rare mineral found only in these mountains. She cured herself and became immune — but the infusion changed her. Extended her life. Made her sensitive to sunlight. Gave her a thirst for blood that she fought for decades before finding a way to control it.</p>
+
+                <p>The Heart of Sanguine, you learn, is a crystalized form of her original cure — but bound with a containment spell that also holds the original plague strain inside it. It's both cure and disease, locked together in eternal stalemate. If the crystal is broken, the plague is released at full strength. If it's used correctly — placed in water, dissolved over seven days — it creates a true cure with no side effects.</p>
+
+                <p>You also find a letter from Count Mircalla to his ancestors, dated 1821: <em>"I have contained Annelise. She will not harm another village. I will maintain the tower, guard the Heart, and wait for someone who can end this properly — someone who seeks the truth, not just the cure."</em></p>
+
+                <p class="dim">// The Count has been waiting two hundred years for someone to read this letter. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Go to the Count — tell him you've read the records and want to help</label>
+                <label for="s5_tower_key">Go to the tower — you know how to use the Heart correctly now</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4C — BETRAYAL (Annelise revealed) ============ -->
+        <div id="scene4_betrayal" class="scene">
+            <pre>
+      \|/  \|/
+       O    O
+        \  /
+         \/
+         /\
+        /  \
+       /    \
+    </pre>
+            <span class="scene-tag">// CORRIDOR — THE MASK FALLS //</span>
+            <div class="story-text">
+                <p><em>"Who am I?"</em> Anna — Annelise — laughs, and it's not a pleasant sound. <em>"I'm the one who's been trying to save you. But fine. You want the truth?"</em></p>
+
+                <p>She steps back, and the torchlight catches her face differently — older, sharper, with something ancient moving behind her eyes. <em>"My brother Mircalla has been playing the tragic jailer for two centuries, and people keep falling for it. The Heart of Sanguine isn't a prison for the plague — it's a weapon. He uses it to spread the disease, then offers the 'cure' in exchange for blood samples. He's built an archive of human bloodlines spanning three hundred years. He's not a healer. He's a collector."</em></p>
+
+                <p>She pulls up her sleeve. Her arm is covered in small, neat scars — dozens of them, in various stages of healing. <em>"He keeps me chained because I'm the only one who knows the truth and is willing to tell it. The real cure — the one Lenora actually made — is buried with her in the crypt. Mircalla destroyed all records of it except one, which I hid in the library. Under the loose floorboard, third shelf from the left, behind the red ledger."</em></p>
+
+                <p>She looks at you steadily. <em>"You can still walk away. Go to the crypt, find Lenora's cure, leave the Heart where it is. Or you can go to Mircalla and let him spin you his version. But ask yourself — why would I be chained up if I were the dangerous one? What's easier to control — a prisoner, or a rival?"</em></p>
+
+                <p class="dim">// She makes a compelling argument. But so would anyone. You need to verify her claims independently. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_cellar">Go to the crypt — find Lenora's tomb and verify Annelise's story</label>
+                <label for="s4_library">Go to the library — check the loose floorboard she mentioned</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4D — WAIT FOR THE COUNT ============ -->
+        <div id="scene4_ally" class="scene">
+            <pre>
+      .-"""-.
+     /  WAIT \
+     |   .   |
+     \       /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// UPPER CHAMBER — A CALM CONVERSATION //</span>
+            <div class="story-text">
+                <p>The door opens and Count Mircalla enters. He stops when he sees you standing by the bookshelf, journal in hand. His eyes move to Annelise — still chained, still watching with that cold smile — and something in his expression shifts. Not anger. Relief.</p>
+
+                <p><em>"You didn't free her,"</em> he says quietly. <em>"In two hundred years, you're the first."</em></p>
+
+                <p>He crosses to the fireplace and adds a log. <em>"My sister is very persuasive. She's had a long time to practice. The story she tells — that I'm the monster, that she's the victim, that the Heart is a weapon — it's a good story. Well-constructed. There's even truth in it, which is what makes it so effective."</em> He sinks into a worn armchair. <em>"The truth is messier. Annelise was turned against her will — that part is real. But the turning didn't just change her body. It changed her mind. She developed a kind of madness — a conviction that the only way to end her suffering was to spread it. She believes that if enough people carry the plague, someone will find a cure that works for everyone, including her. She's not evil. She's broken. And she's very, very dangerous."</em></p>
+
+                <p>He looks at you. <em>"The Heart can cure your village. I'll give it to you freely — no blood bargain, no strings. The only thing I ask is that you hear the whole story before you leave. Lenora's story. Our family's story. It matters. It might matter more than you know."</em></p>
+
+                <p class="dim">// The Count is tired. Two hundred years of guarding his sister, maintaining the Heart, waiting for someone to listen. You might be the first person in centuries to actually hear him. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Sit down and listen — hear the full story of the Sanguine family</label>
+                <label for="s5_tower_key">Take the Heart and go — your village is dying, and every hour counts</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4E — OPEN SARCOPHAGUS ============ -->
+        <div id="scene4_sarcophagus" class="scene">
+            <pre>
+      .-"""-.
+     /  OPEN \
+     |   |   |
+     \  __C__/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// FAMILY CRYPT — LENORA'S REST //</span>
+            <div class="story-text">
+                <p>The sarcophagus lid is heavy but counterweighted — it swings open with surprising ease. Inside lies a woman preserved in an unnatural state between life and death. Her skin is pale but not decayed. Her eyes are closed. Her hands, folded over her chest, hold a small crystal vial filled with a glowing red liquid — brighter than the Heart, warmer in color, like liquid sunlight mixed with blood.</p>
+
+                <p>Her eyes open.</p>
+
+                <p>It happens slowly, dreamily, as if she's waking from a very long nap. She focuses on you with pupils that contract in the candlelight. <em>"How long?"</em> she whispers. Her voice is dry as old parchment. <em>"How long has it been?"</em></p>
+
+                <p>You tell her: roughly three hundred years. She closes her eyes again briefly, then opens them. <em>"I hoped it wouldn't be this long. I hoped someone would come sooner."</em> She lifts the crystal vial slightly. <em>"This is the true cure. Not the Heart — the Heart was my first attempt. It worked, but it carried the plague strain within it. This vial contains the perfected version. Seven drops in a village well, and the plague is gone forever — not suppressed, not carried elsewhere, just... gone. No side effects. No carriers. No curse."</em></p>
+
+                <p>Her hand trembles. <em>"Take it. Please. I've been holding it for three centuries, waiting for someone who would use it properly. Don't let my children's mistakes define my legacy."</em></p>
+
+                <p class="dim">// Lenora Sanguine, the first vampire, is not a monster. She's a healer who made a flawed cure and spent her death waiting to make it right. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Take the vial — thank Lenora and promise to use it well</label>
+                <label for="e_relic_cost">Take both the vial and the Heart — you're not leaving anything behind</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4F — IRON CHEST IN CRYPT ============ -->
+        <div id="scene4_passage" class="scene">
+            <pre>
+      .___.
+      |[=]|
+      '---'
+       / \
+      /   \
+    </pre>
+            <span class="scene-tag">// FAMILY CRYPT — THE IRON CHEST //</span>
+            <div class="story-text">
+                <p>The rose-shaped lock yields to pressure — it's not locked at all, merely closed. Inside the chest, you find a bundle of letters, a silver dagger, and a folded map of the castle. The letters are correspondence between Lenora and her children, dated from the 1690s through the early 1700s.</p>
+
+                <p>They tell a story of a family trying to contain a disaster. Lenora's cure worked — but the plague she'd created in the process of developing it was stored inside the Heart as a necessary part of the alchemical process. She couldn't destroy one without destroying the other. So she locked the Heart in the tower, entrusted the key to her eldest son, and tasked her descendants with a simple mission: wait. Wait for alchemical science to advance enough that the plague could be separated from the cure. Wait for someone who could finish what she started.</p>
+
+                <p>The last letter, written in a different hand, is from Count Mircalla: <em>"Mother, I am still waiting. Annelise grows more unstable each year. I fear I will have to chain her for her own safety, and for the safety of others. I will maintain the tower, guard the Heart, and keep her contained. I hope someone reads this letter someday and understands — we are not monsters. We are caretakers of a mistake we have spent three centuries trying to fix."</em></p>
+
+                <p>At the bottom of the chest, wrapped in velvet, is a small crystal vial. The label reads: <em>"Perfected Cure — L. Sanguine, 1712."</em></p>
+
+                <p class="dim">// The cure was here all along. Lenora perfected it before she died. Her children either didn't know about it, or forgot. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Take the perfected cure — Lenora's legacy is finally fulfilled</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 5A — TOWER KEY ============ -->
+        <div id="scene5_tower_key" class="scene">
+            <pre>
+        /\
+       /  \
+      /    \
+     /  __  \
+    /  /  \  \
+   /  /    \  \
+  /  /  TWR \  \
+ /__/________\__\
+    |        |
+    |  MOON  |
+    |________|
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — THE TOWER — UNDER MOONLIGHT //</span>
+            <div class="story-text">
+                <p>The tower door opens to moonlight, just as the Count said. The circular room at the top is small and spare — stone walls, a single window, and in the center, the Heart of Sanguine on its crystal pedestal. Up close, it's breathtaking — a gem that seems to contain an entire sunset inside it, swirling with deep reds and golds and the faintest hints of amber. It's warm. Almost alive.</p>
+
+                <p>The pedestal has an inscription carved around its base: <em>"He who takes the Heart takes also its burden. The plague and the cure are one. To carry this stone is to carry both. Choose with full knowledge."</em></p>
+
+                <p>The moonlight intensifies, and for a moment the Heart seems to pulse in time with your own heartbeat. You feel it — the weight of the choice, the centuries of waiting, the village thirty-seven souls deep in grief and counting. Whatever you decide, it has to be now. The moon is at its zenith. The Heart is at its most receptive.</p>
+
+                <p class="dim">// You have everything you need to make this decision. The only question is which version of the truth you believe. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_relic_cost">Take the Heart — whatever the cost, your village needs it</label>
+                <label for="e_true">You have the perfected cure from Lenora — use it instead, leave the Heart</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 5B — CELLAR / CRYPT APPROACH ============ -->
+        <div id="scene5_cellar" class="scene">
+            <pre>
+      .-"""-.
+     /  DOWN \
+     |   |   |
+     \  | |  /
+      '-.|.-'
+         |
+         |
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — CELLAR PASSAGE — BENEATH THE FOUNDATIONS //</span>
+            <div class="story-text">
+                <p>The cellar passage is old — older than the castle above it, the stones rough-hewn and unmortared. This was here before the Sanguines built their fortress. This was here before anyone thought to build anything in these mountains. The air grows colder with each step, and the faint red glow intensifies, pulsing steadily through cracks in the stone.</p>
+
+                <p>You emerge into a natural cavern beneath the crypt. Stalactites hang overhead like stone teeth. A subterranean stream runs through the center, its water clear and cold and faintly luminous. And at the far end of the cavern, resting on a natural stone shelf, is a sarcophagus older than the ones in the crypt above — carved with symbols you don't recognize, older than any language you know.</p>
+
+                <p>This is the true resting place of Lenora Sanguine. Not the ornate tomb upstairs — that was a decoy, meant for visitors who might come looking. This is where the first of the Sanguine line chose to spend her eternity, guarding the perfected cure she made in the last years of her life. The air here is still. Sacred. Waiting.</p>
+
+                <p>The sarcophagus lid is carved with a single word: <em>"SPERANTA"</em> — hope, in the old tongue.</p>
+
+                <p class="dim">// You've found it. The true tomb. The real cure. Whatever happens next, you're standing at the heart of a three-hundred-year-old mystery, and the answer is within arm's reach. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Open the sarcophagus — claim Lenora's perfected cure</label>
+                <label for="e_trapped">Something feels wrong — leave now while you still can</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 5C — TOWER CLIMB ============ -->
+        <div id="scene5_tower_climb" class="scene">
+            <pre>
+        /\
+       /  \
+      /    \
+     /||||||\
+    /||||||||\
+    \||||||||/
+     \||||||/
+      \||||/
+       \||/
+        \/
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — TOWER SPIRE — THE HIGHEST POINT //</span>
+            <div class="story-text">
+                <p>You climb. The spiral staircase seems endless, winding up through the tower's core, each step bringing you closer to the rhythmic red glow that has become as familiar as your own pulse. The walls are lined with portraits — generations of Sanguines, pale-faced and dark-eyed, watching you climb with painted stares.</p>
+
+                <p>At the top, the tower room is exactly as described. The Heart pulses on its pedestal. Moonlight streams through the window. And standing beside the Heart, waiting for you, is the Count.</p>
+
+                <p><em>"I wondered if you'd make it here,"</em> he says. <em>"Most don't. Most get lost in the library, or seduced by my sister's stories, or frightened away by the crypt. But you — you kept climbing."</em> He steps aside, gesturing to the Heart. <em>"It's yours. I won't stop you. I've been waiting two hundred years for someone to take it off my hands. But before you do — I want you to know that there's another option. A better one. One my mother perfected before she died, and hid in a place she knew her children would never look."</em></p>
+
+                <p>He holds out a hand. In his palm is a small iron key — the same one from the servants' letter, the same shape as the rose lock on the iron chest in the crypt. <em>"The perfected cure. No plague. No burden. Just — healing. It's in the iron chest at my mother's feet. I was too proud to look for it. Too sure I knew best. Don't make my mistake."</em></p>
+
+                <p class="dim">// The Count is handing you the key to the real cure. He's also handing you three hundred years of regret, wrapped in iron. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Take the key — go to the crypt and find the perfected cure</label>
+                <label for="e_relic_cost">Take the Heart instead — you've come too far to trust another story</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 5D — RELIC ROOM ============ -->
+        <div id="scene5_relic_room" class="scene">
+            <pre>
+      .-"""-.
+     /  GLOW \
+     |   *   |
+     \       /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — THE RELIC ROOM — HIDDEN CHAMBER //</span>
+            <div class="story-text">
+                <p>Behind a tapestry in the library, you find a hidden door. Beyond it, a small chamber lined with shelves holding the Sanguine family's most precious possessions — not gold or jewels, but records. Journals. Letters. A lock of hair tied with a red ribbon. A child's drawing of a rose. The accumulated memory of a family that has lived in the shadow of a curse for ten generations.</p>
+
+                <p>On a central pedestal, in a glass case, rests Lenora's final journal. The last entry reads: <em>"I have done it. After forty-seven years of work, I have separated the plague from the cure. The perfected formula is stable. It will cure any who drink from a well treated with seven drops, and it carries no residual infection. I have placed a vial of it in the iron chest in the crypt, and another — hidden — in the cavern below, where the stream runs clean. My children do not know about the second vial. I could not bring myself to tell them, for fear they would fight over it. Let fate decide who finds it. Let hope guide their hands."</em></p>
+
+                <p>Below the entry, in fresher ink, someone has written: <em>"Found this today. Two hundred and thirteen years after she wrote it. I never knew. — M.S."</em></p>
+
+                <p class="dim">// The Count found this journal recently. Very recently. He's been carrying the weight of this knowledge for a short time, after centuries of believing the Heart was the only option. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Go to the cavern below the crypt — find the second vial in the stream</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 5E — CONFRONT ANNELISE ============ -->
+        <div id="scene5_confront" class="scene">
+            <pre>
+      \   /
+       \ /
+        O
+       / \
+      /   \
+    </pre>
+            <span class="scene-tag">// UPPER CHAMBER — THE FINAL CONFRONTATION //</span>
+            <div class="story-text">
+                <p>You return to the upper chamber armed with knowledge. Annelise sees it in your face immediately. <em>"You figured it out,"</em> she says. Not a question. <em>"Which version did you believe? My brother's tragic jailer story, or mine?"</em></p>
+
+                <p><em>"Neither,"</em> you say. <em>"I believe Lenora's."</em></p>
+
+                <p>Annelise goes still. For a long moment, she doesn't move, doesn't blink, doesn't seem to breathe. Then, very quietly: <em>"Grandmother Lenora?"</em></p>
+
+                <p><em>"She perfected the cure,"</em> you tell her. <em>"Before she died. She hid it because she knew her descendants would fight over it. The Heart was never the answer — it was a stopgap, and everyone who came after her treated it like the final solution. Including you. Including Mircalla. All of you have been fighting over the wrong thing for three hundred years."</em></p>
+
+                <p>Annelise's expression crumbles. The cold, predatory mask falls away, and underneath is just a woman — tired, ancient, impossibly sad. <em>"I didn't know,"</em> she whispers. <em>"All this time. All those villages. I thought — I thought I was punishing him. I thought if I spread the plague, he'd have to admit the Heart was a lie. I never..."</em> She covers her face with her hands. <em>"What have I done?"</em></p>
+
+                <p class="dim">// Annelise is a villain. She's also a victim. The two things are not mutually exclusive, and the weight of that complexity fills the room like smoke. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_true">Tell Annelise it's not too late — help her find a way to make amends</label>
+                <label for="e_slain">The damage is done — leave her to her guilt and take the cure to your village</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 5F — ESCAPE RUN ============ -->
+        <div id="scene5_escape_run" class="scene">
+            <pre>
+      .-"""-.
+     /  RUN  \
+     |   |   |
+     \  / \  /
+      '-' '-'
+    </pre>
+            <span class="scene-tag">// CASTLE SANGUINE — THE FLIGHT //</span>
+            <div class="story-text">
+                <p>You run. Through the servant's passage, down the spiraling stairs, through the kitchen and into the cold night air of the garden. The roses seem to turn toward you as you pass, their crimson blooms tracking your movement like silent faces. Behind you, the castle looms dark and patient, its windows flickering with candlelight.</p>
+
+                <p>You didn't find the cure. You didn't find the Heart. But you're alive, and sometimes that's the only victory the castle allows. You'll return to your village empty-handed, but you'll return with knowledge — the Sanguine family's story, the truth about the plague, the location of the perfected cure. Maybe that knowledge will be enough. Maybe someone braver, or luckier, or more persuasive than you will come next and finish what you started.</p>
+
+                <p>The mountain road stretches before you, silver in the moonlight. Behind you, a single candle appears in the tower window — someone watching you go. You don't know if it's Mircalla or Annelise. You suppose it doesn't matter. You're leaving Castle Sanguine behind, but you suspect it will never quite leave you.</p>
+
+                <p class="dim">// You escaped. But the castle keeps its secrets, and your village is still dying. Some victories are just postponements of defeat. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_escape">Walk the mountain road — go home and tell them what you've learned</label>
+            </div>
+        </div>
+
+        <!-- ==================== ENDINGS ==================== -->
+
+        <!-- ENDING: THRALL -->
+        <div id="scene_e_thrall" class="scene">
+            <pre>
+      .-"""-.
+     /  RED   \
+     |   EYES  |
+     \  FOREVER/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE COUNT'S COLLECTION //</span>
+            <div class="story-text">
+                <p class="ending-title">✕ ENDING: BLOODBOUND ✕</p>
+                <p>You gave the Count what he wanted. The vial of blood, freely offered, created a bond you didn't understand until it was too late. You are not dead — the Count doesn't kill his donors. But you are changed. Bound to the castle. Bound to him. You will serve as his attendant, his scribe, his companion in the long centuries ahead. You will watch other travelers come and go. You will see the Heart taken and returned. You will witness Annelise's scheming and the slow decay of the Sanguine line. Your village will die of the plague — the Count has no interest in curing villages that don't send him interesting visitors. You will think about this every day for the rest of your very, very long life.</p>
+                <p class="dim">// You are not a prisoner. You gave your consent. That's the worst part. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Castle Has Many Doors</label></div>
+        </div>
+
+        <!-- ENDING: TRAPPED -->
+        <div id="scene_e_trapped" class="scene">
+            <pre>
+      .-"""-.
+     /  DARK  \
+     |   |    |
+     \  FOREVER/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: BURIED WITH LENORA //</span>
+            <div class="story-text">
+                <p class="ending-title">✕ ENDING: THE CRYPT CLAIMS ALL ✕</p>
+                <p>The sarcophagus lid seals behind you with a sound like a stone heartbeat stopping. In the darkness, you hear Lenora sigh — not with malice, but with the weary disappointment of someone who has seen this happen before. <em>"You should have left when you had the chance,"</em> she murmurs. <em>"But since you're here — you may as well keep me company. The centuries are long, and stories make them shorter. Tell me about the world above. Tell me what I've missed."</em> You have no choice. You talk. The darkness listens. And somewhere far above, in a village you'll never see again, the Crimson Plague takes its thirty-eighth soul.</p>
+                <p class="dim">// You found Lenora. You just can't leave her. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Castle Remembers, But You May Forget</label></div>
+        </div>
+
+        <!-- ENDING: RELIC COST -->
+        <div id="scene_e_relic_cost" class="scene">
+            <pre>
+      .-"""-.
+     /  BURDEN \
+     |   *   |
+     \  HEAVY /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE CARRIER'S ROAD //</span>
+            <div class="story-text">
+                <p class="ending-title">△ ENDING: THE WANDERING CURE △</p>
+                <p>You take the Heart and return to your village. The plague recedes within a week — the sick recover, the dying stabilize, the wells run clean. Your village hails you as a hero. But you know what you carry. The Heart's warmth is constant against your chest, a reminder that the plague is not gone — it's contained within you now. You leave your village under cover of night, before anyone can ask too many questions. You become a wanderer, moving from town to town, curing outbreaks that mysteriously follow in your wake. The Count was right — the life of a carrier is lonely. But sometimes, in the quiet moments between crises, you look at the Heart and think about Lenora Sanguine, who chose this same burden three hundred years ago, and you feel something almost like kinship across the centuries.</p>
+                <p class="dim">// You saved your village. The cost was everything else. Was it worth it? Only the road knows. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — Other Paths Await</label></div>
+        </div>
+
+        <!-- ENDING: VAMPIRE SLAIN -->
+        <div id="scene_e_slain" class="scene">
+            <pre>
+      .-"""-.
+     /  DAWN  \
+     |   *   |
+     \  PEACE /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE HUNTER'S TRIUMPH //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="silver">◇ ENDING: THE CASTLE FALLS ◇</span></p>
+                <p>You return to your village with the perfected cure. Seven drops in the well, and within a day the plague begins to lift. Within a week, the sick are walking. Within a month, the village is whole again. But you can't stop thinking about Castle Sanguine — about Mircalla and Annelise, locked in their centuries-old conflict, waiting for someone to end it. You gather a party of volunteers and return to the castle with torches and silver. The battle is brief. Mircalla, exhausted by centuries of guardianship, barely fights back. Annelise, consumed by guilt, surrenders willingly. The castle burns. The Heart is destroyed — the plague strain within it finally, permanently ended. Lenora's body, brought into the sunlight, crumbles to ash with a sound almost like a sigh of relief. You go home. You sleep. For the first time in months, you sleep without dreaming of roses.</p>
+                <p class="dim">// The Sanguine line is ended. The plague is gone. The cure is real. Sometimes the right ending is the simple one. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — Every Story Has Its Hunter</label></div>
+        </div>
+
+        <!-- TRUE ENDING -->
+        <div id="scene_e_true" class="scene">
+            <pre>
+         *
+        /|\
+       / | \
+      /  |  \
+     /   |   \
+    /    |    \
+   /     |     \
+  /______|______\
+      |  |  |
+      |  |  |
+      |__|__|
+       \   /
+        \ /
+         *
+      [ DAWN ]
+    </pre>
+            <span class="scene-tag">// TRUE ENDING: THE HEALER'S LEGACY //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ffcc88;">✦ TRUE ENDING: WHAT LENORA WANTED ✦</span></p>
+                <p>You take Lenora's perfected cure — not the Heart, but the small crystal vial she spent forty-seven years refining. Seven drops in your village well. Within a day, the fever breaks across every household. Within a week, the dying sit up and ask for soup. Within a month, your village is not just healed but whole — the grief still present, but no longer compounded by fresh loss every morning.</p>
+
+                <p>You return to Castle Sanguine. Not to burn it, not to fight, but to talk. You tell Count Mircalla about Lenora's journal, about the perfected cure, about the second vial hidden in the cavern. You tell Annelise that her grandmother's legacy is not the plague — it's the cure. The plague was a mistake. The cure was the point.</p>
+
+                <p>Annelise weeps. Mircalla, after a long silence, unlocks her chains himself — not because he trusts her, but because he's tired of being her jailer. <em>"We have both been prisoners,"</em> he says. <em>"I think it's time we learned to be something else."</em></p>
+
+                <p>The Sanguine siblings begin a long, difficult process of reconciliation. Annelise dedicates herself to undoing the damage she caused — traveling to the villages she infected, offering what reparations she can. Mircalla opens the castle to travelers, turning it into a waystation for those crossing the Carpathians. The Heart remains in the tower, but it's no longer a secret or a burden — it's a museum piece, a reminder of what happens when good intentions go wrong.</p>
+
+                <p>You go home. You plant a rose bush in the village square — a cutting from the garden at Castle Sanguine, given to you by Annelise as a gesture of apology. It blooms every spring, deep crimson, and the villagers say the petals glow faintly on the anniversary of the day the plague ended. You're not sure if that's true or just a story. But you like it. You like the idea that Lenora is still watching, still hoping, still waiting for the world to become what she always believed it could be.</p>
+
+                <p class="dim">// To reach this ending you needed to find the truth beneath the stories — Lenora's journal, the perfected cure, the understanding that the Sanguines were not monsters but caretakers of a mistake they didn't know how to fix. You gave them the answer. You gave them each other. And you gave your village a future. Not bad, for someone who walked up a mountain with nothing but a lantern and a desperate hope. //</p>
+            </div>
+            <div class="choices">
+                <label for="s0">★ Begin Again — Every Path Has Its Own Dawn ★</label>
+            </div>
+            <p class="note">// CASTLE SANGUINE — A Gothic Tale //<br>6 endings · 3 main branches · 30+ scenes · The castle remembers every choice //</p>
+        </div>
+
+        <!-- ENDING: ESCAPE -->
+        <div id="scene_e_escape" class="scene">
+            <pre>
+      .   .   .
+     .   .   .
+    .   .   .   .
+     .   .   .
+      .   .   .
+    </pre>
+            <span class="scene-tag">// ENDING: THE LONG WALK HOME //</span>
+            <div class="story-text">
+                <p class="ending-title">□ ENDING: ALIVE, AT LEAST □</p>
+                <p>You walk the mountain road as dawn breaks over the Carpathians. The sky turns from black to deep purple to a pale, watery gold. Behind you, Castle Sanguine is a silhouette against the morning — just another ruin on a hill, just another story to tell. You didn't find the cure. You didn't find the Heart. But you found something — information, experience, the knowledge that the world is stranger and older than your village ever taught you. You'll go home and tell them what you learned. Maybe it won't save anyone. But maybe it will inspire someone else to try. Someone better prepared. Someone who won't run when the castle doors close behind them. The road is long. Your lantern has gone out. But the sun is rising, and for now, that's enough.</p>
+                <p class="dim">// You survived. Sometimes that's the only ending the castle allows. But survival, in itself, is a kind of victory. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Castle Is Always Waiting</label></div>
+        </div>
+
+    </div>
+</body>
+</html>
