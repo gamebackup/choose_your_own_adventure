@@ -308,8 +308,7 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link" style="color: white;">Back to Home</a>
-
+	<a href="#" onclick="window.parent.showMenu();return false;" style="color:white;cursor:pointer;">Back to Home</a>
     <!-- STATE INPUTS -->
     <input type="radio" name="game" id="s0" checked>
     <input type="radio" name="game" id="s1_furnace">
@@ -341,23 +340,22 @@
         <!-- SCENE 0 — START -->
         <div id="scene0" class="scene">
             <pre>
-        .    *    .
-      .   . | .   .
-    .   .   |   .   .
-      .   . | .   .
-        .   |   .
-    ---+---+---+---
-       /    |    \
-      /     |     \
-     /      |      \
-    /       |       \
-   /    __  |  __    \
-  /    /  \ | /  \    \
- /____/    \|/    \____\
-      |     |     |
-      |  TOWER OF  |
-      |  ALCHEMIST |
-      |_____|_____|
+                                                |>>>
+                                             |
+                                             _  _|_  _
+                                             |;|_|;|_|;|
+                                             \\.    .  /
+                                             \\:  .  /
+                                             ||:   |
+                                             ||:.  |
+                                             ||:  .|
+                                                       ||:   |       \,/
+                                                            ||: , |            /`\
+                                             ||:   |
+                                             ||: . |
+              __                            _||_   |
+     ____--`~    '--~~__            __ ----~    ~`---,              ___
+-~--~                   ~---__ ,--~'                  ~~----_____-~'   `~----~~
     </pre>
             <span class="scene-tag">// THE BLACKENWALD — NIGHT OF THE CONJUNCTION //</span>
             <div class="story-text">
@@ -378,18 +376,7 @@
 
         <!-- ============ FURNACE BRANCH ============ -->
         <div id="scene1_furnace" class="scene">
-            <pre>
-      /\    /\    /\
-     /  \  /  \  /  \
-    /    \/    \/    \
-    |    /\    /\    |
-    |   /  \  /  \   |
-    |  /    \/    \  |
-    | /     /\     \ |
-    |/     /  \     \|
-    [   CRUCIBLE GLOW  ]
-    [   lead + fire     ]
-    </pre>
+        
             <span class="scene-tag">// FURNACE CHAMBER — THE RED WORK //</span>
             <div class="story-text">
                 <p>The furnace dominates the room — a massive brick structure with iron doors, its interior still glowing cherry-red. On the workbench, a clay crucible contains cooled, half-melted lead. Beside it, your master's notes are scattered: diagrams of the <strong>Magnum Opus</strong>, the Great Work, with the final stage circled repeatedly — <em>"Projection: the Stone cast upon base metal transforms it to gold."</em></p>
@@ -406,15 +393,7 @@
 
         <!-- Transmute -->
         <div id="scene2_transmute" class="scene">
-            <pre>
-      .-"""-.
-     /  LEAD  \
-     |   ->   |
-     \  GOLD  /
-      '-...-'
-       / | \
-      /  |  \
-    </pre>
+   
             <span class="scene-tag">// FURNACE CHAMBER — THE TRANSMUTATION //</span>
             <div class="story-text">
                 <p>You follow the notes with trembling precision. The Prima Materia — a shimmering, oil-slick liquid — goes in first, then the sulfur, then the quicksilver. You slide the crucible into the furnace and work the bellows. The heat is extraordinary. Sweat drips from your brow. The metal inside begins to glow — red, then orange, then a brilliant, impossible white.</p>
@@ -433,20 +412,7 @@
 
         <!-- Flame / Salamander -->
         <div id="scene2_flame" class="scene">
-            <pre>
-      \|/  \|/  \|/
-       O    O    O
-        \   |   /
-         \  |  /
-          \ | /
-     .-"""-|-"""-.
-    /  o o  |  o o  \
-    |   ~   |   ~   \
-    \       |       /
-     '-...- | -...-'
-            |
-        [ SALAMANDER ]
-    </pre>
+           
             <span class="scene-tag">// FURNACE CHAMBER — THE FIRE ELEMENTAL //</span>
             <div class="story-text">
                 <p>You kneel before the furnace and stare into the flames. For long minutes, nothing — just the dance of heat and light. Then you see it: a shape within the fire, small and sinuous, like a lizard woven from pure incandescence. It moves with purpose, circling the crucible, leaving trails of violet light.</p>
@@ -467,15 +433,7 @@
 
         <!-- ============ LIBRARY BRANCH ============ -->
         <div id="scene1_library" class="scene">
-            <pre>
-      .-"""-.-"""-.-"""-.
-     / BOOKS|BOOKS|BOOKS \
-     |  ~~~ | ~~~ | ~~~  |
-     \  ___ | ___ | ___  /
-      '-...'-'...'-'...-'
-       /  |   |   |  \
-      /   |   |   |   \
-    </pre>
+     
             <span class="scene-tag">// GRAND LIBRARY — THE WHITE WORK //</span>
             <div class="story-text">
                 <p>The library is vast and silent, its shelves climbing three stories toward a vaulted ceiling painted with constellations. The air smells of leather, dust, and something sharper underneath — ozone, perhaps, or the residue of old experiments. Your master's desk sits at the center, a single candle still burning beside an open book.</p>
@@ -492,15 +450,7 @@
 
         <!-- Forbidden Tome -->
         <div id="scene2_forbidden" class="scene">
-            <pre>
-      .-"""-.
-     /  EYES  \
-     |   O_O  |
-     \  WIDE  /
-      '-...-'
-       /   \
-      /     \
-    </pre>
+        
             <span class="scene-tag">// GRAND LIBRARY — THE FORBIDDEN TEXT //</span>
             <div class="story-text">
                 <p>The tome opens with a sound like a sigh. The pages are not paper — they're something finer, almost translucent, covered in script that shifts as you read it. The knowledge pours into you with the force of a physical thing: the true nature of the Philosopher's Stone, not as a mere transmutation agent, but as a <strong>conduit of consciousness</strong>. The Stone doesn't just turn lead to gold — it turns the alchemist into something more than human.</p>
@@ -519,15 +469,7 @@
 
         <!-- Master's Journal -->
         <div id="scene2_journal" class="scene">
-            <pre>
-      .-"""-.
-     /  QUILL \
-     |   ~_~  |
-     \   INK  /
-      '-...-'
-       /   \
-      /     \
-    </pre>
+
             <span class="scene-tag">// GRAND LIBRARY — THE MASTER'S JOURNAL //</span>
             <div class="story-text">
                 <p>Your master's journal is a chronicle of forty years of work, written in the careful hand of someone who expected to be read. The final entries, dated within the last week, grow increasingly urgent:</p>
@@ -548,16 +490,7 @@
 
         <!-- ============ GARDEN BRANCH ============ -->
         <div id="scene1_garden" class="scene">
-            <pre>
-      .-. .-. .-. .-. .-.
-      |R| |O| |S| |E| |S|
-      '-' '-' '-' '-' '-'
-       |   |   |   |   |
-       |   |   |   |   |
-      / \ / \ / \ / \ / \
-     /   |   |   |   |   \
-    /    |   |   |   |    \
-    </pre>
+         
             <span class="scene-tag">// ALCHEMICAL GARDEN — THE GREEN WORK //</span>
             <div class="story-text">
                 <p>The garden is a walled courtyard covered by a glass roof, its atmosphere warm and humid. Plants from across the known world grow here in orderly beds — some familiar, some strange beyond description. The full moon shines through the glass, illuminating everything in silver.</p>
@@ -576,15 +509,7 @@
 
         <!-- Moonflower -->
         <div id="scene2_moonflower" class="scene">
-            <pre>
-      .-"""-.
-     /  PETAL \
-     |   *_*  |
-     \  FALLS /
-      '-...-'
-       /   \
-      /     \
-    </pre>
+           
             <span class="scene-tag">// ALCHEMICAL GARDEN — THE MOONFLOWER HARVEST //</span>
             <div class="story-text">
                 <p>You pluck the Moonflower at the peak of its bloom, catching its falling petals in a glass vial. The petals continue to glow faintly even after being separated from the stem — a soft, milky luminescence that pulses in time with your heartbeat. Back in the tower's workroom, you can distill this into the <strong>Elixir of Life</strong> — a potion capable of curing any disease and extending life far beyond its natural span.</p>
@@ -601,15 +526,7 @@
 
         <!-- Shadow Root -->
         <div id="scene2_mandrake" class="scene">
-            <pre>
-      .-"""-.
-     /  DARK  \
-     |   x_x  |
-     \  OOZE  /
-      '-...-'
-       /   \
-      /     \
-    </pre>
+            
             <span class="scene-tag">// ALCHEMICAL GARDEN — THE SHADOW ROOT HARVEST //</span>
             <div class="story-text">
                 <p>The Shadow Root comes free with a wet, sucking sound. Its black sap coats your fingers, cold as ice, and where it touches your skin you feel a strange numbness — not unpleasant, but deeply unsettling. This is a substance that exists at the boundary between matter and void, between form and dissolution.</p>
@@ -630,13 +547,7 @@
 
         <!-- Gold stabilization -->
         <div id="scene3_gold" class="scene">
-            <pre>
-      .-"""-.
-     /  GOLD  \
-     |  STABLE |
-     \  FOREVER/
-      '-...-'
-    </pre>
+          
             <span class="scene-tag">// GARDEN + FURNACE — THE STABILIZED GOLD //</span>
             <div class="story-text">
                 <p>You harvest the Moonflower and bring it back to the Furnace. Crushing the petals into a fine powder, you sprinkle it over the flickering gold. The effect is immediate — the unstable yellow stabilizes into a deep, permanent luster. The Moonflower's life-giving essence has fixed the transmutation. You hold in your hands a bar of genuine, permanent gold, transmuted from common lead.</p>
@@ -653,15 +564,7 @@
 
         <!-- Salamander's deeper vision -->
         <div id="scene3_salamander" class="scene">
-            <pre>
-      \|/  \|/
-       O    O
-        \  /
-         \/
-         /\
-        /  \
-       /    \
-    </pre>
+            
             <span class="scene-tag">// FURNACE — THE SALAMANDER'S FULL VISION //</span>
             <div class="story-text">
                 <p>You offer the salamander another drop of blood, and this time the vision is overwhelming. You see the hidden vault beneath the tower — a circular chamber of black glass, inscribed with alchemical symbols that glow with their own inner light. At the center, on a pedestal of obsidian, rests the <strong>Philosopher's Stone</strong> — a crystalline orb the size of a fist, swirling with colors that don't exist in the normal spectrum.</p>
@@ -680,13 +583,7 @@
 
         <!-- Dark knowledge -->
         <div id="scene3_dark" class="scene">
-            <pre>
-      .-"""-.
-     /  VOID  \
-     |   O_O  |
-     \  GAZES /
-      '-...-'
-    </pre>
+            
             <span class="scene-tag">// LIBRARY + FORBIDDEN KNOWLEDGE — THE PRICE DEEPENS //</span>
             <div class="story-text">
                 <p>Armed with the forbidden knowledge, you return to the Furnace. The salamander recognizes what you've become — someone who paid the tome's price and survived with enough self left to function. It approaches you warily, then with something like respect. The fire it offers is different — darker, edged with violet-black, the flame of transformation at its most dangerous.</p>
@@ -703,13 +600,7 @@
 
         <!-- Formula path -->
         <div id="scene3_formula" class="scene">
-            <pre>
-      .-"""-.
-     /  MIND  \
-     |   ~_~  |
-     \  CLEAR /
-      '-...-'
-    </pre>
+          
             <span class="scene-tag">// LIBRARY + JOURNAL — THE COMPLETE FORMULA //</span>
             <div class="story-text">
                 <p>Your master's journal has given you the complete formula for the Philosopher's Stone — not just the ingredients and the process, but the philosophical underpinnings that make the Work possible. You understand now that the Stone is not merely a physical object but a <strong>convergence of matter, will, and cosmic alignment</strong>. The conjunction your master mentioned is real — a rare alignment of celestial bodies that amplifies alchemical processes a thousandfold.</p>
@@ -726,13 +617,7 @@
 
         <!-- Elixir path -->
         <div id="scene3_elixir" class="scene">
-            <pre>
-      .-"""-.
-     /  CURE  \
-     |   *_*  |
-     \  ALL   /
-      '-...-'
-    </pre>
+           
             <span class="scene-tag">// GARDEN + MOONFLOWER — THE ELIXIR OF LIFE //</span>
             <div class="story-text">
                 <p>You distill the Moonflower petals through seven cycles of purification, following your master's precise instructions. The resulting liquid is clear as water but glows with a soft, silvery light. The <strong>Elixir of Life</strong> — a single drop can cure any illness. A vial can extend life by decades. The full batch you've created could save a kingdom from plague.</p>
@@ -749,13 +634,7 @@
 
         <!-- Poison path -->
         <div id="scene3_poison" class="scene">
-            <pre>
-      .-"""-.
-     /  VOID  \
-     |   x_x  |
-     \  DROP  /
-      '-...-'
-    </pre>
+         
             <span class="scene-tag">// GARDEN + SHADOW ROOT — AZOTH'S TINCTURE //</span>
             <div class="story-text">
                 <p>You distill the Shadow Root's black sap through a process your master called <em>"the Nigredo"</em> — the blackening, the first stage of the Great Work. The resulting <strong>Azoth's Tincture</strong> is a drop of absolute darkness, so black it seems to absorb light from the room. A single drop can dissolve any material into its elemental components. A vial can reduce a castle wall to dust. In the wrong hands, it could unmake anything.</p>
@@ -774,11 +653,7 @@
 
         <!-- Gold ending -->
         <div id="scene4_gold_ending" class="scene">
-            <pre>
-      .___. .___. .___.
-      |Au| |Au| |Au|
-      '---' '---' '---'
-    </pre>
+         
             <span class="scene-tag">// ENDING: THE AURIFICER //</span>
             <div class="story-text">
                 <p class="ending-title"><span style="color:#eecc66;">△ ENDING: THE GOLDEN TOUCH △</span></p>
@@ -791,13 +666,7 @@
 
         <!-- Burn ending -->
         <div id="scene4_burn_ending" class="scene">
-            <pre>
-      .-"""-.
-     /  FIRE  \
-     |   *   |
-     \  CONSUMES/
-      '-...-'
-    </pre>
+            
             <span class="scene-tag">// ENDING: THE FIRE UNBOUND //</span>
             <div class="story-text">
                 <p class="ending-title"><span class="warn">✕ ENDING: THE CONFLAGRATION ✕</span></p>
@@ -810,13 +679,7 @@
 
         <!-- Corrupt ending -->
         <div id="scene4_corrupt_ending" class="scene">
-            <pre>
-      .-"""-.
-     /  VOID  \
-     |   O_O  |
-     \  ETERNAL/
-      '-...-'
-    </pre>
+           
             <span class="scene-tag">// ENDING: THE HOLLOW ALCHEMIST //</span>
             <div class="story-text">
                 <p class="ending-title"><span style="color:#8844cc;">◇ ENDING: THE PRICE OF FORBIDDEN KNOWLEDGE ◇</span></p>
@@ -829,13 +692,7 @@
 
         <!-- Enlighten ending -->
         <div id="scene4_enlighten_ending" class="scene">
-            <pre>
-      .-"""-.
-     /  LIGHT \
-     |   ~_~  |
-     \  ETERNAL/
-      '-...-'
-    </pre>
+        
             <span class="scene-tag">// ENDING: THE KEEPER OF KNOWLEDGE //</span>
             <div class="story-text">
                 <p class="ending-title"><span style="color:#dda0ff;">□ ENDING: THE GRAND ARCHIVIST □</span></p>
@@ -848,13 +705,7 @@
 
         <!-- Healer ending -->
         <div id="scene4_healer_ending" class="scene">
-            <pre>
-      .-"""-.
-     /  CURE  \
-     |   *_*  |
-     \  WORLD /
-      '-...-'
-    </pre>
+           
             <span class="scene-tag">// ENDING: THE GREEN WORK COMPLETED //</span>
             <div class="story-text">
                 <p class="ending-title"><span style="color:#88cc66;">◉ ENDING: THE HEALER'S PATH ◉</span></p>
@@ -867,13 +718,7 @@
 
         <!-- Assassin ending -->
         <div id="scene4_assassin_ending" class="scene">
-            <pre>
-      .-"""-.
-     /  VOID  \
-     |   x_x  |
-     \  DROPS /
-      '-...-'
-    </pre>
+         
             <span class="scene-tag">// ENDING: THE DISSOLVER //</span>
             <div class="story-text">
                 <p class="ending-title"><span style="color:#9966cc;">◇ ENDING: THE SHADOW ALCHEMIST ◇</span></p>
@@ -886,19 +731,7 @@
 
         <!-- True ending path -->
         <div id="scene5_true" class="scene">
-            <pre>
-        /\
-       /  \
-      /    \
-     /  __  \
-    /  /  \  \
-   /  /    \  \
-  /  /  VAULT \  \
- /__/__________\__\
-    |    |    |
-    |    |    |
-    |____|____|
-</pre>
+            
             <span class="scene-tag">// THE HIDDEN VAULT — ALL THREE KEYS ASSEMBLED //</span>
             <div class="story-text">
                 <p>You stand before the vault door with all three keys. The salamander circles your wrist — fire. Your mind holds the complete formula from the Library — knowledge. In your hand, a vial of Moonflower essence or the catalyst of Shadow Root — essence. The door recognizes the convergence. The alchemical symbols on its surface flare with violet light, and the black glass slides open without a sound.</p>
@@ -918,23 +751,7 @@
 
         <!-- TRUE ENDING -->
         <div id="scene5_stone_secret" class="scene">
-            <pre>
-         *
-        /|\
-       / | \
-      /  |  \
-     /   |   \
-    /    |    \
-   /     |     \
-  /______|______\
-      |  |  |
-      |  |  |
-      |__|__|
-       \   /
-        \ /
-         *
-      [ DAWN ]
-    </pre>
+ 
             <span class="scene-tag">// TRUE ENDING: THE MAGNUM OPUS //</span>
             <div class="story-text">
                 <p class="ending-title"><span style="color:#dda0ff;">✦ TRUE ENDING: THE PHILOSOPHER'S STONE ✦</span></p>
