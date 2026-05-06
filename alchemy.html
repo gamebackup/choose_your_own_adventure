@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Own Adventure</title>
+    <style>
+        :root {
+            --alchemy: #bb66ff;
+            --alchemy-bright: #dda0ff;
+            --alchemy-dim: #5a2088;
+            --alchemy-deep: #3a1060;
+            --amber-accent: #ee9944;
+            --danger-accent: #ff4466;
+            --glow-alchemy: rgba(187, 102, 255, 0.28);
+            --glow-furnace: rgba(220, 140, 80, 0.3);
+            --glow-library: rgba(160, 120, 220, 0.25);
+            --glow-garden: rgba(140, 200, 100, 0.22);
+            --glow-danger: rgba(255, 68, 102, 0.35);
+            --glow-truth: rgba(200, 160, 255, 0.38);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #060210;
+            color: var(--alchemy);
+            font-family: 'Courier New', 'Courier', 'Lucida Console', monospace;
+            padding: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(60, 15, 90, 0.04) 3px,
+                    rgba(60, 15, 90, 0.04) 6px);
+            background-size: 100% 6px;
+            background-attachment: fixed;
+        }
+
+        .game-container {
+            max-width: 740px;
+            margin: 0 auto;
+            border: 2px solid var(--alchemy);
+            padding: 30px 24px;
+            min-height: 84vh;
+            box-shadow: 0 0 28px var(--glow-alchemy), inset 0 0 55px rgba(150, 60, 200, 0.04);
+            background: radial-gradient(ellipse at center,
+                    rgba(25, 8, 45, 0.72) 0%,
+                    rgba(4, 1, 10, 0.97) 72%);
+            transition: box-shadow 0.6s ease, border-color 0.6s ease, color 0.6s ease;
+        }
+
+        .env-furnace {
+            box-shadow: 0 0 28px var(--glow-furnace);
+            border-color: #cc8844;
+            color: #f0c890;
+        }
+        .env-library {
+            box-shadow: 0 0 28px var(--glow-library);
+            border-color: #9966cc;
+            color: #d8c0f0;
+        }
+        .env-garden {
+            box-shadow: 0 0 28px var(--glow-garden);
+            border-color: #669944;
+            color: #c8e8a8;
+        }
+        .env-danger {
+            box-shadow: 0 0 32px var(--glow-danger);
+            border-color: #cc3355;
+            color: #ff8899;
+        }
+        .env-truth {
+            box-shadow: 0 0 30px var(--glow-truth);
+            border-color: #aa77ee;
+            color: #e8d0ff;
+        }
+
+        pre {
+            font-size: 12px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 22px;
+            text-shadow: 0 0 7px currentColor;
+            line-height: 1.25;
+            overflow-x: auto;
+            letter-spacing: 0;
+            animation: flickerIn 1s ease-out;
+            padding: 2px 0;
+        }
+
+        @keyframes flickerIn {
+            0% {
+                opacity: 0;
+                text-shadow: 0 0 35px currentColor;
+            }
+            18% {
+                opacity: 0.35;
+            }
+            30% {
+                opacity: 0.8;
+                text-shadow: 0 0 15px currentColor;
+            }
+            45% {
+                opacity: 0.5;
+            }
+            60% {
+                opacity: 0.9;
+            }
+            78% {
+                opacity: 0.55;
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 7px currentColor;
+            }
+        }
+
+        .scene-tag {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--alchemy-dim);
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .story-text {
+            font-size: 1.1rem;
+            margin-bottom: 28px;
+            padding: 0 4px;
+            line-height: 1.75;
+            animation: fadeIn 0.55s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .story-text p {
+            margin-bottom: 13px;
+        }
+        .story-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        strong {
+            color: var(--alchemy-bright);
+            font-weight: bold;
+        }
+        em {
+            color: var(--amber-accent);
+            font-style: italic;
+        }
+        .dim {
+            color: var(--alchemy-dim);
+        }
+        .warn {
+            color: var(--danger-accent);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--alchemy-dim);
+            margin: 20px 0;
+            opacity: 0.4;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(8, 2, 16, 0.6);
+            font-weight: bold;
+            font-size: 0.82rem;
+            width: 86%;
+            text-align: center;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+            user-select: none;
+            position: relative;
+        }
+
+        label::before {
+            content: '> ';
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        label:hover::before {
+            opacity: 1;
+            animation: blink 0.65s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        label:hover {
+            background: currentColor;
+            color: #060210 !important;
+            box-shadow: 0 0 22px currentColor;
+            transform: scale(1.025);
+        }
+
+        label:active {
+            transform: scale(0.97);
+            transition: transform 0.08s;
+        }
+
+        .ending-title {
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 18px;
+            text-shadow: 0 0 12px currentColor;
+        }
+
+        .note {
+            font-size: 0.76rem;
+            color: var(--alchemy-dim);
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+        .scene {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* STATE MACHINE */
+        #s0:checked~.game-container #scene0,
+        #s1_furnace:checked~.game-container #scene1_furnace,
+        #s1_library:checked~.game-container #scene1_library,
+        #s1_garden:checked~.game-container #scene1_garden,
+        #s2_transmute:checked~.game-container #scene2_transmute,
+        #s2_flame:checked~.game-container #scene2_flame,
+        #s2_forbidden:checked~.game-container #scene2_forbidden,
+        #s2_journal:checked~.game-container #scene2_journal,
+        #s2_moonflower:checked~.game-container #scene2_moonflower,
+        #s2_mandrake:checked~.game-container #scene2_mandrake,
+        #s3_gold:checked~.game-container #scene3_gold,
+        #s3_salamander:checked~.game-container #scene3_salamander,
+        #s3_dark:checked~.game-container #scene3_dark,
+        #s3_formula:checked~.game-container #scene3_formula,
+        #s3_elixir:checked~.game-container #scene3_elixir,
+        #s3_poison:checked~.game-container #scene3_poison,
+        #s4_gold_ending:checked~.game-container #scene4_gold_ending,
+        #s4_burn_ending:checked~.game-container #scene4_burn_ending,
+        #s4_corrupt_ending:checked~.game-container #scene4_corrupt_ending,
+        #s4_enlighten_ending:checked~.game-container #scene4_enlighten_ending,
+        #s4_healer_ending:checked~.game-container #scene4_healer_ending,
+        #s4_assassin_ending:checked~.game-container #scene4_assassin_ending,
+        #s5_true:checked~.game-container #scene5_true,
+        #s5_stone_secret:checked~.game-container #scene5_stone_secret {
+            display: block;
+        }
+
+        @media (max-width: 520px) {
+            .game-container {
+                padding: 18px 12px;
+            }
+            pre {
+                font-size: 10px;
+            }
+            .story-text {
+                font-size: 0.95rem;
+            }
+            label {
+                width: 94%;
+                font-size: 0.76rem;
+                padding: 11px 14px;
+                letter-spacing: 1px;
+            }
+            .ending-title {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link" style="color: white;">Back to Home</a>
+
+    <!-- STATE INPUTS -->
+    <input type="radio" name="game" id="s0" checked>
+    <input type="radio" name="game" id="s1_furnace">
+    <input type="radio" name="game" id="s1_library">
+    <input type="radio" name="game" id="s1_garden">
+    <input type="radio" name="game" id="s2_transmute">
+    <input type="radio" name="game" id="s2_flame">
+    <input type="radio" name="game" id="s2_forbidden">
+    <input type="radio" name="game" id="s2_journal">
+    <input type="radio" name="game" id="s2_moonflower">
+    <input type="radio" name="game" id="s2_mandrake">
+    <input type="radio" name="game" id="s3_gold">
+    <input type="radio" name="game" id="s3_salamander">
+    <input type="radio" name="game" id="s3_dark">
+    <input type="radio" name="game" id="s3_formula">
+    <input type="radio" name="game" id="s3_elixir">
+    <input type="radio" name="game" id="s3_poison">
+    <input type="radio" name="game" id="s4_gold_ending">
+    <input type="radio" name="game" id="s4_burn_ending">
+    <input type="radio" name="game" id="s4_corrupt_ending">
+    <input type="radio" name="game" id="s4_enlighten_ending">
+    <input type="radio" name="game" id="s4_healer_ending">
+    <input type="radio" name="game" id="s4_assassin_ending">
+    <input type="radio" name="game" id="s5_true">
+    <input type="radio" name="game" id="s5_stone_secret">
+
+    <div class="game-container" id="gameBox">
+
+        <!-- SCENE 0 — START -->
+        <div id="scene0" class="scene">
+            <pre>
+        .    *    .
+      .   . | .   .
+    .   .   |   .   .
+      .   . | .   .
+        .   |   .
+    ---+---+---+---
+       /    |    \
+      /     |     \
+     /      |      \
+    /       |       \
+   /    __  |  __    \
+  /    /  \ | /  \    \
+ /____/    \|/    \____\
+      |     |     |
+      |  TOWER OF  |
+      |  ALCHEMIST |
+      |_____|_____|
+    </pre>
+            <span class="scene-tag">// THE BLACKENWALD — NIGHT OF THE CONJUNCTION //</span>
+            <div class="story-text">
+                <p>The tower rises from the forest like a stone finger pointing at the stars. You've been climbing the winding road since dusk, your master's final letter clutched in your hand: <em>"Come quickly. The conjunction approaches. I have found the final piece — the formula for the <strong>Philosopher's Stone</strong>. But I am old, and the work is unfinished. You must complete what I cannot."</em></p>
+
+                <p>Your master, <strong>Alaric Voss</strong>, was the greatest alchemist of the age. Three days ago, his letters stopped. You fear the worst. Now you stand before the tower's iron door, its surface etched with alchemical symbols that pulse faintly in the moonlight. The door is slightly ajar, and from within comes a complex smell — hot metal, old parchment, something sweet and green and alive.</p>
+
+                <p>Three chambers lie beyond the entrance hall. To the left, the <strong>Furnace Chamber</strong>, where base metals are transformed and the crucible still glows with residual heat. Straight ahead, the <strong>Grand Library</strong>, where your master's accumulated knowledge fills shelf after shelf of ancient texts. To the right, the <strong>Alchemical Garden</strong> — a walled courtyard where rare plants grow under glass, their properties essential to the Great Work.</p>
+
+                <p class="dim">// Three paths. Three branches of alchemy. The Stone requires mastery of all three — but you must start somewhere. Choose wisely. //</p>
+            </div>
+            <div class="choices">
+                <label for="s1_furnace">Enter the Furnace Chamber — the path of transmutation</label>
+                <label for="s1_library">Enter the Grand Library — the path of knowledge</label>
+                <label for="s1_garden">Enter the Alchemical Garden — the path of living essence</label>
+            </div>
+        </div>
+
+        <!-- ============ FURNACE BRANCH ============ -->
+        <div id="scene1_furnace" class="scene">
+            <pre>
+      /\    /\    /\
+     /  \  /  \  /  \
+    /    \/    \/    \
+    |    /\    /\    |
+    |   /  \  /  \   |
+    |  /    \/    \  |
+    | /     /\     \ |
+    |/     /  \     \|
+    [   CRUCIBLE GLOW  ]
+    [   lead + fire     ]
+    </pre>
+            <span class="scene-tag">// FURNACE CHAMBER — THE RED WORK //</span>
+            <div class="story-text">
+                <p>The furnace dominates the room — a massive brick structure with iron doors, its interior still glowing cherry-red. On the workbench, a clay crucible contains cooled, half-melted lead. Beside it, your master's notes are scattered: diagrams of the <strong>Magnum Opus</strong>, the Great Work, with the final stage circled repeatedly — <em>"Projection: the Stone cast upon base metal transforms it to gold."</em></p>
+
+                <p>Two options present themselves. The crucible is prepared for a transmutation attempt — your master was moments from trying it. All the ingredients are laid out: powdered sulfur, quicksilver, a vial of something labeled <strong>"Prima Materia — First Matter."</strong> You could attempt the transmutation yourself, following his notes precisely. Or you could study the flame more carefully — there's something unusual about its color, a violet flicker at the edges that suggests an elemental presence. Your master wrote of <strong>salamanders</strong> — fire elementals — that could be bound to assist in the Work.</p>
+
+                <p class="dim">// The crucible is ready. The flame is alive. Which will you pursue? //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_transmute">Attempt the transmutation — turn lead into gold</label>
+                <label for="s2_flame">Study the violet flame — seek the salamander within</label>
+            </div>
+        </div>
+
+        <!-- Transmute -->
+        <div id="scene2_transmute" class="scene">
+            <pre>
+      .-"""-.
+     /  LEAD  \
+     |   ->   |
+     \  GOLD  /
+      '-...-'
+       / | \
+      /  |  \
+    </pre>
+            <span class="scene-tag">// FURNACE CHAMBER — THE TRANSMUTATION //</span>
+            <div class="story-text">
+                <p>You follow the notes with trembling precision. The Prima Materia — a shimmering, oil-slick liquid — goes in first, then the sulfur, then the quicksilver. You slide the crucible into the furnace and work the bellows. The heat is extraordinary. Sweat drips from your brow. The metal inside begins to glow — red, then orange, then a brilliant, impossible white.</p>
+
+                <p>When you draw the crucible out and let it cool, the surface of the metal has changed. It gleams with a buttery yellow luster. <strong>Gold.</strong> Real gold, formed from lead. But as you watch, the color begins to flicker — the gold is unstable, shifting back toward grey at the edges. The transmutation is incomplete. Without a stabilizing agent, it will revert within hours.</p>
+
+                <p>Your master's notes mention two possible stabilizers: <strong>powdered Moonflower petal</strong> from the Garden, or <strong>distilled Shadow Root essence</strong>, also from the Garden. You have enough time to retrieve one before the gold decays.</p>
+
+                <p class="dim">// The gold is real but fleeting. You need the Garden's bounty to fix it permanently. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_gold">Go to the Garden — harvest Moonflower for the stabilizing tincture</label>
+                <label for="s3_salamander">Abandon the gold — the violet flame called to you, return to the furnace and seek the salamander</label>
+            </div>
+        </div>
+
+        <!-- Flame / Salamander -->
+        <div id="scene2_flame" class="scene">
+            <pre>
+      \|/  \|/  \|/
+       O    O    O
+        \   |   /
+         \  |  /
+          \ | /
+     .-"""-|-"""-.
+    /  o o  |  o o  \
+    |   ~   |   ~   \
+    \       |       /
+     '-...- | -...-'
+            |
+        [ SALAMANDER ]
+    </pre>
+            <span class="scene-tag">// FURNACE CHAMBER — THE FIRE ELEMENTAL //</span>
+            <div class="story-text">
+                <p>You kneel before the furnace and stare into the flames. For long minutes, nothing — just the dance of heat and light. Then you see it: a shape within the fire, small and sinuous, like a lizard woven from pure incandescence. It moves with purpose, circling the crucible, leaving trails of violet light.</p>
+
+                <p>Your master's voice comes back to you from old lessons: <em>"Salamanders are born of the purest flame. They cannot be captured — only befriended. Offer it something of yourself. A breath. A memory. A drop of blood willingly given."</em></p>
+
+                <p>You prick your finger on the edge of the crucible and let a single drop fall into the fire. The salamander freezes, turns, and fixes you with eyes like twin suns. Then it speaks — not in words, but in a rush of images and heat that floods your mind: <em>a hidden chamber beneath the tower, a stone that glows with inner light, a formula written in fire on a wall of black glass.</em></p>
+
+                <p>The salamander has shown you the location of the <strong>Philosopher's Stone</strong> itself — hidden by your master in a secret vault. But the vision is incomplete. You need the <strong>knowledge from the Library</strong> to understand the formula, and the <strong>essence from the Garden</strong> to stabilize the Stone once you find it.</p>
+
+                <p class="dim">// The salamander's gift is a map. But a map is useless without the knowledge to read it and the materials to act on it. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_salamander">Follow the salamander's vision — descend to the hidden vault immediately</label>
+                <label for="s3_formula">Go to the Library first — decode the formula before approaching the Stone</label>
+            </div>
+        </div>
+
+        <!-- ============ LIBRARY BRANCH ============ -->
+        <div id="scene1_library" class="scene">
+            <pre>
+      .-"""-.-"""-.-"""-.
+     / BOOKS|BOOKS|BOOKS \
+     |  ~~~ | ~~~ | ~~~  |
+     \  ___ | ___ | ___  /
+      '-...'-'...'-'...-'
+       /  |   |   |  \
+      /   |   |   |   \
+    </pre>
+            <span class="scene-tag">// GRAND LIBRARY — THE WHITE WORK //</span>
+            <div class="story-text">
+                <p>The library is vast and silent, its shelves climbing three stories toward a vaulted ceiling painted with constellations. The air smells of leather, dust, and something sharper underneath — ozone, perhaps, or the residue of old experiments. Your master's desk sits at the center, a single candle still burning beside an open book.</p>
+
+                <p>Two texts lie before you. One is your master's <strong>personal journal</strong> — leather-bound, filled with his spidery handwriting, the pages worn from years of consultation. The other is a <strong>forbidden tome</strong> bound in something that looks disturbingly like skin, its cover marked with a symbol you recognize as the <em>Sigil of Azoth</em> — the universal solvent, the fire that burns away all lies to reveal truth. Your master warned you never to open it. But your master is gone, and the warnings of the dead carry a different weight than the warnings of the living.</p>
+
+                <p class="dim">// Knowledge is the second pillar of alchemy. But some knowledge changes the knower. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_forbidden">Open the forbidden tome — seek the deepest truths</label>
+                <label for="s2_journal">Read your master's journal — follow his footsteps</label>
+            </div>
+        </div>
+
+        <!-- Forbidden Tome -->
+        <div id="scene2_forbidden" class="scene">
+            <pre>
+      .-"""-.
+     /  EYES  \
+     |   O_O  |
+     \  WIDE  /
+      '-...-'
+       /   \
+      /     \
+    </pre>
+            <span class="scene-tag">// GRAND LIBRARY — THE FORBIDDEN TEXT //</span>
+            <div class="story-text">
+                <p>The tome opens with a sound like a sigh. The pages are not paper — they're something finer, almost translucent, covered in script that shifts as you read it. The knowledge pours into you with the force of a physical thing: the true nature of the Philosopher's Stone, not as a mere transmutation agent, but as a <strong>conduit of consciousness</strong>. The Stone doesn't just turn lead to gold — it turns the alchemist into something more than human.</p>
+
+                <p>But the knowledge comes with a price. The tome extracts its payment in memory. You feel pieces of yourself slipping away — the name of your childhood village, the face of your mother, the taste of fresh bread. In exchange, you receive the complete formula for the Stone, burned into your mind with the clarity of lightning.</p>
+
+                <p>The formula requires two things: the <strong>fire of a salamander</strong> from the Furnace, willingly given, and the <strong>distilled essence of Moonflower</strong> from the Garden, harvested under the full moon. You have neither. But you know exactly where to find both.</p>
+
+                <p class="dim">// You paid for knowledge with yourself. Was it worth it? Ask the person you used to be. If you can remember them. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_dark">Go to the Furnace — seek the salamander's fire</label>
+                <label for="s3_gold">Go to the Garden — harvest the Moonflower first</label>
+            </div>
+        </div>
+
+        <!-- Master's Journal -->
+        <div id="scene2_journal" class="scene">
+            <pre>
+      .-"""-.
+     /  QUILL \
+     |   ~_~  |
+     \   INK  /
+      '-...-'
+       /   \
+      /     \
+    </pre>
+            <span class="scene-tag">// GRAND LIBRARY — THE MASTER'S JOURNAL //</span>
+            <div class="story-text">
+                <p>Your master's journal is a chronicle of forty years of work, written in the careful hand of someone who expected to be read. The final entries, dated within the last week, grow increasingly urgent:</p>
+
+                <p><em>"The Stone is complete. I have done it — after four decades, I hold the Philosopher's Stone in my hands. But I dare not use it. The conjunction approaches, and the Stone requires a living will to activate it — a mind strong enough to direct its power without being consumed. I am too old. My will is frayed. The Stone must pass to another."</em></p>
+
+                <p>The last entry, written in a shaky hand: <em>"I have hidden the Stone in the vault beneath the tower. The key is in three parts — the fire of the salamander, the knowledge of the library, and the essence of the garden. Only one who has mastered all three branches of the Art can claim it. I have left the salamander in the Furnace, the formula in this journal, and the Moonflower blooming in the Garden. Find all three. Complete the Work. — A.V."</em></p>
+
+                <p>You have the knowledge. Now you need the other two pieces.</p>
+
+                <p class="dim">// Your master left a trail. The Stone awaits. But you need all three keys. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_formula">Go to the Furnace — find the salamander</label>
+                <label for="s3_elixir">Go to the Garden — harvest the Moonflower</label>
+            </div>
+        </div>
+
+        <!-- ============ GARDEN BRANCH ============ -->
+        <div id="scene1_garden" class="scene">
+            <pre>
+      .-. .-. .-. .-. .-.
+      |R| |O| |S| |E| |S|
+      '-' '-' '-' '-' '-'
+       |   |   |   |   |
+       |   |   |   |   |
+      / \ / \ / \ / \ / \
+     /   |   |   |   |   \
+    /    |   |   |   |    \
+    </pre>
+            <span class="scene-tag">// ALCHEMICAL GARDEN — THE GREEN WORK //</span>
+            <div class="story-text">
+                <p>The garden is a walled courtyard covered by a glass roof, its atmosphere warm and humid. Plants from across the known world grow here in orderly beds — some familiar, some strange beyond description. The full moon shines through the glass, illuminating everything in silver.</p>
+
+                <p>Two plants draw your attention. The first is the <strong>Moonflower</strong> — a luminous white bloom that opens only under moonlight, its petals releasing a faint, sweet scent. Your master's notes say it's the key ingredient in the <strong>Elixir of Life</strong>, a healing potion of extraordinary power. The second is the <strong>Shadow Root</strong> — a dark, gnarled plant that grows in the deepest shade of the garden, its leaves dripping with a black, oily substance. Your master used it to create <strong>Azoth's Tincture</strong>, a universal solvent capable of dissolving any material — or any poison — into its component elements.</p>
+
+                <p>You can only harvest one properly before the moon sets. The Moonflower for healing and life. The Shadow Root for dissolution and transformation.</p>
+
+                <p class="dim">// Life and death grow side by side in the alchemist's garden. The choice reflects the alchemist. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_moonflower">Harvest the Moonflower — seek the Elixir of Life</label>
+                <label for="s2_mandrake">Harvest the Shadow Root — brew Azoth's Tincture</label>
+            </div>
+        </div>
+
+        <!-- Moonflower -->
+        <div id="scene2_moonflower" class="scene">
+            <pre>
+      .-"""-.
+     /  PETAL \
+     |   *_*  |
+     \  FALLS /
+      '-...-'
+       /   \
+      /     \
+    </pre>
+            <span class="scene-tag">// ALCHEMICAL GARDEN — THE MOONFLOWER HARVEST //</span>
+            <div class="story-text">
+                <p>You pluck the Moonflower at the peak of its bloom, catching its falling petals in a glass vial. The petals continue to glow faintly even after being separated from the stem — a soft, milky luminescence that pulses in time with your heartbeat. Back in the tower's workroom, you can distill this into the <strong>Elixir of Life</strong> — a potion capable of curing any disease and extending life far beyond its natural span.</p>
+
+                <p>But as you hold the vial, you feel something else — a resonance. The Moonflower is not just a healing agent. It's a <strong>stabilizing essence</strong>, capable of fixing the unstable transmutation in the Furnace. Your master's notes mentioned that the Philosopher's Stone requires a stabilizing agent to complete its formation. The Moonflower is that agent. Combined with the <strong>fire of the salamander</strong> and the <strong>formula from the Library</strong>, it could complete the Stone itself.</p>
+
+                <p class="dim">// The Moonflower is more than medicine. It's one-third of the key to the Philosopher's Stone. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_elixir">Brew the Elixir of Life — become a legendary healer</label>
+                <label for="s3_formula">Go to the Library — find the formula that completes the Stone</label>
+            </div>
+        </div>
+
+        <!-- Shadow Root -->
+        <div id="scene2_mandrake" class="scene">
+            <pre>
+      .-"""-.
+     /  DARK  \
+     |   x_x  |
+     \  OOZE  /
+      '-...-'
+       /   \
+      /     \
+    </pre>
+            <span class="scene-tag">// ALCHEMICAL GARDEN — THE SHADOW ROOT HARVEST //</span>
+            <div class="story-text">
+                <p>The Shadow Root comes free with a wet, sucking sound. Its black sap coats your fingers, cold as ice, and where it touches your skin you feel a strange numbness — not unpleasant, but deeply unsettling. This is a substance that exists at the boundary between matter and void, between form and dissolution.</p>
+
+                <p>Back in the tower, you can distill it into <strong>Azoth's Tincture</strong> — a universal solvent that can break any compound into its purest elements. With it, you could dissolve poisons, purify metals beyond any furnace's capability, or even — according to the forbidden texts — dissolve the boundaries between the physical and the spiritual.</p>
+
+                <p>But the Shadow Root has another property. It is the <strong>catalyst of transformation</strong> — the agent that allows the Stone to transmute not just metal, but the alchemist themselves. Combined with the <strong>salamander's fire</strong> and the <strong>formula from the Library</strong>, it could complete the Great Work in its highest form.</p>
+
+                <p class="dim">// The Shadow Root dissolves. But dissolution is the first step of transformation. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_poison">Brew Azoth's Tincture — master the art of dissolution</label>
+                <label for="s3_dark">Go to the Library — find the forbidden knowledge that completes the Work</label>
+            </div>
+        </div>
+
+        <!-- ============ LEVEL 3 SCENES ============ -->
+
+        <!-- Gold stabilization -->
+        <div id="scene3_gold" class="scene">
+            <pre>
+      .-"""-.
+     /  GOLD  \
+     |  STABLE |
+     \  FOREVER/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// GARDEN + FURNACE — THE STABILIZED GOLD //</span>
+            <div class="story-text">
+                <p>You harvest the Moonflower and bring it back to the Furnace. Crushing the petals into a fine powder, you sprinkle it over the flickering gold. The effect is immediate — the unstable yellow stabilizes into a deep, permanent luster. The Moonflower's life-giving essence has fixed the transmutation. You hold in your hands a bar of genuine, permanent gold, transmuted from common lead.</p>
+
+                <p>This is the <strong>Red Work</strong> completed — the lesser stone, capable of turning base metal into gold. With this, you could be the richest alchemist in history. But your master's journal spoke of something greater: the <strong>Philosopher's Stone</strong> itself, which transmutes not just metal but the alchemist. The gold is a success. But is it the success you came for?</p>
+
+                <p class="dim">// You have achieved what most alchemists only dream of. But the Great Work calls you further. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_gold_ending">Accept this triumph — you've created gold, the dream of alchemists</label>
+                <label for="s5_true">Seek more — the Philosopher's Stone awaits, and you have one of three keys</label>
+            </div>
+        </div>
+
+        <!-- Salamander's deeper vision -->
+        <div id="scene3_salamander" class="scene">
+            <pre>
+      \|/  \|/
+       O    O
+        \  /
+         \/
+         /\
+        /  \
+       /    \
+    </pre>
+            <span class="scene-tag">// FURNACE — THE SALAMANDER'S FULL VISION //</span>
+            <div class="story-text">
+                <p>You offer the salamander another drop of blood, and this time the vision is overwhelming. You see the hidden vault beneath the tower — a circular chamber of black glass, inscribed with alchemical symbols that glow with their own inner light. At the center, on a pedestal of obsidian, rests the <strong>Philosopher's Stone</strong> — a crystalline orb the size of a fist, swirling with colors that don't exist in the normal spectrum.</p>
+
+                <p>But the vault is sealed. Three locks hold the door: one that requires <strong>fire</strong>, one that requires <strong>knowledge</strong>, and one that requires <strong>essence</strong>. The salamander can provide the fire — it is willing to accompany you, to bind itself to your purpose. But you still need the formula from the Library to speak the words of opening, and the essence from the Garden to complete the unlocking ritual.</p>
+
+                <p>The salamander curls around your wrist, a bracelet of living flame that does not burn. <em>"I will go with you,"</em> it seems to say. <em>"But hurry. The Stones does not wait forever."</em></p>
+
+                <p class="dim">// You have the fire. Two keys remain. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_true">Go to the Library — get the formula, then the Garden, then the vault</label>
+                <label for="s4_burn_ending">Go directly to the vault — try to force the door with fire alone</label>
+            </div>
+        </div>
+
+        <!-- Dark knowledge -->
+        <div id="scene3_dark" class="scene">
+            <pre>
+      .-"""-.
+     /  VOID  \
+     |   O_O  |
+     \  GAZES /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// LIBRARY + FORBIDDEN KNOWLEDGE — THE PRICE DEEPENS //</span>
+            <div class="story-text">
+                <p>Armed with the forbidden knowledge, you return to the Furnace. The salamander recognizes what you've become — someone who paid the tome's price and survived with enough self left to function. It approaches you warily, then with something like respect. The fire it offers is different — darker, edged with violet-black, the flame of transformation at its most dangerous.</p>
+
+                <p>But the knowledge has changed you. You can feel the gaps in your memory where pieces of yourself used to be. The formula for the Stone is clear in your mind, but so is the understanding that using it will cost more — perhaps everything you have left. The alchemist who completes the Great Work is not the same person who began it.</p>
+
+                <p class="dim">// You've paid dearly for knowledge. The final price may be higher still. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_corrupt_ending">Complete the Stone regardless — whatever the cost, the Work must be finished</label>
+                <label for="s5_true">Seek the Garden first — the Moonflower's light may balance the darkness within you</label>
+            </div>
+        </div>
+
+        <!-- Formula path -->
+        <div id="scene3_formula" class="scene">
+            <pre>
+      .-"""-.
+     /  MIND  \
+     |   ~_~  |
+     \  CLEAR /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// LIBRARY + JOURNAL — THE COMPLETE FORMULA //</span>
+            <div class="story-text">
+                <p>Your master's journal has given you the complete formula for the Philosopher's Stone — not just the ingredients and the process, but the philosophical underpinnings that make the Work possible. You understand now that the Stone is not merely a physical object but a <strong>convergence of matter, will, and cosmic alignment</strong>. The conjunction your master mentioned is real — a rare alignment of celestial bodies that amplifies alchemical processes a thousandfold.</p>
+
+                <p>With the formula clear in your mind, you know what you need: the <strong>salamander's fire</strong> to provide the transformative heat, the <strong>Moonflower's essence</strong> to stabilize the reaction, and your own focused will to direct the transformation. You have the knowledge. Two more keys remain.</p>
+
+                <p class="dim">// Knowledge without action is just theory. The Furnace and the Garden await. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_true">Go to the Furnace — claim the salamander's fire</label>
+                <label for="s4_enlighten_ending">Stay in the Library — record everything you've learned for future generations</label>
+            </div>
+        </div>
+
+        <!-- Elixir path -->
+        <div id="scene3_elixir" class="scene">
+            <pre>
+      .-"""-.
+     /  CURE  \
+     |   *_*  |
+     \  ALL   /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// GARDEN + MOONFLOWER — THE ELIXIR OF LIFE //</span>
+            <div class="story-text">
+                <p>You distill the Moonflower petals through seven cycles of purification, following your master's precise instructions. The resulting liquid is clear as water but glows with a soft, silvery light. The <strong>Elixir of Life</strong> — a single drop can cure any illness. A vial can extend life by decades. The full batch you've created could save a kingdom from plague.</p>
+
+                <p>But as you hold the finished elixir, you realize it has another property. It's the <strong>perfect stabilizing agent</strong> — not just for gold, but for the Philosopher's Stone itself. Your master's journal mentioned that the Stone, once formed, must be stabilized within moments or it will collapse into inert crystal. The Elixir of Life can provide that stabilization, holding the Stone's power in perfect balance indefinitely.</p>
+
+                <p class="dim">// You have created something miraculous. But it might be the key to something greater. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_healer_ending">Keep the Elixir — become a healer, save countless lives</label>
+                <label for="s5_true">Reserve some Elixir — you'll need it to stabilize the Philosopher's Stone</label>
+            </div>
+        </div>
+
+        <!-- Poison path -->
+        <div id="scene3_poison" class="scene">
+            <pre>
+      .-"""-.
+     /  VOID  \
+     |   x_x  |
+     \  DROP  /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// GARDEN + SHADOW ROOT — AZOTH'S TINCTURE //</span>
+            <div class="story-text">
+                <p>You distill the Shadow Root's black sap through a process your master called <em>"the Nigredo"</em> — the blackening, the first stage of the Great Work. The resulting <strong>Azoth's Tincture</strong> is a drop of absolute darkness, so black it seems to absorb light from the room. A single drop can dissolve any material into its elemental components. A vial can reduce a castle wall to dust. In the wrong hands, it could unmake anything.</p>
+
+                <p>But in the right hands — yours — it's the <strong>ultimate catalyst</strong>. The Philosopher's Stone requires not just heat and knowledge, but a catalyst that can break the old material down so the new can form. Azoth's Tincture is that catalyst. Combined with the salamander's fire and the formula from the Library, it could create the Stone in its most powerful form.</p>
+
+                <p class="dim">// Destruction and creation are the same process viewed from different angles. Azoth proves it. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_assassin_ending">Keep the Tincture — its power is terrifying but immense</label>
+                <label for="s5_true">Use it as a catalyst — the Philosopher's Stone requires dissolution before creation</label>
+            </div>
+        </div>
+
+        <!-- ============ ENDINGS ============ -->
+
+        <!-- Gold ending -->
+        <div id="scene4_gold_ending" class="scene">
+            <pre>
+      .___. .___. .___.
+      |Au| |Au| |Au|
+      '---' '---' '---'
+    </pre>
+            <span class="scene-tag">// ENDING: THE AURIFICER //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#eecc66;">△ ENDING: THE GOLDEN TOUCH △</span></p>
+                <p>You perfect the transmutation process. Over the following months, you produce enough gold to fund a small kingdom. You become the wealthiest alchemist in history, your name spoken with reverence in every court from here to the Eastern Seas. Kings seek your counsel. Cities bid for your presence. You live in comfort and die in peace, leaving behind a legacy of practical alchemy that advances the Art by generations.</p>
+                <p>But the Philosopher's Stone remains undiscovered, its secrets still locked in the vault beneath the tower. Sometimes, late at night, you feel the faint pulse of it through the stone floor — a reminder of the greater Work you chose not to complete. You made gold. You didn't make yourself into something more. Was that enough? Only you know. Only you ever will.</p>
+                <p class="dim">// The Red Work is complete. The Great Work remains. Some alchemists are content with gold. The greatest never are. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Tower Has Other Doors</label></div>
+        </div>
+
+        <!-- Burn ending -->
+        <div id="scene4_burn_ending" class="scene">
+            <pre>
+      .-"""-.
+     /  FIRE  \
+     |   *   |
+     \  CONSUMES/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE FIRE UNBOUND //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="warn">✕ ENDING: THE CONFLAGRATION ✕</span></p>
+                <p>You force the vault door with fire alone. The salamander, strained beyond its capacity, explodes in a burst of violet flame that engulfs the chamber. The tower catches fire — first the Furnace room, then the Library, then the Garden. Centuries of accumulated alchemical knowledge burn in a single night. You escape with your life and nothing else. Behind you, the tower collapses into its foundations, taking the Philosopher's Stone with it — buried now under tons of rubble, its light extinguished, perhaps forever.</p>
+                <p>You walk away from the smoldering ruin with the salamander's last gift still flickering in your mind: the image of what could have been, if you'd only been patient enough to gather all three keys. The Stone is not destroyed — merely inaccessible. Someone else may dig it out someday. Someone with more wisdom. More patience. More respect for the Art.</p>
+                <p class="dim">// Fire without knowledge and essence is just destruction. The salamander tried to warn you. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Tower Remembers, Even in Ruins</label></div>
+        </div>
+
+        <!-- Corrupt ending -->
+        <div id="scene4_corrupt_ending" class="scene">
+            <pre>
+      .-"""-.
+     /  VOID  \
+     |   O_O  |
+     \  ETERNAL/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE HOLLOW ALCHEMIST //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#8844cc;">◇ ENDING: THE PRICE OF FORBIDDEN KNOWLEDGE ◇</span></p>
+                <p>You complete the Philosopher's Stone using the forbidden knowledge, the salamander's dark fire, and the Shadow Root's dissolution essence. The Stone forms — a crystalline orb of swirling black and violet, beautiful and terrible. When you activate it, the power floods through you, transforming you into something beyond human. Your mind expands to encompass vast realms of understanding. You see the cosmos laid bare, the machinery of existence, the equations that govern reality itself.</p>
+                <p>But the forbidden tome took too much. The memories you lost — the human connections, the small joys, the ordinary loves that make life worth living — are gone forever. You are powerful beyond measure and empty beyond hope. The Stone sustains your body indefinitely, but your soul is a hollow chamber where echoes of what you used to be occasionally stir and then fall silent. You become a legend — the ageless alchemist in the ruined tower, granting wisdom to those who seek it, but never smiling. Never remembering why smiling mattered.</p>
+                <p class="dim">// Knowledge has a price. The forbidden tome takes memories. The Stone takes everything else. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — Some Knowledge Should Remain Forbidden</label></div>
+        </div>
+
+        <!-- Enlighten ending -->
+        <div id="scene4_enlighten_ending" class="scene">
+            <pre>
+      .-"""-.
+     /  LIGHT \
+     |   ~_~  |
+     \  ETERNAL/
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE KEEPER OF KNOWLEDGE //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#dda0ff;">□ ENDING: THE GRAND ARCHIVIST □</span></p>
+                <p>You stay in the Library. For years, you study, catalog, and preserve your master's work. You transcribe the forbidden tome into safer language, removing the memory-draining enchantment while preserving the knowledge. You write commentaries on your master's journal, filling in gaps with your own experiments. The Library becomes a beacon — alchemists travel from distant lands to study under you, to read the texts you've preserved, to learn the Art in its fullness.</p>
+                <p>The Philosopher's Stone remains in its vault, untouched but not forgotten. You've left detailed instructions for its retrieval — all three keys, all three branches, the proper sequence. Someone will find it someday. Someone worthy. In the meantime, you have ensured that the knowledge survives, that the Art continues, that your master's forty years of work are not lost to time. You never made gold. You never achieved immortality. But you built something that will outlast both: a tradition.</p>
+                <p class="dim">// The White Work — knowledge refined and shared. Not the most dramatic ending. Perhaps the most important. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Library Holds Many Paths</label></div>
+        </div>
+
+        <!-- Healer ending -->
+        <div id="scene4_healer_ending" class="scene">
+            <pre>
+      .-"""-.
+     /  CURE  \
+     |   *_*  |
+     \  WORLD /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE GREEN WORK COMPLETED //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#88cc66;">◉ ENDING: THE HEALER'S PATH ◉</span></p>
+                <p>You perfect the Elixir of Life and dedicate yourself to its distribution. Over the decades that follow, you travel from village to village, curing plagues that would have killed thousands. Your name becomes synonymous with healing — not just in this kingdom but across the continent. The Elixir cannot be mass-produced — it requires the Moonflower, which blooms only under specific conditions — but you teach others to cultivate it, to harvest it, to distill it properly. A network of healers grows in your wake.</p>
+                <p>You live a long life — the Elixir extends your years well past the century mark — and when you finally pass, it is peacefully, in a garden you planted yourself, surrounded by students who will carry on the work. The Philosopher's Stone remains in its vault. You chose life over power, healing over transformation. If you had it to do again, you'd make the same choice. Every face you saved is a stone in a different kind of Great Work — one built not of crystalline perfection but of accumulated small mercies.</p>
+                <p class="dim">// The Green Work — the living essence, the healing art. Gold fades. Knowledge fades. Lives saved echo forward through generations. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Garden Still Blooms</label></div>
+        </div>
+
+        <!-- Assassin ending -->
+        <div id="scene4_assassin_ending" class="scene">
+            <pre>
+      .-"""-.
+     /  VOID  \
+     |   x_x  |
+     \  DROPS /
+      '-...-'
+    </pre>
+            <span class="scene-tag">// ENDING: THE DISSOLVER //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#9966cc;">◇ ENDING: THE SHADOW ALCHEMIST ◇</span></p>
+                <p>Azoth's Tincture becomes your signature. You perfect its use — not as a weapon, but as a tool. With it, you can dissolve poisons from the bloodstream, break down tumors into harmless elements, purify contaminated water with a single drop. But the power tempts you. You learn that the Tincture can dissolve more than physical matter — it can dissolve bonds, relationships, institutions. You become a shadow operative, working for causes you believe in, dissolving threats before they can harm the innocent.</p>
+                <p>The line between protection and destruction blurs. You tell yourself you're doing good. Mostly, you are. But there are nights when you stare at the vial of absolute darkness and wonder what you've become. The Philosopher's Stone waits in its vault, but you no longer seek it. You've found a different kind of transformation — one that works from the outside in, breaking things down rather than building them up. Whether that makes you an alchemist or just a very efficient destroyer is a question you've stopped asking yourself.</p>
+                <p class="dim">// The Black Work — dissolution, the first stage. Some alchemists get stuck here. Some choose to stay. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — Even Shadows Can Lead to Light</label></div>
+        </div>
+
+        <!-- True ending path -->
+        <div id="scene5_true" class="scene">
+            <pre>
+        /\
+       /  \
+      /    \
+     /  __  \
+    /  /  \  \
+   /  /    \  \
+  /  /  VAULT \  \
+ /__/__________\__\
+    |    |    |
+    |    |    |
+    |____|____|
+</pre>
+            <span class="scene-tag">// THE HIDDEN VAULT — ALL THREE KEYS ASSEMBLED //</span>
+            <div class="story-text">
+                <p>You stand before the vault door with all three keys. The salamander circles your wrist — fire. Your mind holds the complete formula from the Library — knowledge. In your hand, a vial of Moonflower essence or the catalyst of Shadow Root — essence. The door recognizes the convergence. The alchemical symbols on its surface flare with violet light, and the black glass slides open without a sound.</p>
+
+                <p>The chamber beyond is exactly as the salamander showed you — circular, black glass walls inscribed with glowing symbols, and at the center, on an obsidian pedestal, the <strong>Philosopher's Stone</strong>. It's more beautiful than you imagined. It pulses with colors that have no names, and its light seems to illuminate not just the room but the inside of your mind. You feel it reaching out to you — recognizing you as the one who completed the threefold path.</p>
+
+                <p>Your master's voice, recorded somehow in the shimmering air, speaks: <em>"If you are hearing this, you have done what I could not. You have mastered all three branches. The Stone is yours. Use it wisely — it will transform whatever you touch. Including yourself. Choose with care what you become."</em></p>
+
+                <p>The Stone awaits your will.</p>
+
+                <p class="dim">// This is the moment. The Great Work. Everything has led here. //</p>
+            </div>
+            <div class="choices">
+                <label for="s5_stone_secret">Activate the Philosopher's Stone — complete the Great Work</label>
+            </div>
+        </div>
+
+        <!-- TRUE ENDING -->
+        <div id="scene5_stone_secret" class="scene">
+            <pre>
+         *
+        /|\
+       / | \
+      /  |  \
+     /   |   \
+    /    |    \
+   /     |     \
+  /______|______\
+      |  |  |
+      |  |  |
+      |__|__|
+       \   /
+        \ /
+         *
+      [ DAWN ]
+    </pre>
+            <span class="scene-tag">// TRUE ENDING: THE MAGNUM OPUS //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#dda0ff;">✦ TRUE ENDING: THE PHILOSOPHER'S STONE ✦</span></p>
+                <p>You place your hands on the Stone. The salamander's fire flows into it. The formula in your mind shapes its power. The essence from the Garden stabilizes the reaction. And your will — your human will, tested and refined through every choice that brought you here — directs the transformation.</p>
+
+                <p>The Stone doesn't turn you into gold. It turns you into <strong>yourself</strong> — the most complete, most realized version of who you could be. Every potential you carried, every strength and insight and capacity for wonder, crystallizes into permanence. You are not immortal in the crude sense — your body will age and eventually die. But your consciousness, your understanding, your essential self, is now as stable and enduring as the Stone itself.</p>
+
+                <p>You emerge from the tower at dawn. The world looks different — not because it has changed, but because you can now see it clearly. The connections between things are visible to you: the flow of elements, the dance of cause and effect, the hidden symmetries that underpin reality. You will spend the rest of your life teaching others what you've learned — not as a guru or a prophet, but as a patient instructor helping students find their own three keys.</p>
+
+                <p>Your master's tower becomes a school. The <strong>Academy of the Threefold Art</strong> trains alchemists in the Furnace, the Library, and the Garden — teaching not just transmutation but wisdom, not just knowledge but compassion, not just power but restraint. The Philosopher's Stone remains in its vault, accessible only to those who, like you, complete all three branches. Few do. The few who do change the world.</p>
+
+                <p>The salamander stays with you — a companion of living flame, a reminder that fire is not just destruction but warmth, light, and the energy that drives all transformation. On cold nights, it curls on your shoulder like a cat made of embers. On bright days, it dances in the garden, making the Moonflowers turn toward it like sunflowers tracking the sun.</p>
+
+                <p>You fulfilled your master's final request. You completed the Work. And in doing so, you became not just an alchemist — you became the beginning of something that will outlast you, outlast the tower, outlast even the Stone itself: a tradition of wisdom passed from teacher to student, each generation adding its own chapter to the Great Work.</p>
+
+                <p class="dim">// To reach this ending, you needed to find all three keys — the salamander's fire, the formula from the Library, and the essence from the Garden. You walked all three paths. You honored your master's legacy. And you became the alchemist he believed you could be. The Philosopher's Stone is real. So is the transformation it offers. But the truest transformation was never the Stone — it was the journey that made you worthy of it. //</p>
+            </div>
+            <div class="choices">
+                <label for="s0">★ Begin Again — Every Path Has Its Own Truth ★</label>
+            </div>
+            <p class="note">// THE ALCHEMIST'S CRUCIBLE — A Tale of the Great Work //<br>7 endings · 3 main branches · 24 scenes · The Stone awaits those who walk all three paths //</p>
+        </div>
+
+    </div>
+</body>
+</html>
