@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Own Adventure — Coyote Creek</title>
+    <style>
+        :root {
+            --dust: #d4b896;
+            --red: #b33a2a;
+            --gold: #c9a44b;
+            --gunmetal: #3a4a5a;
+            --bg: #0d0804;
+            --glow: rgba(210, 160, 100, 0.25);
+            --glow-red: rgba(179, 58, 42, 0.35);
+            --glow-gun: rgba(58, 74, 90, 0.3);
+            --glow-train: rgba(200, 150, 80, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0a0502;
+            color: var(--dust);
+            font-family: 'Courier New', 'Courier', 'Lucida Console', monospace;
+            padding: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(60, 35, 15, 0.04) 3px,
+                    rgba(60, 35, 15, 0.04) 6px);
+            background-size: 100% 6px;
+            background-attachment: fixed;
+        }
+
+        .game-container {
+            max-width: 740px;
+            margin: 0 auto;
+            border: 2px solid var(--gunmetal);
+            padding: 30px 24px;
+            min-height: 84vh;
+            box-shadow: 0 0 35px var(--glow);
+            background: radial-gradient(ellipse at center,
+                    rgba(35, 22, 12, 0.75) 0%,
+                    rgba(8, 5, 2, 0.97) 72%);
+            transition: box-shadow 0.6s ease, border-color 0.6s ease, color 0.6s ease;
+        }
+
+        .env-train { box-shadow: 0 0 30px var(--glow-train); border-color: #aa8833; color: #e8cc88; }
+        .env-saloon { box-shadow: 0 0 30px rgba(180, 130, 70, 0.3); border-color: #aa7733; color: #e0c090; }
+        .env-street { box-shadow: 0 0 30px var(--glow-gun); border-color: #556677; color: #ccd8e0; }
+        .env-canyon { box-shadow: 0 0 30px rgba(140, 90, 30, 0.3); border-color: #886644; color: #e0c0a0; }
+        .env-danger { box-shadow: 0 0 30px var(--glow-red); border-color: #993333; color: #ffaa99; }
+        .env-duel { box-shadow: 0 0 35px rgba(255, 180, 50, 0.4); border-color: #ddaa00; color: #ffe8a0; }
+
+        pre {
+            font-size: 10px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 18px;
+            text-shadow: 0 0 6px currentColor;
+            line-height: 1.2;
+            overflow-x: auto;
+            animation: flickerIn 0.9s ease-out;
+            padding: 2px 0;
+            color: #c0a080;
+        }
+
+        @keyframes flickerIn {
+            0% { opacity: 0; text-shadow: 0 0 25px currentColor; }
+            20% { opacity: 0.3; }
+            35% { opacity: 0.75; text-shadow: 0 0 10px currentColor; }
+            50% { opacity: 0.5; }
+            70% { opacity: 0.9; }
+            100% { opacity: 1; text-shadow: 0 0 6px currentColor; }
+        }
+
+        .scene-tag {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: #887766;
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .story-text {
+            font-size: 1.1rem;
+            margin-bottom: 28px;
+            padding: 0 4px;
+            line-height: 1.75;
+            animation: fadeIn 0.55s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .story-text p { margin-bottom: 13px; }
+        .story-text p:last-child { margin-bottom: 0; }
+
+        strong { color: #ffbb66; font-weight: bold; }
+        em { color: var(--red); font-style: italic; }
+        .gold-text { color: var(--gold); }
+        .dim { color: #887766; }
+        .warn { color: #ff8877; }
+        .ending-title { font-size: 1.25rem; letter-spacing: 2px; text-align: center; margin-bottom: 18px; text-shadow: 0 0 12px currentColor; }
+        .note { font-size: 0.76rem; color: #887766; text-align: center; margin-top: 10px; font-style: italic; }
+
+        .choices { display: flex; flex-direction: column; gap: 12px; align-items: center; margin-top: 6px; }
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(10, 5, 2, 0.7);
+            font-weight: bold;
+            font-size: 0.82rem;
+            width: 86%;
+            text-align: center;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+            user-select: none;
+            position: relative;
+        }
+        label::before { content: '> '; opacity: 0; transition: opacity 0.15s; }
+        label:hover::before { opacity: 1; animation: blink 0.65s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        label:hover {
+            background: currentColor;
+            color: #0a0502 !important;
+            box-shadow: 0 0 22px currentColor;
+            transform: scale(1.025);
+        }
+        label:active { transform: scale(0.97); transition: transform 0.08s; }
+
+        input[type="radio"] { display: none; }
+        .scene { display: none; animation: fadeIn 0.5s ease-out; }
+
+        #s0:checked~.game-container #scene0,
+        #s1_fight:checked~.game-container #scene1_fight,
+        #s1_cooperate:checked~.game-container #scene1_cooperate,
+        #s1_escape:checked~.game-container #scene1_escape,
+        #s2_agent:checked~.game-container #scene2_agent,
+        #s2_saloon_fight:checked~.game-container #scene2_saloon_fight,
+        #s2_posse:checked~.game-container #scene2_posse,
+        #s2_join_gang:checked~.game-container #scene2_join_gang,
+        #s2_undercover:checked~.game-container #scene2_undercover,
+        #s2_buckshot:checked~.game-container #scene2_buckshot,
+        #s2_church:checked~.game-container #scene2_church,
+        #s3_stakeout:checked~.game-container #scene3_stakeout,
+        #s3_ambush_gang:checked~.game-container #scene3_ambush_gang,
+        #s3_hideout_raid:checked~.game-container #scene3_hideout_raid,
+        #s3_canyon_ambush:checked~.game-container #scene3_canyon_ambush,
+        #s3_plan_heist:checked~.game-container #scene3_plan_heist,
+        #s3_prove_loyalty:checked~.game-container #scene3_prove_loyalty,
+        #s3_revenge_ride:checked~.game-container #scene3_revenge_ride,
+        #s4_train_heist:checked~.game-container #scene4_train_heist,
+        #s4_betrayal:checked~.game-container #scene4_betrayal,
+        #s4_showdown:checked~.game-container #scene4_showdown,
+        #s4_mine_explosion:checked~.game-container #scene4_mine_explosion,
+        #s4_final_duel:checked~.game-container #scene4_final_duel,
+        #e_hero:checked~.game-container #scene_e_hero,
+        #e_outlaw:checked~.game-container #scene_e_outlaw,
+        #e_legend:checked~.game-container #scene_e_legend,
+        #e_dead:checked~.game-container #scene_e_dead,
+        #e_lawman:checked~.game-container #scene_e_lawman,
+        #e_gold:checked~.game-container #scene_e_gold,
+        #e_vigilante:checked~.game-container #scene_e_vigilante,
+        #e_standoff:checked~.game-container #scene_e_standoff,
+        #e_preacher:checked~.game-container #scene_e_preacher,
+        #e_revenge:checked~.game-container #scene_e_revenge {
+            display: block;
+        }
+
+        @media (max-width: 520px) {
+            .game-container { padding: 18px 12px; }
+            pre { font-size: 8px; }
+            .story-text { font-size: 0.95rem; }
+            label { width: 94%; font-size: 0.76rem; padding: 11px 14px; letter-spacing: 1px; }
+            .ending-title { font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link" style="color: white;">Back to Home</a>
+
+    <input type="radio" name="game" id="s0" checked>
+    <input type="radio" name="game" id="s1_fight"> <input type="radio" name="game" id="s1_cooperate"> <input type="radio" name="game" id="s1_escape">
+    <input type="radio" name="game" id="s2_agent"> <input type="radio" name="game" id="s2_saloon_fight"> <input type="radio" name="game" id="s2_posse">
+    <input type="radio" name="game" id="s2_join_gang"> <input type="radio" name="game" id="s2_undercover"> <input type="radio" name="game" id="s2_buckshot"> <input type="radio" name="game" id="s2_church">
+    <input type="radio" name="game" id="s3_stakeout"> <input type="radio" name="game" id="s3_ambush_gang"> <input type="radio" name="game" id="s3_hideout_raid"> <input type="radio" name="game" id="s3_canyon_ambush"> <input type="radio" name="game" id="s3_plan_heist"> <input type="radio" name="game" id="s3_prove_loyalty"> <input type="radio" name="game" id="s3_revenge_ride">
+    <input type="radio" name="game" id="s4_train_heist"> <input type="radio" name="game" id="s4_betrayal"> <input type="radio" name="game" id="s4_showdown"> <input type="radio" name="game" id="s4_mine_explosion"> <input type="radio" name="game" id="s4_final_duel">
+    <input type="radio" name="game" id="e_hero"> <input type="radio" name="game" id="e_outlaw"> <input type="radio" name="game" id="e_legend"> <input type="radio" name="game" id="e_dead"> <input type="radio" name="game" id="e_lawman"> <input type="radio" name="game" id="e_gold"> <input type="radio" name="game" id="e_vigilante"> <input type="radio" name="game" id="e_standoff"> <input type="radio" name="game" id="e_preacher"> <input type="radio" name="game" id="e_revenge">
+
+    <div class="game-container env-train" id="gameBox">
+
+        <!-- SCENE 0 — TRAIN ROBBERY -->
+        <div id="scene0" class="scene">
+            <pre>
+    _______________________________
+  _|_____|_____|_____|_____|_____|_
+  |   _   |   _   |   _   |   _   |
+  |__| |__|__| |__|__| |__|__| |__|
+    O       O       O       O
+    ~~~~~~~~~~  SUNSET EXPRESS  ~~~~~~~~~~
+            </pre>
+            <span class="scene-tag">// ABOARD THE SUNSET EXPRESS — COYOTE CREEK TERRITORY //</span>
+            <div class="story-text">
+                <p>The train screams to a halt. Outside, the desert sky is streaked with crimson. Inside, the passenger car erupts in chaos as <strong>masked bandits</strong> swarm the aisles — bandoliers crossed over dusty serapes, revolvers glinting. Their leader, a man in a skull mask with a pearl-handled Colt, bellows over the panic: <em>"¡Manos arriba! This is a robbery! Cooperate and nobody dies."</em></p>
+                <p>A nun in the seat ahead of you clutches a small leather case. A young cowboy across the aisle reaches for his holster. The bandit nearest you has turned his back. In the distant mail car, you hear the thump of dynamite charges being set.</p>
+                <p class="dim">// The Sunset Express carries not just passengers, but a secret government gold shipment. Everyone on this train has a story. And the next minute will decide yours. //</p>
+            </div>
+            <div class="choices">
+                <label for="s1_fight">Draw your revolver and fight — no bandit takes your freedom</label>
+                <label for="s1_cooperate">Cooperate — hand over your valuables and keep your head low</label>
+                <label for="s1_escape">Slip out the window and climb onto the roof — get out unseen</label>
+            </div>
+        </div>
+
+        <!-- SCENE 1A — FIGHT -->
+        <div id="scene1_fight" class="scene"><pre></pre>
+            <span class="scene-tag">// PASSENGER CAR — GUNSMOKE AND CHAOS //</span>
+            <div class="story-text">
+                <p>Your Colt clears leather before the bandit can turn. The shot takes him in the shoulder, spinning him into a seat. The car erupts — bullets splinter wood, passengers scream, the nun dives for cover. You exchange fire with two more bandits, dropping both, but the leader in the skull mask — <strong>El Muerto</strong> — grabs the nun and holds a blade to her throat. <em>"Drop it, gringo, or she dies."</em></p>
+                <p>Behind you, the young cowboy fires from his seat, wounding another bandit. In the confusion, the nun kicks El Muerto in the knee and breaks free, pulling a <strong>derringer</strong> from her sleeve. She fires point-blank, but El Muerto escapes through the mail car, blowing the door with a dynamite charge and leaping from the train. The remaining bandits flee after him, leaving a trail of blood and gold dust.</p>
+                <p>The nun turns to you, breathless. <em>"Agent Isabella Reyes, Pinkerton Detective Agency. That man has information I need. Thank you — you just saved my life."</em> She eyes the wounded cowboy. <em>"We'll reach Coyote Creek in an hour. There's a saloon, a sheriff, and a railroad man named McClane who wants to string us all up. Who do you want to trust?"</em></p>
+                <p class="dim">// You're a hero now. But McClane, the railroad's security chief, is already suspicious of anyone who fought the bandits and lived. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_agent">Team up with Agent Reyes — investigate the gold shipment plot</label>
+                <label for="s2_saloon_fight">Head to the Last Chance Saloon — find the bandits' inside man</label>
+                <label for="s2_posse">Accept Marshal Garrett's offer and join the posse to hunt El Muerto</label>
+            </div>
+        </div>
+
+        <!-- SCENE 1B — COOPERATE -->
+        <div id="scene1_cooperate" class="scene"><pre></pre>
+            <span class="scene-tag">// PASSENGER CAR — UNDER THE BANDITS' THUMB //</span>
+            <div class="story-text">
+                <p>You raise your hands and let them take your coin purse. The skull-masked leader — <strong>El Muerto</strong> — pauses before you, his dark eyes studying your face. <em>"You got sense, amigo. Not many do."</em> He tosses you a heavy gold coin. <em>"We need men who can follow orders. The next big score is the Golden Spike Express — an entire railcar of gold. You want in, meet us at the old Spanish mission by Coyote Creek. Ask for Culebra. Tell him El Muerto sent you."</em></p>
+                <p>When the gang leaves, the passengers murmur. A nun — Agent Isabella Reyes, though you don't know it yet — watches you closely. The young cowboy curses you for a coward. But you have a gold coin and an invitation to the biggest train robbery the West has ever seen.</p>
+                <p class="dim">// El Muerto saw something in you. Whether he saw a partner or a pawn is up to you. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_join_gang">Ride to the mission — join El Muerto's gang as a full outlaw</label>
+                <label for="s2_undercover">Accept but plan to betray them — find Agent Reyes and offer to be a spy</label>
+            </div>
+        </div>
+
+        <!-- SCENE 1C — ESCAPE -->
+        <div id="scene1_escape" class="scene"><pre></pre>
+            <span class="scene-tag">// TRAIN ROOF — WIND AND SPEED //</span>
+            <div class="story-text">
+                <p>You wriggle through the window and haul yourself onto the roof. The train is still moving, the wind howling. From up here, you see the bandits riding away down a dry wash. The mail car is a wreck of splinters and smoke. You spot a lone figure crawling along the roof toward you — the young cowboy from inside, blood streaming from a graze on his forehead. <em>"They killed the marshal's son,"</em> he gasps. <em>"I'm riding for help."</em></p>
+                <p>He leaps from the train as it slows on a curve, vanishing into the brush. You jump too, landing hard in a sandy arroyo. When you stagger into Coyote Creek hours later, you're met by an old man with a sawed-off shotgun on the porch of a dilapidated ranch. <strong>Buckshot Johnny</strong>, they call him. <em>"You look like you've been chewed up and spit out, son. Come inside. We got bandits to kill and a score to settle."</em></p>
+                <p class="dim">// Johnny's son was killed by El Muerto six months ago. He's been waiting for someone with guts to help him exact revenge. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_buckshot">Accept Johnny's hospitality — train under the old gunslinger</label>
+                <label for="s2_church">Go to the mission church first — you glimpsed a nun on the train who might help</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2A — AGENT REYES -->
+        <div id="scene2_agent" class="scene"><pre></pre>
+            <span class="scene-tag">// COYOTE CREEK — SECRET MEETING BEHIND THE CHURCH //</span>
+            <div class="story-text">
+                <p>Agent Reyes reveals the gold shipment is a trap set by railroad baron <strong>Silas McClane</strong>. He hired El Muerto's gang to rob the train, planning to let them steal fake gold and then slaughter them to claim insurance money. But El Muerto got wind of the double-cross and intends to take the real gold instead. <em>"If we can intercept the train first,"</em> Isabella says, <em>"we can capture both McClane and El Muerto. I need a partner who can handle a gun."</em></p>
+                <p>She hands you a map showing the route through <strong>Dead Horse Canyon</strong>. The Golden Spike Express will pass through at dawn. You can either stake out the canyon and wait for the train, or ambush the gang before they reach the tracks.</p>
+            </div>
+            <div class="choices">
+                <label for="s3_stakeout">Stake out the canyon — intercept the train and take the gold yourself</label>
+                <label for="s3_ambush_gang">Ride ahead and ambush El Muerto's gang before they hit the train</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2B — SALOON FIGHT -->
+        <div id="scene2_saloon_fight" class="scene"><pre></pre>
+            <span class="scene-tag">// LAST CHANCE SALOON — WHISKEY AND FISTS //</span>
+            <div class="story-text">
+                <p>The saloon stinks of cheap tobacco and tension. At the bar, three of El Muerto's scouts — Culebra, Oso, and a one-eyed gunman called Pico — are drinking heavily. They recognize you from the train. <em>"The gringo who almost got us killed,"</em> Culebra snarls. <em>"I think we finish what we started."</em></p>
+                <p>The next few seconds are a blur of broken glass and swinging fists. You duck a bottle, flip a table, and grab a pool cue. The sheriff bursts in, but you're too busy trading blows. When the dust settles, Culebra is unconscious, Oso is nursing a broken nose, and Pico is aiming a derringer at your heart. <em>"You got sand,"</em> he admits, lowering the gun. <em>"Maybe you're not so bad. The boss wants to meet the one who stood up to him. Come to the mission at midnight."</em></p>
+            </div>
+            <div class="choices">
+                <label for="s3_plan_heist">Go to the mission — hear El Muerto's plan and decide where you stand</label>
+                <label for="s3_revenge_ride">Refuse — ride with Buckshot Johnny (he was in the saloon) to take revenge now</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2C — POSSE -->
+        <div id="scene2_posse" class="scene"><pre></pre>
+            <span class="scene-tag">// MARSHAL'S OFFICE — DEPUTY STAR //</span>
+            <div class="story-text">
+                <p>Marshal Garrett pins a star on your vest. <em>"Welcome to the law, son. McClane's already howling for blood — he wants to hang every bandit in the territory. But I reckon there's more to this robbery than meets the eye. You ride with my posse to Dead Horse Canyon. We'll catch the gang before they hit the gold train."</em></p>
+                <p>As you leave, McClane stops you. <em>"I know you fought them on the train,"</em> he says coldly. <em>"But if you cross me, you'll hang alongside them."</em> His private guards — hired guns, not lawmen — stare at you with dead eyes.</p>
+            </div>
+            <div class="choices">
+                <label for="s3_canyon_ambush">Lead the posse into Dead Horse Canyon — spring the trap</label>
+                <label for="s4_betrayal">Secretly warn Agent Reyes — help her expose McClane's insurance fraud</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2D — JOIN GANG -->
+        <div id="scene2_join_gang" class="scene"><pre></pre>
+            <span class="scene-tag">// OLD SPANISH MISSION — BANDIT HIDEOUT //</span>
+            <div class="story-text">
+                <p>El Muerto welcomes you with a ritual: you must drink tequila mixed with gunpowder. <em>"From now on, you are mi hermano de sangre."</em> He lays out the plan for the Golden Spike Express: dynamite on the trestle bridge, horses waiting in the canyon, and a getaway route through Apache territory. The gold will be split evenly — but McClane, he says, will be framed for the robbery. <em>"That gringo thinks he's using us. But we are using him."</em></p>
+                <p>You're given a sawed-off shotgun and a horse. The heist is set for dawn. But one of the gang, a man called Tomas, pulls you aside. <em>"Don't trust the boss. He killed the last gringo who joined us. Keep your eyes open."</em></p>
+            </div>
+            <div class="choices">
+                <label for="s4_train_heist">Ride with the gang — rob the Golden Spike Express</label>
+                <label for="s4_betrayal">Play along but plan to take the gold for yourself — betray everyone at the last moment</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2E — UNDERCOVER -->
+        <div id="scene2_undercover" class="scene"><pre></pre>
+            <span class="scene-tag">// COYOTE CREEK — DEAL WITH A PINKERTON //</span>
+            <div class="story-text">
+                <p>You find Agent Reyes at the church, where she's been waiting. <em>"You're the one who cooperated on the train,"</em> she says sharply. <em>"Convince me you're not a bandit."</em> You show her the gold coin and explain your plan to infiltrate the gang. She smiles. <em>"I knew I could use someone like you. Fine. Get into the mission, learn their plans, and signal me with a lantern from the bell tower. Do that, and I'll make sure you get a full pardon and a reward."</em></p>
+                <p>With your new mission, you ride to the mission. But Tomas, the suspicious gang member, is already watching.</p>
+            </div>
+            <div class="choices">
+                <label for="s3_prove_loyalty">Prove your loyalty to the gang by robbing the town bank</label>
+                <label for="s4_betrayal">Go directly to McClane and sell out the gang for a bigger reward</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2F — BUCKSHOT JOHNNY -->
+        <div id="scene2_buckshot" class="scene"><pre></pre>
+            <span class="scene-tag">// JOHNNY'S RANCH — SAWED-OFF TRAINING //</span>
+            <div class="story-text">
+                <p>Buckshot Johnny is a legend in his own time — retired now, but his hands haven't forgotten the weight of a shotgun. For a week, he drills you in quick-draw, tracking, and survival. <em>"El Muerto killed my boy,"</em> he says, his voice gravel. <em>"I'm too old for a straight fight, but I got a plan. My granddaughter, Maria, works in the saloon. She's been feeding me information. The gang will hit the gold train at Dead Horse Canyon. We'll be waiting with dynamite and the Lord on our side."</em></p>
+                <p>He hands you a custom-loaded shotgun — <strong>"Judge and Jury"</strong> — with two barrels: one loaded with buckshot, the other with a flare to blind horsemen. <em>"Make every shot count."</em></p>
+            </div>
+            <div class="choices">
+                <label for="s3_revenge_ride">Ride with Johnny to Dead Horse Canyon for the ambush</label>
+                <label for="s3_stakeout">Wait at the canyon alone — you want to be the one to face El Muerto</label>
+            </div>
+        </div>
+
+        <!-- SCENE 2G — CHURCH -->
+        <div id="scene2_church" class="scene"><pre></pre>
+            <span class="scene-tag">// MISSION SANTA VIOLETA — SISTER ISABELLA //</span>
+            <div class="story-text">
+                <p>The nun from the train — Sister Isabella — is not what she seems. She meets you in the confessional, her voice low. <em>"I'm a Pinkerton agent. The bandits stole something from the mail car — a coded letter that proves McClane's involvement. They're hiding in the old mission outside town. If you can retrieve that letter, we can bring down the whole conspiracy."</em></p>
+                <p>She slides a small derringer through the grille. <em>"Join the gang or sneak in. But get me that letter before dawn."</em></p>
+            </div>
+            <div class="choices">
+                <label for="s2_join_gang">Join the gang to get close to the letter</label>
+                <label for="s3_prove_loyalty">Sneak into the mission alone tonight — steal the letter and run</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3A — STAKE OUT -->
+        <div id="scene3_stakeout" class="scene"><pre></pre>
+            <span class="scene-tag">// DEAD HORSE CANYON — DUST BEFORE DAWN //</span>
+            <div class="story-text">
+                <p>You and Isabella crouch behind boulders as the Golden Spike Express chugs into the canyon. Below, El Muerto's gang has already dynamited the trestle bridge — the train screeches to a halt. Gunfire erupts. <em>"Now!"</em> Isabella shouts, and you slide down the slope, picking off gunmen one by one. In the chaos, McClane's men appear from the opposite ridge — they were waiting to kill the gang and claim the gold. A three-way firefight ensues.</p>
+                <p>El Muerto, realizing he's trapped, pulls a stick of dynamite and charges the mail car. <em>"If I can't have the gold, nobody can!"</em> he screams.</p>
+            </div>
+            <div class="choices">
+                <label for="s4_showdown">Tackle El Muerto before he reaches the dynamite — settle this man to man</label>
+                <label for="s4_mine_explosion">Let him blow the gold — use the distraction to escape with the coded letter</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3B — AMBUSH GANG -->
+        <div id="scene3_ambush_gang" class="scene"><pre></pre>
+            <span class="scene-tag">// JASMINE WASH — AMBUSH AT DAWN //</span>
+            <div class="story-text">
+                <p>You catch El Muerto's gang moving through a narrow wash. With Isabella's rifle and your revolver, you pick them off from the ridge. Culebra falls. Oso falls. Pico throws down his gun and begs for mercy. El Muerto, however, vanishes into a cave. <em>"He's gone to the old mine,"</em> Pico gasps. <em>"There's a back entrance. He's got dynamite stored there."</em></p>
+                <p>Isabella wants to follow. <em>"The coded letter is still with him. We need it."</em></p>
+            </div>
+            <div class="choices">
+                <label for="s4_mine_explosion">Follow El Muerto into the mine — confront him in the dark</label>
+                <label for="s4_showdown">Wait for him to come out — call him out to a duel at high noon</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3C — HIDEOUT RAID -->
+        <div id="scene3_hideout_raid" class="scene"><pre></pre>
+            <span class="scene-tag">// OLD MISSION — POSSE ASSAULT //</span>
+            <div class="story-text">
+                <p>Marshal Garrett's posse surrounds the mission at dawn. A fierce shootout erupts through the crumbling cloisters. You corner Tomas, who throws a key at you. <em>"The letter — it's in the bell tower. But McClane's men are already inside! They want to burn it!"</em></p>
+                <p>You sprint up the stone steps as flames lick the wooden beams. McClane himself is there, holding the coded letter. <em>"This ends now,"</em> he snarls, pulling a revolver.</p>
+            </div>
+            <div class="choices">
+                <label for="s4_final_duel">Draw and fire — duel McClane in the burning bell tower</label>
+                <label for="s4_showdown">Jump him — wrestle for the letter and throw him from the tower</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3D — CANYON AMBUSH -->
+        <div id="scene3_canyon_ambush" class="scene"><pre></pre>
+            <span class="scene-tag">// DEAD HORSE CANYON — THE TRAP SPRUNG //</span>
+            <div class="story-text">
+                <p>The posse takes positions. When the train stops and the gang boards, McClane's men open fire — not on the bandits, but on the posse! <em>"It's a massacre!"</em> the marshal shouts. McClane has double-crossed everyone. You spot Isabella pinned down behind a rock. Buckshot Johnny (if alive) unleashes his shotgun, covering your charge. El Muerto is laughing as he loads the gold onto mules.</p>
+                <p>The canyon fills with gunsmoke and screams. You have one chance to turn the tide.</p>
+            </div>
+            <div class="choices">
+                <label for="s4_showdown">Charge El Muerto's mules — stop him from escaping with the gold</label>
+                <label for="s4_mine_explosion">Use Johnny's flare gun to ignite the dynamite on the trestle, collapsing the bridge</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3E — PLAN HEIST -->
+        <div id="scene3_plan_heist" class="scene"><pre></pre>
+            <span class="scene-tag">// MISSION — CANDLELIT CONSPIRACY //</span>
+            <div class="story-text">
+                <p>El Muerto spreads a map on the altar. <em>"The train passes the canyon at dawn. We blow the trestle, board the mail car, and take the gold. McClane will be waiting with his men, but we have a surprise — his own explosives, rigged to a secondary fuse. When he thinks he's got us, we'll blow them to kingdom come."</em></p>
+                <p>He looks at you. <em>"I want you on the trestle, setting the dynamite. It's the most dangerous job. Do it, and you get a fifth of the gold. Fail, and you're dead. What do you say?"</em></p>
+            </div>
+            <div class="choices">
+                <label for="s4_train_heist">Accept the job — blow the trestle and rob the train</label>
+                <label for="s4_betrayal">Agree, but secretly rig the dynamite to blow early — trap the gang</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3F — PROVE LOYALTY -->
+        <div id="scene3_prove_loyalty" class="scene"><pre></pre>
+            <span class="scene-tag">// COYOTE CREEK BANK — MIDNIGHT ROBBERY //</span>
+            <div class="story-text">
+                <p>To prove you're not a spy, El Muerto demands you rob the town bank with Tomas. The two of you blow the safe with nitroglycerin. But as you scoop up the cash, Tomas turns on you. <em>"The boss says only one of us walks away."</em> He aims his gun. You have a split second.</p>
+                <p>Outside, a Pinkerton agent's lantern flashes — it's Isabella, signaling. She's found the letter. The bank is about to be surrounded by the marshal's men.</p>
+            </div>
+            <div class="choices">
+                <label for="s4_showdown">Outdraw Tomas — take the cash and meet Isabella outside</label>
+                <label for="s4_betrayal">Surrender to the marshal — give up the gang in exchange for amnesty</label>
+            </div>
+        </div>
+
+        <!-- SCENE 3G — REVENGE RIDE -->
+        <div id="scene3_revenge_ride" class="scene"><pre></pre>
+            <span class="scene-tag">// NIGHTHAWK TRAIL — THE VIGILANTES //</span>
+            <div class="story-text">
+                <p>Buckshot Johnny leads you on a hard ride through the night. Maria, his granddaughter, has slipped word that the gang is gathering at the mission. As you approach, you see the glow of lanterns and hear the strum of a guitar. <em>"They're celebrating,"</em> Johnny whispers. <em>"This is our chance."</em> He hands you a stick of dynamite. <em>"For my boy."</em></p>
+                <p>The two of you sneak close. The mission's powder magazine sits near the old well. One well-placed throw could take out half the gang. But it would also destroy any evidence of McClane's crimes.</p>
+            </div>
+            <div class="choices">
+                <label for="s4_mine_explosion">Throw the dynamite — blow the magazine and take your revenge</label>
+                <label for="s4_final_duel">Call El Muerto out — challenge him to a duel in front of his men</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4A — TRAIN HEIST -->
+        <div id="scene4_train_heist" class="scene"><pre></pre>
+            <span class="scene-tag">// TRESTLE BRIDGE — DAWN EXPLOSION //</span>
+            <div class="story-text">
+                <p>You light the fuse and dive for cover. The trestle explodes in a thunder of fire and splintered wood. The train shrieks, derailing just enough to stop without crashing. The gang swarms the gold car. But McClane's men spring their trap — guns blazing from the canyon rim. El Muerto laughs and triggers the secondary fuse, blowing a rock slide that buries half of McClane's mercenaries.</p>
+                <p>In the chaos, you climb into the gold car. Isabella is there, gun drawn. <em>"Step away from the gold,"</em> she orders. El Muerto appears behind her. A three-way standoff.</p>
+            </div>
+            <div class="choices">
+                <label for="e_outlaw">Sideline Isabella and escape with the gold — become the new bandit king</label>
+                <label for="e_hero">Help Isabella — arrest El Muerto and return the gold to the government</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4B — BETRAYAL -->
+        <div id="scene4_betrayal" class="scene"><pre></pre>
+            <span class="scene-tag">// MOMENTS BEFORE DAWN — DOUBLE CROSS //</span>
+            <div class="story-text">
+                <p>You slip away from the gang under cover of darkness and race to warn Marshal Garrett. But McClane is waiting. <em>"I knew you'd break,"</em> he sneers. <em>"You're just like all the others — no stomach for real work."</em> He raises a shotgun. Before he can fire, Johnny's shotgun booms from the shadows. McClane falls. <em>"Always pay your debts,"</em> Johnny growls.</p>
+                <p>Now you have McClane's own ledger, proving the insurance fraud. With Isabella's testimony, you can bring down the railroad empire. But El Muerto is still on his way to the train.</p>
+            </div>
+            <div class="choices">
+                <label for="e_lawman">Bring McClane in — let the law clean up the mess</label>
+                <label for="e_vigilante">Ride out and stop El Muerto yourself — no more trials, just bullets</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4C — SHOWDOWN -->
+        <div id="scene4_showdown" class="scene"><pre></pre>
+            <span class="scene-tag">// COYOTE CREEK MAIN STREET — HIGH NOON //</span>
+            <div class="story-text">
+                <p>The townsfolk line the boardwalks. The sun blazes. El Muerto stands at one end of the street, his pearl-handled Colt gleaming. You at the other, hand hovering. <em>"¡Vamanos!"</em> he shouts. <em>"Let's see if you're as fast as they say, gringo."</em></p>
+                <p>The world goes silent. A wagon creaks. A hawk cries. Your fingers twitch. In a blur, you draw — two shots ring out as one. Dust swirls. One man falls. The other stands.</p>
+            </div>
+            <div class="choices">
+                <label for="e_legend">You hit him — El Muerto is dead, but his legend lives on in you</label>
+                <label for="e_dead">He's faster — you take the bullet, but your sacrifice buys the town peace</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4D — MINE EXPLOSION -->
+        <div id="scene4_mine_explosion" class="scene"><pre></pre>
+            <span class="scene-tag">// ABANDONED SILVER MINE — ENTRANCE COLLAPSING //</span>
+            <div class="story-text">
+                <p>The dynamite goes off, collapsing the mine entrance. Rocks bury the gang's supplies and half their horses. El Muerto, trapped inside, screams curses. You have a choice: dig him out and face him, or leave him to die in the dark. Isabella wants him alive for trial. Johnny wants him dead for his son.</p>
+            </div>
+            <div class="choices">
+                <label for="e_revenge">Leave him — the mine becomes his tomb</label>
+                <label for="e_lawman">Dig him out — drag him to justice, no matter how long it takes</label>
+            </div>
+        </div>
+
+        <!-- SCENE 4E — FINAL DUEL -->
+        <div id="scene4_final_duel" class="scene"><pre></pre>
+            <span class="scene-tag">// BELL TOWER — FLAMES AND LEAD //</span>
+            <div class="story-text">
+                <p>You and McClane face each other across the burning bell tower. The letter is on a table between you. <em>"You think you're a hero?"</em> he spits. <em>"Heroes die young."</em> He draws. You're faster. The shot echoes through the valley as McClane tumbles backward into the flames. You snatch the letter and leap from the window, landing in a hay cart as the tower collapses.</p>
+                <p>Below, the town watches in awe. The marshal nods. Isabella smiles. The letter is safe. The conspiracy is exposed.</p>
+            </div>
+            <div class="choices">
+                <label for="e_hero">Present the letter — let the Pinkertons bring down the railroad</label>
+                <label for="e_vigilante">Disappear — let the legend of the stranger in the tower grow</label>
+            </div>
+        </div>
+
+        <!-- ENDING: HERO -->
+        <div id="scene_e_hero" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE HERO OF COYOTE CREEK //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="gold-text">✦ ENDING: THE SILVER STAR ✦</span></p>
+                <p>You saved the gold, exposed the conspiracy, and brought El Muerto and McClane to justice. The town erects a statue in your honor. Isabella offers you a job with the Pinkertons. You accept, but only for a while — the West still calls. Every train that passes through Coyote Creek blows its whistle for you.</p>
+                <p class="dim">// You chose the law. But the law can be a heavy star to wear. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: OUTLAW KING -->
+        <div id="scene_e_outlaw" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE NEW BANDIT KING //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="warn">✦ ENDING: EL PATRON ✦</span></p>
+                <p>With El Muerto gone, the gang looks to you. You become the most wanted man in the territory, robbing trains, banks, and stagecoaches. Your face is on wanted posters from Texas to California. But you also share the wealth with the poor, and the people sing corridos about you. You're an outlaw, but you're a legend.</p>
+                <p class="dim">// You traded your soul for gold and glory. It feels lighter than you thought. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: LEGEND -->
+        <div id="scene_e_legend" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE FASTEST GUN //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ffcc88;">✦ ENDING: QUICK AS LIGHTNING ✦</span></p>
+                <p>You won the duel. Now every gunslinger wants to test themselves against you. You drift from town to town, never staying long, always watching the horizon. Sometimes you stop at a saloon and play a slow game of poker, and someone asks, "Are you the one who outdrew El Muerto?" You just smile and order another whiskey.</p>
+                <p class="dim">// The fastest gun in the West has no home. But that suits you fine. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: DEAD -->
+        <div id="scene_e_dead" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: BURIED IN BOOT HILL //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ff8877;">✕ ENDING: THE FINAL BULLET ✕</span></p>
+                <p>You took a bullet, but your sacrifice wasn't in vain. The marshal and Isabella finished the work. The gold was saved, McClane was hanged, and the gang scattered. They buried you on a hill overlooking the canyon, with a stone that reads: "Here lies a stranger who did the right thing." Every spring, desert flowers grow on your grave.</p>
+                <p class="dim">// Dying is easy. Making a difference is hard. You did both. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: LAWMAN -->
+        <div id="scene_e_lawman" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE SHERIFF'S STAR //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#b8c8d8;">◇ ENDING: PEACE AT LAST ◇</span></p>
+                <p>Marshal Garrett retires, and the town votes you in as the new sheriff. You clean up Coyote Creek, run the railroad out of town, and marry Isabella. The two of you raise a family on a small ranch outside town. Sometimes, when the train whistle blows, you look up and remember the days of gunfights and gold. But you don't miss them.</p>
+                <p class="dim">// Some men chase glory. You found something better: peace. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: GOLD -->
+        <div id="scene_e_gold" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE GOLDEN GHOST //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="gold-text">✦ ENDING: ALL THE GOLD IN THE WEST ✦</span></p>
+                <p>You rode away with the gold. Changed your name, bought a hacienda in Mexico, and lived like a king. But the gold was cursed — every midnight, you hear the screams of the men who died for it. You're rich, but you never sleep through the night. Sometimes you see a skull-faced figure in the mirror.</p>
+                <p class="dim">// The gold is yours. And so is the guilt. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: VIGILANTE -->
+        <div id="scene_e_vigilante" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE SPIRIT OF THE WEST //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ccaa77;">✦ ENDING: THE MASKED RIDER ✦</span></p>
+                <p>You vanished after the shootout, taking the coded letter and a mask. Now you roam the territory as a vigilante — striking at corrupt railroads, freeing prisoners, and giving stolen gold to the poor. No one knows your face, but everyone knows your name: <strong>The Ghost of Coyote Creek</strong>. The law hunts you, but the people protect you. You are the West's last hope.</p>
+                <p class="dim">// You chose justice outside the law. It's a lonely road, but it's yours. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: STANDOFF -->
+        <div id="scene_e_standoff" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: MEXICAN STANDOFF //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ff8888;">◈ ENDING: NO ONE WINS ◈</span></p>
+                <p>You, El Muerto, and McClane stand in a triangle, guns drawn. Three shots ring out simultaneously. When the dust clears, all three of you are down. The gold sits untouched in the mail car. The town bury you all side by side on Boot Hill. No one wins — but the gold goes back to the government, and the railroad is investigated. Your death wasn't empty.</p>
+                <p class="dim">// Sometimes a draw is the only fair outcome. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: PREACHER -->
+        <div id="scene_e_preacher" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: THE PREACHER'S PEACE //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#99ccaa;">✙ ENDING: FROM GUNS TO GLORY ✙</span></p>
+                <p>You lay down your guns and take up the cross. The mission is rebuilt, and you become its caretaker. Townsfolk come to hear your sermons about redemption. You never stop carrying the scar of a bullet near your heart, a reminder that violence can be left behind. Isabella visits often — not as an agent, but as a friend. You've found a different kind of peace.</p>
+                <p class="dim">// The fastest gun in the West became its gentlest soul. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+        <!-- ENDING: REVENGE -->
+        <div id="scene_e_revenge" class="scene"><pre></pre>
+            <span class="scene-tag">// ENDING: BLOOD FOR BLOOD //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#cc5544;">✕ ENDING: BURN IT ALL DOWN ✕</span></p>
+                <p>You left El Muerto to die in the mine and watched the entrance collapse. Johnny wept over his son's grave that night. But the revenge didn't bring peace — it only left a hole. You and Johnny ride together now, haunted by the ghosts of the men you've killed. The West doesn't give clean endings.</p>
+                <p class="dim">// Some debts can't be paid with bullets. //</p>
+            </div><div class="choices"><label for="s0">Begin Again</label></div></div>
+
+    </div>
+</body>
+</html>
