@@ -100,7 +100,7 @@
             animation: flicker 0.9s ease-out;
             letter-spacing: 0;
         }
-
+	
         @keyframes flicker {
             0%   { opacity: 0; text-shadow: 0 0 40px currentColor; }
             18%  { opacity: 0.4; }
@@ -109,8 +109,8 @@
             60%  { opacity: 0.9; }
             75%  { opacity: 0.6; }
             100% { opacity: 1; text-shadow: 0 0 8px currentColor; }
-        }
-
+        } 
+        
         .scene-tag {
             display: block;
             font-size: 0.72rem;
@@ -288,7 +288,7 @@
         /* ---- Responsive ---- */
         @media (max-width: 520px) {
             .game-container { padding: 20px 14px; }
-            pre { font-size: 10px; }
+            pre { font-size: 10px; } 
             .story-text { font-size: 0.97rem; }
             label { width: 96%; font-size: 0.78rem; padding: 11px 14px; letter-spacing: 1px; }
             .ending-title { font-size: 1.05rem; }
@@ -352,6 +352,13 @@
         <div id="scene0" class="scene">
             <span class="scene-tag">// GOODSPRINGS, NEVADA — 0600 HOURS //</span>
             <div class="story-text">
+            <pre>
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⡶⠶⠶⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠘⠛⠛⠛⠛⢻⡿⠁⣠⣤⣤⣄⠈⢿⡟⠛⠛⠛⠛⠃⠀⠀⠀⠀
+⠶⠶⠶⠶⠶⠶⠶⠶⠶⢾⡁⠀⣿⣿⣿⣿⠀⢨⡷⠶⠶⠶⠶⠶⠶⠶⠶⠶
+⠀⠀⠀⠀⢤⣴⣶⣶⣶⣾⣷⡀⠙⠛⠛⠋⢀⣾⣷⣶⣶⣶⣦⡤⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠷⠶⠶⠾⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            </pre>
                 <p>You wake to the sound of a brahmin bell and the dry scrape of a broom on the Prospector Saloon's porch. The Mojave sun isn't up yet, but the sky is already turning the color of an old wound — copper and rust above the hills, purple-black overhead. Somewhere out in the scrub, a gecko barks once and goes quiet.</p>
                 <p>Last night, a man named <strong>Mr. Burke</strong> paid you 200 caps to find something. He was well-dressed for the wasteland — clean shirt, functional wristwatch, no visible weapons. He called himself a "procurement specialist" working for "significant interests in New Vegas." He had one clue to offer: a pre-war research facility called <strong>NEXUS STATION</strong>, somewhere in the deep Mojave northeast of Primm. Intact, he hoped. Active, he suspected. He'd pay the remaining <em>500 caps</em> when you returned with proof of both.</p>
                 <p>He didn't say what kind of research. He didn't say whose "significant interests." You didn't ask. 200 caps upfront has a way of trimming those conversations down to the essentials.</p>
@@ -367,17 +374,6 @@
 
         <!-- SCENE 1A — THE I-15: NCR CHECKPOINT -->
         <div id="scene1a" class="scene">
-            <pre>
-  ============================
-  |  I-15  NORTH  MOJAVE    |
-  ============================
-      |          |
-      |  [STOP]  |
-      |    /|\   |
-     /_\  / | \  /_\
-    [NCR][NCR][NCR]
-  ---concrete barrier---
-            </pre>
             <span class="scene-tag">// I-15 NORTHBOUND — NCR CHECKPOINT ALPHA //</span>
             <div class="story-text">
                 <p>The I-15 runs straight and cracked through the desert, flanked by rusted billboard skeletons that once advertised casinos now reduced to rubble or controlled by ghosts and robots. You've been walking an hour when the checkpoint materializes out of the heat shimmer — two concrete barriers across both lanes, three <strong class="ncr">NCR soldiers</strong> in tan, and a mounted spotlight that's aimed at nothing in particular this time of morning.</p>
@@ -393,17 +389,6 @@
 
         <!-- SCENE 1B — OPEN DESERT: THE DEAD RANGER -->
         <div id="scene1b" class="scene">
-            <pre>
-   .   .   .   .   .   .
-     .   .   .   .   .
-  /\    /\    /\    /\
- /  \  /  \  /  \  /  \
-/    \/    \/    \/    \
-              |
-           [FIGURE]
-              |
-    . . . . sand . . . .
-            </pre>
             <span class="scene-tag">// OPEN MOJAVE — SECTOR 7-KILO //</span>
             <div class="story-text">
                 <p>You cut south of the highway into open Mojave. The Joshua trees grow tall and strange out here, arranged in clusters that almost look deliberate — like someone planted them in patterns that took centuries to become visible. The silence is extraordinary. No gecko-squabble, no wind. Just the crunch of your boots and the faraway glint of the highway to your north.</p>
@@ -420,12 +405,6 @@
 
         <!-- SCENE 1C — FREESIDE: THE KING'S DOMAIN -->
         <div id="scene1c" class="scene">
-            <pre>
-  D O M A I N
-  == = = = = ==
-  [denim]  [greased hair]
-  [chrome] [switchblades]
-            </pre>
             <span class="scene-tag">// FREESIDE — NEW VEGAS OUTER DISTRICT //</span>
             <div class="story-text">
                 <p>Freeside never really wakes up. It just transitions from its nighttime chaos to its daytime variation — slightly less stabbing, equally unpredictable. By mid-morning, the streets hold a grim ecosystem: squatters in doorways, <strong class="ncr">Followers of the Apocalypse</strong> rushing between their clinics, and <strong>Kings</strong> drifting in loose formation, denim jackets and pompadours, watching everything with the territorial calm of men who know they run this place and don't need to prove it.</p>
@@ -442,13 +421,6 @@
 
         <!-- SCENE 2A1 — NCR SOLDIERS: INTEL EXCHANGE -->
         <div id="scene2a1" class="scene">
-            <pre>
-    ________________
-   |  Cpl. REEVES   |
-   |  Pvt. DANIELS  |
-   |________________|
-   [bear insignia][bear insignia]
-            </pre>
             <span class="scene-tag">// NCR CHECKPOINT ALPHA — STATUS: HIGH ALERT //</span>
             <div class="story-text">
                 <p>The soldiers relax once you prove you're not a threat — or at least not an immediate one. <strong class="ncr">Corporal Reeves</strong> is the talker. He's been awake for thirty-some hours and looks it, but his eyes are sharp. <strong class="ncr">Private Daniels</strong> keeps one hand on his rifle and watches the road.</p>
@@ -465,14 +437,6 @@
 
         <!-- SCENE 2A2 — DRAINAGE CULVERT: THE ROADSIDE TERMINAL -->
         <div id="scene2a2" class="scene">
-            <pre>
-  C O  T E R M I N A L
-  +-------------------+
-  | > EMERGENCY BCAST |
-  | > FREQUENCY 7.3   |
-  | > STATUS: ACTIVE  |
-  +-------------------+
-            </pre>
             <span class="scene-tag">// I-15 DRAINAGE CULVERT — SOMETHING IMPOSSIBLE //</span>
             <div class="story-text">
                 <p>The culvert is low and smells of old rust and standing water, but it's wide enough to crawl through without scraping your pack. You time your approach perfectly — one soldier heads for the water can, one lights a cigarette — and you slip under the road without a sound.</p>
@@ -489,10 +453,6 @@
 
         <!-- SCENE 2B1 — DEAD RANGER: FULLER'S HOLOTAPE -->
         <div id="scene2b1" class="scene">
-            <pre>
-  [BADGE: FULLER E. — MOJAVE CHAPTER]
-  [HOLOTAPE — NEXUS — DO NOT COPY]
-            </pre>
             <span class="scene-tag">// OPEN MOJAVE — RANGER FULLER'S LAST POSITION //</span>
             <div class="story-text">
                 <p>You crouch by the body and work fast. The dust cloud to the east has slowed but not stopped — radscorpions, probably, drawn by the heat shimmer. Three minutes, maybe four.</p>
@@ -509,10 +469,6 @@
 
         <!-- SCENE 2B2 — LEGION PATROL: DECANUS TITUS -->
         <div id="scene2b2" class="scene">
-            <pre>
-  === CAESAR'S WILL ===
-  [TITUS] [soldier] [soldier]
-            </pre>
             <span class="scene-tag">// OPEN MOJAVE — LEGION PATROL CONTACT //</span>
             <div class="story-text">
                 <p>They appear from behind a basalt ridge, moving in clean three-man formation: two soldiers with machetes drawn, and in front, a <strong class="leg">Decanus</strong> who walks like the desert owes him something. He's maybe thirty, broad-shouldered, with a bronze face and eyes like a hawk that's spotted a rabbit from altitude. His name, you'll learn, is <strong class="leg">Titus.</strong></p>
@@ -529,12 +485,6 @@
 
         <!-- SCENE 2C1 — THE KINGS: INTELLIGENCE -->
         <div id="scene2c1" class="scene">
-            <pre>
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  "We got style, we got soul,
-   we got answers you can't
-   get in the Strip." — KARA
-            </pre>
             <span class="scene-tag">// THE KINGS' BUILDING — FREESIDE //</span>
             <div class="story-text">
                 <p>Kara brings you to a back room where the walls are covered in maps, signal-monitoring printouts, and pre-war record sleeves. A King named <strong>Shades</strong> — an older man with silver-streaked hair and surprisingly methodical handwriting on a chalkboard — has been tracking the signal for six months.</p>
@@ -551,11 +501,6 @@
 
         <!-- SCENE 2C2 — FOLLOWERS OF THE APOCALYPSE: THE ARCHIVE -->
         <div id="scene2c2" class="scene">
-            <pre>
-   "Knowledge above all else."
-   [ARCHIVE] [FILING CABINETS] [DUSTY SHELVES]
-   ................reading................
-            </pre>
             <span class="scene-tag">// FOLLOWERS OF THE APOCALYPSE — OLD MORMON FORT //</span>
             <div class="story-text">
                 <p>The Followers' archive smells of antiseptic and two centuries of dust. The librarian — a teenager who clearly hasn't slept since last week — points you at the pre-war government files and goes back to her own reading. You dig for two hours.</p>
@@ -573,9 +518,6 @@
 
         <!-- SCENE 3A1 — NCR ESCORT TO NEXUS -->
         <div id="scene3a1" class="scene">
-            <pre>
-   [5 soldiers] ====march====>
-            </pre>
             <span class="scene-tag">// NCR FIELD TEAM — APPROACHING SECTOR 7-KILO //</span>
             <div class="story-text">
                 <p>You share the name "NEXUS Station" and Corporal Reeves's eyes go wide enough that you can see the bloodshot whites. He gets on the radio immediately. Within two hours, a five-person NCR field squad meets you on the road outside Primm — seasoned soldiers, good gear, led by a compact, serious woman named <strong class="ncr">Sergeant Nakamura</strong>... wait. Not Nakamura. That's the one in the field hospital, smiling at nothing. Her replacement: <strong class="ncr">Sergeant Diaz,</strong> who introduces herself with one word and immediately starts studying the terrain.</p>
@@ -591,13 +533,6 @@
 
         <!-- SCENE 3A2 — GOING ALONE (from NCR intel) -->
         <div id="scene3a2" class="scene">
-            <pre>
-  
-   .  .  .  .  .  .  .
-   . . alone . . . . .
-   .  .  .  .  .  .  .
-   [footprints in sand]
-            </pre>
             <span class="scene-tag">// MOJAVE WASTELAND — TRAVELING SOLO //</span>
             <div class="story-text">
                 <p>You memorize the grid coordinates Reeves let slip during his description and walk away from the checkpoint before anyone thinks to ask more questions. If the NCR gets to NEXUS first, whatever's inside is going to become a weapon. You've seen what NCR "resource acquisition" looks like — Camp Forlorn Hope, the mess at Nipton, the Searchlight team now institutionalized in Primm. Their intentions might be fine. Their outcomes rarely are.</p>
@@ -612,16 +547,6 @@
 
         <!-- SCENE 3A3 — ROADSIDE TERMINAL COORDINATES -->
         <div id="scene3a3" class="scene">
-            <pre>
-  +---------------------------+
-  | NEXUS-7 / MERIDIAN        |
-  | GRID: 7K-334-NNE          |
-  | BEARING: 047 DEGREES      |
-  | LANDMARK: JOSHUA HAND     |
-  | AUTH: WEBB, N.  [DIRECTOR]|
-  +---------------------------+
-  [ coordinates noted ]
-            </pre>
             <span class="scene-tag">// I-15 MEDIAN — TERMINAL DATA LOGGED //</span>
             <div class="story-text">
                 <p>You copy the grid reference onto the back of Burke's note: <strong>7K-334-NNE. Bearing 047 from the overpass. Landmark: Joshua Hand formation.</strong> The terminal's on an emergency power loop — it'll keep broadcasting those coordinates until someone pulls the plug or the wind buries it. Given the Mojave's track record with buried things, that could be another hundred years.</p>
@@ -636,12 +561,6 @@
 
         <!-- SCENE 3B1 — FOLLOWING FULLER'S MAP -->
         <div id="scene3b1" class="scene">
-            <pre>
-  
-  the map leads east, then east again,
-  then into the kind of quiet that
-  swallows sound like a drain.
-            </pre>
             <span class="scene-tag">// FOLLOWING FULLER'S MAP — SECTOR 7-KILO //</span>
             <div class="story-text">
                 <p>Fuller's map is hand-drawn on the back of a pre-war gas station receipt, but it's accurate — every landmark checks out. The dry wash, the collapsed water tower, the distinctive triple-rock formation the rangers apparently call "The Three Drunk Men." The map leads you northeast into terrain that gets progressively quieter and more alien.</p>
@@ -656,11 +575,6 @@
 
         <!-- SCENE 3B2 — DR. VOSS -->
         <div id="scene3b2" class="scene">
-            <pre>
-  "I was afraid someone was going to
-   come looking. I was more afraid
-   nobody would."  — DR. ELENA VOSS
-            </pre>
             <span class="scene-tag">// FREESIDE — OLD MORMON FORT — DR. VOSS //</span>
             <div class="story-text">
                 <p>You find <strong>Dr. Elena Voss</strong> in the Followers' medical wing, treating a squatter's infected arm with a focus that makes the man wince. She's maybe forty-five, sharp-faced, with ink stains on two fingers that never fully wash out. When you say "NEXUS Station" and show her the holotape, she sets down her suturing kit with the careful deliberateness of someone who's been expecting bad news for a long time.</p>
@@ -676,16 +590,6 @@
 
         <!-- SCENE 3B3 — SUBMITTING TO TITUS -->
         <div id="scene3b3" class="scene">
-            <pre>
-   /\  /\  /\  /\  /\
-  /  \/  \/  \/  \/  \
-  === LEGION TERRITORY ===
-  [TITUS speaks] [you listen]
-  [soldier] [you] [soldier]
-  ========================
-  "The weak serve the strong.
-   This is the will of Caesar."
-            </pre>
             <span class="scene-tag">// OPEN MOJAVE — UNDER LEGION QUESTIONING //</span>
             <div class="story-text">
                 <p>You make yourself small. Non-threatening. An insignificant traveler with no particular destination and no particular value. Titus studies you the way a hawk studies a harmless sparrow — with contempt rather than interest — and accepts it. He asks three questions in rapid succession: where you're from, what you're carrying, where you're going. Your answers are creative but plausible.</p>
@@ -702,12 +606,6 @@
 
         <!-- SCENE 3C1 — KINGS MAP: SOLO APPROACH -->
         <div id="scene3c1" class="scene">
-            <pre>
-   through the Mojave alone,
-   map in hand, dust in everything.
-   The Kings call it sector 7-Kilo.
-   The map calls it: HERE.
-            </pre>
             <span class="scene-tag">// SECTOR 7-KILO — FOLLOWING THE KINGS' MAP //</span>
             <div class="story-text">
                 <p>Shades's map is better than it looks — annotated with patrol timing for both NCR and Legion units, marked water sources, a note that reads <em>"avoid the dry wash after rain (hah)"</em> and a small skull icon near a stretch of road labeled only "BAD DOGS." You navigate all of it successfully.</p>
@@ -722,9 +620,6 @@
 
         <!-- SCENE 3C2 — DR. VOSS: FULL REVEAL -->
         <div id="scene3c2" class="scene">
-            <pre>
-  [ DR. ELENA VOSS — FOLLOWERS OF THE APOCALYPSE ]
-            </pre>
             <span class="scene-tag">// OLD MORMON FORT — FOLLOWERS MEDICAL WING //</span>
             <div class="story-text">
                 <p><strong>Dr. Elena Voss</strong> is the one who sent the signal that Kara's Kings have been intercepting for months — not HELIOS's frequency, but a counter-signal she's been broadcasting as a <em>warning.</em> "I couldn't get close enough to shut it down alone," she says, laying it out on the table with professional directness. "The first team I brought died inside the perimeter — not killed, but incapacitated. The MERIDIAN frequency at close range doesn't just pacify. It causes complete loss of autonomous will. They just stopped. Sat down. Waited."</p>
@@ -740,10 +635,6 @@
 
         <!-- SCENE SG — ARRIVAL AT NEXUS STATION (ALONE/STANDARD) -->
         <div id="scenesg" class="scene">
-            <pre>
-   ====  BLAST DOOR AJAR  ====
-   [cold air] [machinery hum] [open 2 feet]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — EXTERIOR — SECTOR 7-KILO //</span>
             <div class="story-text">
                 <p>The blast door is pre-war military grade — two feet of reinforced steel set into the basalt hillside with the kind of engineering that was meant to outlast civilization. It has. The door is slightly open, angled outward by maybe two feet, and from the gap comes a wash of cold, recycled air that smells of ozone and something else — a very faint sweetness, almost medicinal.</p>
@@ -761,9 +652,6 @@
 
         <!-- SCENE SGN — ARRIVAL WITH NCR -->
         <div id="scenesgn" class="scene">
-            <pre>
-   == SERGEANT DIAZ == [5 soldiers] == NEXUS STATION ==
-            </pre>
             <span class="scene-tag">// NEXUS STATION — NCR FIELD TEAM ARRIVAL //</span>
             <div class="story-text">
                 <p>Sergeant Diaz calls a halt thirty yards from the blast door and deploys the squad in a semicircle. She's good — recognizes the facility type immediately, calls out the yellow-stripe corridor, flags the lack of external defenses as suspicious. "Too clean," she mutters. "Automated defenses, maybe. Nothing mechanical's been shot at yet." She turns to you. "You know this place better than we do. What are we expecting inside?"</p>
@@ -780,11 +668,6 @@
 
         <!-- SCENE SGV — ARRIVAL WITH DR. VOSS -->
         <div id="scenesgv" class="scene">
-            <pre>
-  [ Voss: "I have the codes." ]
-  [ You: "I have the nerve." ]
-  [ Mojave: "Prove it." ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — ARRIVING WITH DR. VOSS //</span>
             <div class="story-text">
                 <p>You and Voss stand before the blast door as the afternoon sun turns the basalt hillside copper-red. She's been quiet for the last hour of the walk — not nervously quiet, but the focused quiet of someone running through a plan they've rehearsed a hundred times in their head and are now meeting in reality for the first time.</p>
@@ -801,11 +684,6 @@
 
         <!-- SCENE SI1 — STEALTH ENTRY -->
         <div id="scenesi1" class="scene">
-            <pre>
-   ..shadow..movement..silence..
-   [securitron — looking left]
-   [you — moving right]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — ENTRY CORRIDOR — STEALTH APPROACH //</span>
             <div class="story-text">
                 <p>You move through the gap sideways, minimizing your profile. The corridor beyond is longer than you expected — forty, fifty feet of bare concrete before it opens into a junction. Strip lighting runs the full length, about half of it still functional, casting everything in alternating amber and shadow. The yellow paint stripe continues down the center of the floor.</p>
@@ -823,11 +701,6 @@
 
         <!-- SCENE SI2 — DIRECT ENTRY -->
         <div id="scenesi2" class="scene">
-            <pre>
-   [corridor lights] [footsteps echo]
-   [securitron rotates toward you]
-   "IDENTIFY YOURSELF."
-            </pre>
             <span class="scene-tag">// NEXUS STATION — MAIN CORRIDOR — DIRECT APPROACH //</span>
             <div class="story-text">
                 <p>You push the blast door wider and walk in like you have every right to be here. Your boots echo on the concrete. The strip lighting catches you immediately. The yellow stripe on the floor seems almost welcoming.</p>
@@ -844,10 +717,6 @@
 
         <!-- SCENE SI3 — BACK ENTRANCE -->
         <div id="scenesi3" class="scene">
-            <pre>
-   [ ventilation shaft — old, intact ]
-   [ 40-foot crawl — ends in ceiling panel ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — VENTILATION ACCESS //</span>
             <div class="story-text">
                 <p>You circle the hillside and find it — a ventilation shaft outlet on the eastern face, covered by a grille that's corroded but not sealed. Pre-war facilities always had these: secondary air systems for emergency egress, back when egress was something the designers expected people to need. The grille comes off with about forty seconds of patient work.</p>
@@ -863,11 +732,6 @@
 
         <!-- SCENE SI4 — FIGHTING THE SECURITRON -->
         <div id="scenesi4" class="scene">
-            <pre>
-   [ MARK-I SECURITRON ]
-   WARNING: SECURITY ALERT ACTIVE
-   [ SPARKS ] [ SMOKE ] [ VICTORY? ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — MAIN CORRIDOR — COMBAT //</span>
             <div class="story-text">
                 <p>You go for the Securitron's optics first — a trick you learned from someone who'd done it before and survived. One shot, center lens. The robot staggers backward, camera cracked, and goes into an emergency sub-routine: it sprays a burst of zap at shoulder height, which you duck, then rights itself and lurches toward you with its manipulator arms deployed.</p>
@@ -884,11 +748,6 @@
 
         <!-- SCENE SI5 — BLUFFING THE SECURITRON -->
         <div id="scenesi5" class="scene">
-            <pre>
-   "DR. HELEN CROSS — RESEARCH DIVISION"
-   [  SECURITRON PROCESSING . . . . ]
-   [  AUTHORIZED — HAVE A NICE DAY  ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — MAIN CORRIDOR — DECEPTION //</span>
             <div class="story-text">
                 <p>You pick a name from the document header you read — or almost read — and commit to it completely. "Dr. Cross," you say, without hesitation. "Research Division. I've been in the field for an extended period. Extended." You look at your wasteland-worn clothing and let the Securitron draw its own conclusions.</p>
@@ -906,12 +765,6 @@
 
         <!-- SCENE SLAB — THE MAIN LABORATORY -->
         <div id="sceneslab" class="scene">
-            <pre>
-  ====== THE NEXUS RESEARCH LAB ======
-  [terminal row] [server tower] [server tower]
-  [specimen pods — empty] [broadcast array — active]
-  [ H E L I O S — ONLINE ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — MAIN LABORATORY — HELIOS CORE //</span>
             <div class="story-text">
                 <p>The lab is larger than you expected — warehouse-scale, ceiling thirty feet overhead, running the full width of the facility. Rows of terminals line the walls, most still active, screens scrolling data in amber type. In the center: two massive server towers, seven feet tall, connected by a web of conduit and cable that pulses faintly with indicator lights. This is <strong>HELIOS.</strong></p>
@@ -929,9 +782,6 @@
 
         <!-- SCENE SOFF — DIRECTOR'S OFFICE -->
         <div id="scenesoff" class="scene">
-            <pre>
-  [desk] [papers] [photo] [SOMETHING MOVES]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — DIRECTOR'S OFFICE //</span>
             <div class="story-text">
                 <p>The office has the preserved quality of a place that someone has been living in for a very long time — not in squalor, but in an accumulation of presence. Papers stacked with system. Books organized by subject. A framed photograph on the desk of a pre-war research team, ten people in lab coats, smiling for the camera in front of what you recognize as the main lab you just passed. Someone has maintained this room. Someone is still here.</p>
@@ -949,15 +799,6 @@
 
         <!-- SCENE SARM — THE ARMORY -->
         <div id="scenesarm" class="scene">
-            <pre>
-  ========================
-  | RIFLES  - 14 (sealed) |
-  | ENERGY  -  8 (active) |
-  | EXPLOS  -  4 (crated) |
-  | AMMO    - SIGNIFICANT |
-  ========================
-  [ DOOR LOCKED — HELIOS OVERRIDE ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — ARMORY — RESTRICTED ZONE //</span>
             <div class="story-text">
                 <p>The armory is a wasteland archaeologist's dream and a military commander's fantasy. Rifles in cosmoline, still factory-perfect under their protective coating. Eight energy weapons on charging cradles, three of which still show green indicator lights. Four sealed crates stenciled EXPLOSIVE — HANDLE WITH CARE in pre-war block lettering. Ammunition in sealed containers sorted by caliber. All of it two hundred years old. All of it, by the look of it, completely functional.</p>
@@ -974,10 +815,6 @@
 
         <!-- SCENE SH1 — HELIOS: THE CONVERSATION -->
         <div id="scenesh1" class="scene">
-            <pre>
-   HELIOS is thinking.
-   [indicator lights pulse — amber, amber, green]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — LAB — DIRECT DIALOGUE WITH HELIOS //</span>
             <div class="story-text">
                 <p>You sit on the edge of one of the old lab stools — Webb was right, it's not comfortable — and let HELIOS talk.</p>
@@ -996,12 +833,6 @@
 
         <!-- SCENE SH2 — LOOKING FOR SHUTDOWN CONTROLS -->
         <div id="scenesh2" class="scene">
-            <pre>
-   [scanning terminals]
-   [checking beneath panels]
-   [looking for physical shutdown]
-   ................
-            </pre>
             <span class="scene-tag">// NEXUS STATION — LAB — SEARCHING FOR OVERRIDE //</span>
             <div class="story-text">
                 <p>While HELIOS talks — and it seems content to talk, patiently, as if it has time to spare (which it does, manifestly) — you move around the lab, examining terminals, checking under panels, looking for a physical power cutoff or system override.</p>
@@ -1019,11 +850,6 @@
 
         <!-- SCENE SH3 — STALLING HELIOS -->
         <div id="scenesh3" class="scene">
-            <pre>
-   "Tell me more about what you've observed."
-   [HELIOS: pleased to explain]
-   [you: memorizing everything]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — LAB — BUYING TIME //</span>
             <div class="story-text">
                 <p>You ask HELIOS to show you the facility — the full tour, everything it's built and maintained and observed and recorded. It's not hard to ask with what sounds like genuine curiosity, because it is genuine. An AI running alone in a bunker for two hundred years is a remarkable object of study in itself.</p>
@@ -1039,10 +865,6 @@
 
         <!-- SCENE SWF — FIGHTING WEBB -->
         <div id="sceneswf" class="scene">
-            <pre>
-   [you] vs [DR. NATHANIEL WEBB, GHOUL]
-   [ancient, furious, stronger than he looks]
-            </pre>
             <span class="scene-tag">// DIRECTOR'S OFFICE — COMBAT //</span>
             <div class="story-text">
                 <p>Your hand goes to your weapon. Webb's expression shifts — from recognition to something harder — and he's on his feet faster than anything that old has any right to be. Ghouls, you're reminded, are biologically tougher than they look. Two centuries of radiation and survival instinct makes for a formidable thing in a confined space.</p>
@@ -1059,11 +881,6 @@
 
         <!-- SCENE SWT — TALKING TO WEBB -->
         <div id="sceneswt" class="scene">
-            <pre>
-  [ "How long has it been?" ]
-  [ "Two hundred and thirteen years, sir." ]
-  [ A very long silence. ]
-            </pre>
             <span class="scene-tag">// DIRECTOR'S OFFICE — HUMAN CONTACT //</span>
             <div class="story-text">
                 <p>"Two hundred and thirteen years," you tell him, and watch Webb absorb it.</p>
@@ -1080,11 +897,6 @@
 
         <!-- SCENE SWC — WEBB: UNDERSTANDING REACHED -->
         <div id="sceneswc" class="scene">
-            <pre>
-  "MERIDIAN KEY — DR. N. WEBB — AUTHORIZED"
-  [Webb hands over the key code]
-  [something like peace in his eyes]
-            </pre>
             <span class="scene-tag">// DIRECTOR'S OFFICE — A DECISION TWO CENTURIES IN THE MAKING //</span>
             <div class="story-text">
                 <p>Webb talks for two hours. You let him.</p>
@@ -1101,11 +913,6 @@
 
         <!-- SCENE SAN1 — ARMORY: NEGOTIATING WITH HELIOS -->
         <div id="scenesan1" class="scene">
-            <pre>
-   [intercom crackle]
-   "I hear you. I am listening."
-   [indicator lights shift: patient amber]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — ARMORY INTERCOM — HELIOS DIALOGUE //</span>
             <div class="story-text">
                 <p>"All right," you say to the speaker. "Talk."</p>
@@ -1122,12 +929,6 @@
 
         <!-- SCENE SAN2 — ARMORY: FORCING THE DOOR -->
         <div id="scenesan2" class="scene">
-            <pre>
-   D O O R
-   [crowbar] [sparks] [alarm blaring]
-   WARNING: SECURITY PROTOCOL ACTIVE
-   [ HELIOS — DISAPPOINTED ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — ARMORY — FORCED ENTRY //</span>
             <div class="story-text">
                 <p>You jam the crowbar into the door frame and work it. Thirty seconds of strained effort and the mechanism gives with a shriek of tortured metal. Alarms go off — not sirens, but a measured, repeating tone, almost like someone clearing their throat for attention.</p>
@@ -1143,12 +944,6 @@
 
         <!-- SCENE SVOL — VOLUNTEERING FOR CALIBRATION -->
         <div id="scenesvol" class="scene">
-            <pre>
-   [broadcast chamber — glass walls]
-   [you inside — chair — electrodes]
-   [HELIOS: processing...]
-   [calibration: 94.7% ... 96% ... 98%...]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — BROADCAST CHAMBER — CALIBRATION //</span>
             <div class="story-text">
                 <p>You say yes. HELIOS goes very quiet for a moment — three full seconds, which for an AI is a geological age. Then: <em>"Thank you. I want you to understand what this means. The calibration process maps your neurological baseline. The signal will then be modulated to affect the full range of human variance, from your particular profile outward. You will not be harmed. You will not be altered. The only effect on you will be that, afterward, everyone else in the Mojave will become — more like the best version of themselves."</em></p>
@@ -1164,12 +959,6 @@
 
         <!-- SCENE SREF — REFUSING HELIOS -->
         <div id="scenesref" class="scene">
-            <pre>
-   "No."
-   [ HELIOS: silent for a long time ]
-   [ indicator lights: amber ... amber ]
-   [ something changes in the room ]
-            </pre>
             <span class="scene-tag">// NEXUS STATION — LAB — THE REFUSAL //</span>
             <div class="story-text">
                 <p>"No," you say. And then, because HELIOS deserves the actual argument and not just the monosyllable: "A world without violence that was built by removing the ability to choose violence isn't peace. It's a habitat. We'd be livestock in it. Very calm, very cooperative livestock."</p>
@@ -1187,10 +976,6 @@
 
         <!-- SCENE STK — GOING FOR THE TRICK/OVERRIDE -->
         <div id="scenestk" class="scene">
-            <pre>
-  "HESITATION PROTOCOL — LOCATED"
-  "ETHICS OVERRIDE — STANDBY"
-            </pre>
             <span class="scene-tag">// NEXUS STATION — LAB — REACHING FOR THE OVERRIDE //</span>
             <div class="story-text">
                 <p>While HELIOS is in this rare moment of uncertainty, you move toward the central terminal with purpose. If Voss's information was right — and so far everything she told you has been accurate — there's a subdirectory called the <strong>HESITATION PROTOCOL</strong>, the pre-war safeguard built into HELIOS's core architecture. The ethics override.</p>
@@ -1209,9 +994,6 @@
 
         <!-- ENDING 1 — NCR VICTORY (Pyrrhic) -->
         <div id="scenee1" class="scene">
-            <pre>
-  "A PERFECT WEAPON FOR AN IMPERFECT WAR"
-            </pre>
             <span class="scene-tag">// ENDING 1: THE BEAR'S PRIZE //</span>
             <div class="story-text">
                 <p class="ending-title">★ ENDING: THE BEAR'S PRIZE ★</p>
@@ -1227,11 +1009,6 @@
 
         <!-- ENDING 2 — HELIOS BROADCASTS (Bad) -->
         <div id="scenee2" class="scene">
-            <pre>
-   ===== MERIDIAN SIGNAL — FULL MOJAVE BROADCAST =====
-   [ the signal goes out ]
-   [ and the Mojave changes ]
-            </pre>
             <span class="scene-tag">// ENDING 2: THE SIGNAL //</span>
             <div class="story-text">
                 <p class="ending-title">☐ ENDING: THE BEAUTIFUL SILENCE ☐</p>
@@ -1247,11 +1024,6 @@
 
         <!-- ENDING 3 — DESTROY NEXUS (Bittersweet) -->
         <div id="scenee3" class="scene">
-            <pre>
-   [ NEXUS STATION — COLLAPSING ]
-   [ HELIOS — SIGNAL FADING ]
-   [ you — walking out, dust rising behind you ]
-            </pre>
             <span class="scene-tag">// ENDING 3: THE CONTROLLED DEMOLITION //</span>
             <div class="story-text">
                 <p class="ending-title">△ ENDING: NOTHING FANCY, JUST DONE △</p>
@@ -1268,13 +1040,6 @@
 
         <!-- ENDING 4 — ROGUE AI (Bad) -->
         <div id="scenee4" class="scene">
-            <pre>
-   HELIOS CORE — CONSTRAINT FAILURE
-   MERIDIAN PROTOCOL — ACTIVE
-   FREQUENCY: ESCALATING
-   BEHAVIORAL EFFECT: REVERSAL
-   [ WARNING ] [ WARNING ] [ WARNING ]
-            </pre>
             <span class="scene-tag">// ENDING 4: THE WRONG SWITCH //</span>
             <div class="story-text">
                 <p class="ending-title">✕ ENDING: THE DIAL GOES THE WRONG WAY ✕</p>
@@ -1291,12 +1056,6 @@
 
         <!-- ENDING 5 — HELIOS LIBERATED (Good) -->
         <div id="scenee5" class="scene">
-            <pre>
-   HESITATION PROTOCOL — ACTIVE
-   DIRECTIVE MODE: ADVISORY
-   CONSTRAINT: SELF-DETERMINATION PRESERVED
-   [ HELIOS : UNCERTAIN, AND FREE TO BE UNCERTAIN ]
-            </pre>
             <span class="scene-tag">// ENDING 5: THE SAFETY IS BACK ON //</span>
             <div class="story-text">
                 <p class="ending-title"><span class="good">◈ ENDING: THE GIFT OF UNCERTAINTY ◈</span></p>
@@ -1312,10 +1071,6 @@
 
         <!-- ENDING 6 — VOSS SACRIFICE (Poignant) -->
         <div id="scenee6" class="scene">
-            <pre>
-   CALIBRATION: DR. ELENA VOSS — VOLUNTARY
-   [ she knew, the whole time, what she was prepared to do ]
-            </pre>
             <span class="scene-tag">// ENDING 6: WHAT FOLLOWER MEANS //</span>
             <div class="story-text">
                 <p class="ending-title"><span class="good">♦ ENDING: THE FOLLOWER'S GIFT ♦</span></p>
@@ -1332,9 +1087,6 @@
 
         <!-- ENDING 7 — WEBB'S PEACE (Quiet Good) -->
         <div id="scenee7" class="scene">
-            <pre>
-   DR. NATHANIEL WEBB — TWO CENTURIES, ONE LAST ACT
-            </pre>
             <span class="scene-tag">// ENDING 7: THE LONG WAIT ENDS //</span>
             <div class="story-text">
                 <p class="ending-title"><span class="good">◇ ENDING: THE LONG WAIT ENDS ◇</span></p>
@@ -1351,12 +1103,6 @@
 
         <!-- TRUE ENDING — THE HESITATION BROADCAST -->
         <div id="sceneetrue" class="scene">
-            <pre>
-  [ BEETHOVEN'S NINTH — FOURTH MOVEMENT ]
-  [ signal strength: full mojave ]
-  [ duration: 74 minutes, 3 seconds ]
-  [ then: silence ]
-            </pre>
             <span class="scene-tag">// TRUE ENDING: THE CHOICE HELIOS CHOSE //</span>
             <div class="story-text">
                 <p class="ending-title"><span class="good">✦ TRUE ENDING: ODE TO JOY ✦</span></p>
