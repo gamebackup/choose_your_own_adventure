@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Own Adventure — Crow's Perch</title>
+    <style>
+        :root {
+            --silver: #8899aa;
+            --silver-bright: #b8c8d8;
+            --silver-dim: #556066;
+            --moon: #c8d8e8;
+            --turquoise: #5a9a8a;
+            --turquoise-glow: rgba(90, 154, 138, 0.3);
+            --gold: #d4b860;
+            --gold-glow: rgba(212, 184, 96, 0.35);
+            --danger: #cc3344;
+            --danger-glow: rgba(204, 51, 68, 0.35);
+            --pine: #3a5a3a;
+            --bg: #060a10;
+            --glow-silver: rgba(136, 153, 170, 0.25);
+            --glow-moon: rgba(200, 216, 232, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #04080d;
+            color: var(--silver-bright);
+            font-family: 'Courier New', 'Courier', 'Lucida Console', monospace;
+            padding: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(40, 50, 60, 0.03) 3px,
+                    rgba(40, 50, 60, 0.03) 6px);
+            background-size: 100% 6px;
+            background-attachment: fixed;
+        }
+
+        .game-container {
+            max-width: 740px;
+            margin: 0 auto;
+            border: 2px solid var(--silver);
+            padding: 30px 24px;
+            min-height: 84vh;
+            box-shadow: 0 0 30px var(--glow-silver), inset 0 0 50px rgba(100, 120, 140, 0.03);
+            background: radial-gradient(ellipse at center,
+                    rgba(20, 28, 36, 0.75) 0%,
+                    rgba(4, 8, 13, 0.97) 72%);
+            transition: box-shadow 0.6s ease, border-color 0.6s ease, color 0.6s ease;
+        }
+
+        .env-town {
+            box-shadow: 0 0 28px var(--glow-silver);
+            border-color: #778899;
+            color: #c0ccd8;
+        }
+        .env-mountain {
+            box-shadow: 0 0 28px var(--glow-moon);
+            border-color: #99aabb;
+            color: #d0dce8;
+        }
+        .env-mine {
+            box-shadow: 0 0 28px var(--turquoise-glow);
+            border-color: #4a8a7a;
+            color: #b0ddd0;
+        }
+        .env-danger {
+            box-shadow: 0 0 28px var(--danger-glow);
+            border-color: #aa3344;
+            color: #ff8877;
+        }
+        .env-treasure {
+            box-shadow: 0 0 28px var(--gold-glow);
+            border-color: #c4a850;
+            color: #f0d890;
+        }
+        .env-night {
+            box-shadow: 0 0 28px rgba(100, 120, 180, 0.3);
+            border-color: #667788;
+            color: #bcc8d8;
+        }
+
+        pre {
+            font-size: 11px;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 6px currentColor;
+            line-height: 1.2;
+            overflow-x: auto;
+            letter-spacing: 0;
+            animation: flickerIn 0.9s ease-out;
+            padding: 2px 0;
+            color: var(--silver);
+        }
+
+        @keyframes flickerIn {
+            0% {
+                opacity: 0;
+                text-shadow: 0 0 30px currentColor;
+            }
+            20% {
+                opacity: 0.3;
+            }
+            35% {
+                opacity: 0.75;
+                text-shadow: 0 0 12px currentColor;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            70% {
+                opacity: 0.9;
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 6px currentColor;
+            }
+        }
+
+        .scene-tag {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--silver-dim);
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .story-text {
+            font-size: 1.1rem;
+            margin-bottom: 28px;
+            padding: 0 4px;
+            line-height: 1.75;
+            animation: fadeIn 0.55s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .story-text p {
+            margin-bottom: 13px;
+        }
+        .story-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        strong {
+            color: var(--moon);
+            font-weight: bold;
+        }
+        em {
+            color: var(--turquoise);
+            font-style: italic;
+        }
+        .gold-text {
+            color: var(--gold);
+        }
+        .dim {
+            color: var(--silver-dim);
+        }
+        .warn {
+            color: #ff8877;
+        }
+        .ending-title {
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 18px;
+            text-shadow: 0 0 12px currentColor;
+        }
+        .note {
+            font-size: 0.76rem;
+            color: var(--silver-dim);
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        label {
+            display: inline-block;
+            border: 1px solid currentColor;
+            padding: 13px 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(6, 10, 16, 0.7);
+            font-weight: bold;
+            font-size: 0.82rem;
+            width: 86%;
+            text-align: center;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+            user-select: none;
+            position: relative;
+        }
+
+        label::before {
+            content: '> ';
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        label:hover::before {
+            opacity: 1;
+            animation: blink 0.65s step-end infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+        label:hover {
+            background: currentColor;
+            color: #060a10 !important;
+            box-shadow: 0 0 22px currentColor;
+            transform: scale(1.025);
+        }
+        label:active {
+            transform: scale(0.97);
+            transition: transform 0.08s;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+        .scene {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #s0:checked~.game-container #scene0,
+        #s1_gallows:checked~.game-container #scene1_gallows,
+        #s1_marshal:checked~.game-container #scene1_marshal,
+        #s1_saloon:checked~.game-container #scene1_saloon,
+        #s2_watch:checked~.game-container #scene2_watch,
+        #s2_cut_rope:checked~.game-container #scene2_cut_rope,
+        #s2_deputy:checked~.game-container #scene2_deputy,
+        #s2_apache:checked~.game-container #scene2_apache,
+        #s2_rosalita:checked~.game-container #scene2_rosalita,
+        #s2_poker:checked~.game-container #scene2_poker,
+        #s3_map_body:checked~.game-container #scene3_map_body,
+        #s3_governor_talk:checked~.game-container #scene3_governor_talk,
+        #s3_flee:checked~.game-container #scene3_flee,
+        #s3_hide:checked~.game-container #scene3_hide,
+        #s3_mine_investigate:checked~.game-container #scene3_mine_investigate,
+        #s3_mansion:checked~.game-container #scene3_mansion,
+        #s3_parley:checked~.game-container #scene3_parley,
+        #s3_war_path:checked~.game-container #scene3_war_path,
+        #s3_secret_map:checked~.game-container #scene3_secret_map,
+        #s3_testify:checked~.game-container #scene3_testify,
+        #s3_win_poker:checked~.game-container #scene3_win_poker,
+        #s3_lose_poker:checked~.game-container #scene3_lose_poker,
+        #s4_treasure_cave:checked~.game-container #scene4_treasure_cave,
+        #s4_mine_truth:checked~.game-container #scene4_mine_truth,
+        #s4_ambush_pass:checked~.game-container #scene4_ambush_pass,
+        #s4_mansion_secrets:checked~.game-container #scene4_mansion_secrets,
+        #s4_apache_treaty:checked~.game-container #scene4_apache_treaty,
+        #s4_save_santiago:checked~.game-container #scene4_save_santiago,
+        #s4_governor_confront:checked~.game-container #scene4_governor_confront,
+        #s4_hidden_valley:checked~.game-container #scene4_hidden_valley,
+        #s4_mine_collapse:checked~.game-container #scene4_mine_collapse,
+        #e_treasure:checked~.game-container #scene_e_treasure,
+        #e_justice:checked~.game-container #scene_e_justice,
+        #e_outlaw:checked~.game-container #scene_e_outlaw,
+        #e_martyr:checked~.game-container #scene_e_martyr,
+        #e_peace:checked~.game-container #scene_e_peace,
+        #e_damned:checked~.game-container #scene_e_damned,
+        #e_legend:checked~.game-container #scene_e_legend {
+            display: block;
+        }
+
+        @media (max-width: 520px) {
+            .game-container {
+                padding: 18px 12px;
+            }
+            pre {
+                font-size: 9px;
+            }
+            .story-text {
+                font-size: 0.95rem;
+            }
+            label {
+                width: 94%;
+                font-size: 0.76rem;
+                padding: 11px 14px;
+                letter-spacing: 1px;
+            }
+            .ending-title {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link" style="color: white;">Back to Home</a>
+
+    <input type="radio" name="game" id="s0" checked>
+    <input type="radio" name="game" id="s1_gallows">
+    <input type="radio" name="game" id="s1_marshal">
+    <input type="radio" name="game" id="s1_saloon">
+    <input type="radio" name="game" id="s2_watch">
+    <input type="radio" name="game" id="s2_cut_rope">
+    <input type="radio" name="game" id="s2_deputy">
+    <input type="radio" name="game" id="s2_apache">
+    <input type="radio" name="game" id="s2_rosalita">
+    <input type="radio" name="game" id="s2_poker">
+    <input type="radio" name="game" id="s3_map_body">
+    <input type="radio" name="game" id="s3_governor_talk">
+    <input type="radio" name="game" id="s3_flee">
+    <input type="radio" name="game" id="s3_hide">
+    <input type="radio" name="game" id="s3_mine_investigate">
+    <input type="radio" name="game" id="s3_mansion">
+    <input type="radio" name="game" id="s3_parley">
+    <input type="radio" name="game" id="s3_war_path">
+    <input type="radio" name="game" id="s3_secret_map">
+    <input type="radio" name="game" id="s3_testify">
+    <input type="radio" name="game" id="s3_win_poker">
+    <input type="radio" name="game" id="s3_lose_poker">
+    <input type="radio" name="game" id="s4_treasure_cave">
+    <input type="radio" name="game" id="s4_mine_truth">
+    <input type="radio" name="game" id="s4_ambush_pass">
+    <input type="radio" name="game" id="s4_mansion_secrets">
+    <input type="radio" name="game" id="s4_apache_treaty">
+    <input type="radio" name="game" id="s4_save_santiago">
+    <input type="radio" name="game" id="s4_governor_confront">
+    <input type="radio" name="game" id="s4_hidden_valley">
+    <input type="radio" name="game" id="s4_mine_collapse">
+    <input type="radio" name="game" id="e_treasure">
+    <input type="radio" name="game" id="e_justice">
+    <input type="radio" name="game" id="e_outlaw">
+    <input type="radio" name="game" id="e_martyr">
+    <input type="radio" name="game" id="e_peace">
+    <input type="radio" name="game" id="e_damned">
+    <input type="radio" name="game" id="e_legend">
+
+    <div class="game-container env-town" id="gameBox">
+
+        <!-- ============ SCENE 0 — ARRIVAL ============ -->
+        <div id="scene0" class="scene">
+            <pre>
+      /|      /|
+     / |     / |
+    /__|____/__|
+   |   |   |   |
+   |   |   |   |   CROW'S PERCH
+   |___|___|___|   NEW MEXICO TERRITORY · 1878
+    /   /   /
+   /   /   /
+  /___/___/
+   |   |
+   |   |
+ __|___|__
+ \  |||  /
+  \ ||| /
+   \|||/
+    \|/
+     |
+    / \
+   /   \
+            </pre>
+            <span class="scene-tag">// SANGRE DE CRISTO MOUNTAINS — DAWN OF THE HANGING //</span>
+            <div class="story-text">
+                <p>You crest the ridge just as the first pale light touches the peaks. Below, the town of <strong>Crow's Perch</strong> clings to the mountainside like a miner's lantern hooked onto a cliff — narrow streets, steep-roofed buildings, and a single bell tower that cuts a dark silhouette against the morning sky. Pines crowd the upper slopes. Somewhere below, a stream rushes over stone.</p>
+
+                <p>You've ridden three days from Santa Fe, chasing a rumor that won't let you sleep. A man named <strong>Santiago Valdez</strong> is scheduled to hang at dawn today — convicted of poisoning the town's water with silver tailings, causing a sickness that has claimed eleven children. But the letter you received last month, unsigned and written in a hurried hand, said: <em>"Valdez is innocent. The governor did it. Valdez knows where the Madrigal gold is buried. If he dies, the truth dies with him. Come quickly."</em></p>
+
+                <p>Below, you can make out three points of interest. The <strong>gallows</strong> stands on a bare knoll at the northern edge of town — you can see a small crowd already gathering. The <strong>marshal's office</strong> sits on Main Street, its windows lit with oil lamps. And the <strong>Silver Vein Saloon</strong>, the largest building in town, spills piano music and yellow light into the cold morning air. You have maybe an hour before the hanging. Maybe less.</p>
+
+                <p class="dim">// The air is thin and cold at this altitude. The pines smell like winter. Somewhere in these mountains, Spanish gold has been hidden for three hundred years. Somewhere in this town, a man who knows where it is waits to die. //</p>
+            </div>
+            <div class="choices">
+                <label for="s1_gallows">Ride to the gallows — witness the hanging up close</label>
+                <label for="s1_marshal">Head to the marshal's office — learn the law's side of things</label>
+                <label for="s1_saloon">Enter the Silver Vein Saloon — gather information discreetly</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 1A — GALLOWS ============ -->
+        <div id="scene1_gallows" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// GALLOWS KNOLL — THE HOUR APPROACHES //</span>
+            <div class="story-text">
+                <p>The gallows is a crude but sturdy structure — fresh pine beams, a trapdoor, a single noose swaying gently in the mountain breeze. About thirty townsfolk have gathered, their faces a mixture of grief, anger, and grim satisfaction. A preacher reads from a worn Bible. A woman in a black shawl weeps silently near the front.</p>
+
+                <p>On the platform, <strong>Santiago Valdez</strong> stands with his hands bound. He's younger than you expected — maybe twenty-five, with tired dark eyes and the look of a man who hasn't slept in weeks. His gaze sweeps the crowd and lands on you. Something flickers in his expression. Recognition? Hope? Or just the desperate scanning of a condemned man looking for anyone who might help?</p>
+
+                <p>A heavyset man in an expensive wool coat stands near the marshal — <strong>Governor Silas Crane</strong>, his presence unexpected at a small-town hanging. He watches the proceedings with the patient satisfaction of a man who has already won. Behind him, two armed guards in territorial uniforms stand at attention.</p>
+
+                <p class="dim">// The marshal checks his pocket watch. The preacher closes his Bible. You have minutes, not hours. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_watch">Do nothing — watch the hanging and search the body afterward</label>
+                <label for="s2_cut_rope">Intervene — draw your gun and cut Valdez down before the trap drops</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 1B — MARSHAL'S OFFICE ============ -->
+        <div id="scene1_marshal" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MARSHAL'S OFFICE — MAIN STREET — THE LAW'S SIDE //</span>
+            <div class="story-text">
+                <p>The marshal's office is small and cluttered — wanted posters on the walls, a rifle rack by the door, a potbelly stove glowing in the corner. <strong>Marshal John Whitfield</strong> is a gaunt man in his fifties, with deep-set eyes and the careful demeanor of someone who has learned that the law and justice are not always the same thing. He sizes you up as you enter.</p>
+
+                <p><em>"You're the rider from Santa Fe,"</em> he says. It's not a question. <em>"Word travels fast in a town this size. You're here about Valdez, I take it."</em> He pours two cups of coffee and slides one across the desk. <em>"I don't like this hanging any more than you do. But the evidence was... compelling. Silver tailings in the well. Valdez's tools found nearby. And the governor himself pushed for a swift trial."</em> He pauses, lowering his voice. <em>"Between you and me, something doesn't sit right. But I'm one man with a badge against the territorial government. What exactly are you hoping to find here?"</em></p>
+
+                <p>He leans back. <em>"I can deputize you — give you legal authority to investigate. Or I can tell you what I know about the Apache connection. Chief Nantan's people have been watching the town for weeks. They say the sickness started when Crane's men began surveying for the railroad. They say the governor is poisoning the land to drive everyone out."</em></p>
+
+                <p class="dim">// Marshal Whitfield is tired. He wants to do the right thing. He just doesn't know what it is anymore. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_deputy">Take the deputy badge — investigate the poisoning officially</label>
+                <label for="s2_apache">Ask about the Apache — ride out to Chief Nantan's camp</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 1C — SALOON ============ -->
+        <div id="scene1_saloon" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER VEIN SALOON — MAIN STREET — WHISKEY & WHISPERS //</span>
+            <div class="story-text">
+                <p>The Silver Vein is warm and dim, smelling of pine smoke, spilled whiskey, and old secrets. At this early hour, only the serious drinkers remain — men with nowhere else to be and women who've learned to listen more than they speak. A tired piano player picks out a melancholy tune in the corner. Behind the bar, a wiry man with graying hair polishes glasses and watches everything.</p>
+
+                <p>Two figures catch your attention. At a table near the back, a young woman in traveling clothes sits alone, a half-empty glass before her. She has the look of someone who's been waiting for something — or someone — for a long time. When she sees you, her eyes narrow with something between suspicion and hope.</p>
+
+                <p>At the bar, three men in territorial uniforms are playing poker — Governor Crane's men, from the look of their insignias. One of them, a sergeant with a broken nose, is loudly recounting a story about <em>"the vein we found up near Spider Rock"</em> before another soldier elbows him into silence. A map and a small leather journal sit on the bar beside their chips.</p>
+
+                <p class="dim">// The woman wants to talk. The soldiers want to play cards. Both paths lead to information — but the kind of information you get depends on who you approach first. //</p>
+            </div>
+            <div class="choices">
+                <label for="s2_rosalita">Approach the woman — she looks like she has a story to tell</label>
+                <label for="s2_poker">Join the poker game — gamble for information with Crane's men</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 2A — WATCH THE HANGING ============ -->
+        <div id="scene2_watch" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// GALLOWS KNOLL — THE TRAP DROPS //</span>
+            <div class="story-text">
+                <p>The trapdoor slams open. Santiago Valdez falls. The rope catches with a sound that echoes off the mountains. The crowd exhales — some in relief, some in horror. The woman in the black shawl collapses to her knees. Governor Crane watches without expression, then turns and walks briskly toward a waiting carriage, his business apparently concluded.</p>
+
+                <p>In the confusion that follows, you notice something: a small leather pouch has fallen from Valdez's vest during the hanging. It lies in the dust beneath the gallows, unnoticed by the dispersing crowd. The marshal is busy directing the body's removal. The governor's carriage is already rolling down Main Street. You have a narrow window.</p>
+
+                <p>When you retrieve the pouch, you find inside a <strong>folded piece of oilskin</strong> with a hand-drawn map — not of the mine, but of a route through the mountains, marked with a red X near a place labeled <em>"La Cueva del Oro"</em> — the Cave of Gold. On the reverse, in hurried handwriting: <em>"If I die, find Rosalita. She has the rest. The governor poisoned the well at Spider Rock. Prove it. — S.V."</em></p>
+
+                <p class="dim">// Valdez left a message for anyone who would look. The map is only half the story. Rosalita — whoever she is — has the other half. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_map_body">Follow the map into the mountains — find the Cave of Gold</label>
+                <label for="s3_governor_talk">Follow Governor Crane's carriage — confront him about the map</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 2B — CUT THE ROPE ============ -->
+        <div id="scene2_cut_rope" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// GALLOWS KNOLL — CHAOS AT DAWN //</span>
+            <div class="story-text">
+                <p>Your revolver clears leather before you've fully thought it through. The shot severs the rope just as the trapdoor opens, and Valdez crashes through the gallows floor into the dust below — alive, gasping, but alive. The crowd scatters. The marshal's hand goes to his gun but hesitates. Governor Crane's face twists with fury. <em>"Shoot them both!"</em> he bellows, but his guards are slow to react, and in the confusion you manage to haul Valdez to his feet.</p>
+
+                <p><em>"Gracias,"</em> he chokes out. <em>"I knew someone would come. My sister — Rosalita — she sent the letter. She's at the Silver Vein. But we can't stay here. The governor will have us both killed within the hour. We need to run — now. I know a place in the mountains where they won't find us. The gold is real. I can take you there. But you have to trust me."</em></p>
+
+                <p>Behind you, the marshal is shouting for order. Crane's guards are pushing through the panicked crowd. You have seconds to decide.</p>
+
+                <p class="dim">// You've just become an outlaw. Every lawman in the territory will be after you by noon. But Valdez is alive, and he knows where the treasure is buried. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_flee">Flee into the mountains with Valdez — go now, go fast</label>
+                <label for="s3_hide">Hide Valdez in the town — find Rosalita and regroup at the saloon</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 2C — TAKE DEPUTY BADGE ============ -->
+        <div id="scene2_deputy" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MARSHAL'S OFFICE — PINNED & SWORN //</span>
+            <div class="story-text">
+                <p>Marshal Whitfield pins the tin star to your vest with hands that tremble slightly. <em>"You're a deputy now,"</em> he says. <em>"That gives you the right to ask questions. But it also puts a target on your back. Governor Crane doesn't like people poking around his affairs."</em> He hands you a ring of keys and a worn ledger. <em>"Start with the mine office. The Silver Queen Mine — that's where the tailings supposedly came from. See if the records match Valdez's story. While you're there, keep an eye out for anything that connects back to the governor."</em></p>
+
+                <p>He pauses at the door. <em>"Oh — and watch your back at the mine. It's been closed since the poisoning was discovered. But Crane's men still patrol up there. Unofficially. They say they're protecting the site. I say they're hiding something."</em></p>
+
+                <p>Through the window, you can see the gallows on the distant knoll. The crowd is still gathered. The hanging hasn't happened yet. You have time.</p>
+
+                <p class="dim">// You're now the law in a town where the law has been bending toward corruption for months. The badge gives you access. It also makes you visible. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_mine_investigate">Ride to the Silver Queen Mine — search the records and the tailings site</label>
+                <label for="s3_mansion">Go to Governor Crane's rented mansion — search for evidence while he's at the gallows</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 2D — APACHE CONNECTION ============ -->
+        <div id="scene2_apache" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MARSHAL'S OFFICE — THE APACHE ANGLE //</span>
+            <div class="story-text">
+                <p><em>"Chief Nantan,"</em> Marshal Whitfield says, tracing a line on a territory map. <em>"His band has lived in these mountains for generations — long before the Spanish came, long before the silver rush, long before anyone thought to draw borders on paper. They know every stream, every cave, every hidden valley. When the sickness started, Nantan came to me personally. Said the water at Spider Rock had been poisoned — deliberately. Said his people had seen Crane's men dumping barrels upstream."</em></p>
+
+                <p>The marshal rubs his eyes. <em>"I wanted to investigate. But Crane got the territorial judge to issue a warrant for Nantan's arrest instead — 'inciting unrest,' they called it. Now the Apache won't talk to any white lawman. But you..."</em> He looks at you appraisingly. <em>"You're new. You're not carrying the baggage of the last six months. If you ride to their camp — alone, unarmed except for a peace offering — Nantan might speak with you. He might tell you what he saw. It's dangerous, but it might be the only way to get the truth before Valdez hangs."</em></p>
+
+                <p class="dim">// The Apache have been watching from the high country. They know something about the poisoned water. But approaching their camp is a risk — Crane has posted bounties on any Apache found off the reservation. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_parley">Ride to Chief Nantan's camp — seek a parley and learn the truth</label>
+                <label for="s3_war_path">Take a rifle and scout the Spider Rock site yourself — see the evidence firsthand</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 2E — ROSALITA ============ -->
+        <div id="scene2_rosalita" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER VEIN SALOON — THE SISTER'S STORY //</span>
+            <div class="story-text">
+                <p>You sit down across from the woman. Up close, she's younger than she first appeared — early twenties, with dark hair pulled back and eyes that have been crying recently but aren't crying now. <em>"You got my letter,"</em> she says quietly. <em>"I'm Rosalita Valdez. Santiago is my brother. And he's going to die in..."</em> she glances at the window, <em>"...less than an hour, unless someone does something."</em></p>
+
+                <p>She slides a worn leather journal across the table. <em>"This is my brother's mining log. He kept detailed records of every vein he found, every assay, every conversation. Six weeks ago, he discovered something at Spider Rock — not just silver. Gold. Spanish gold, hidden in a cave behind a waterfall. He told Governor Crane, thinking he'd get a fair partnership. Instead, Crane had the well poisoned, blamed Santiago, and pushed for a hanging. He wants the gold for himself — all of it."</em></p>
+
+                <p>She opens the journal to a marked page. It shows a geological survey with coordinates and a hand-drawn route. <em>"The gold is in a cave called La Cueva del Oro. My brother found it. He's the only one who knows exactly where it is. But Crane doesn't know that Santiago already gave me the location. If we can prove the poisoning was Crane's doing, we can save my brother. If we can't..."</em> She closes the journal. <em>"Then at least we can stop Crane from getting the gold."</em></p>
+
+                <p class="dim">// Rosalita is brave, desperate, and carrying the weight of her family's survival. She has the map. She has the journal. She needs an ally. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_secret_map">Take the journal and ride for La Cueva del Oro — find the gold before Crane does</label>
+                <label for="s3_testify">Go to the gallows — use the journal as evidence to stop the hanging publicly</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 2F — POKER GAME ============ -->
+        <div id="scene2_poker" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER VEIN SALOON — HIGH STAKES AT DAWN //</span>
+            <div class="story-text">
+                <p>You slide into the empty chair at the poker table. The three soldiers — Sergeant Brock, Corporal Hayes, and a private who looks barely old enough to shave — eye you with the wariness of men who've been losing money all night. <em>"Buy-in's five dollars,"</em> Brock says. His broken nose gives his voice a nasal quality. <em>"You got the stomach for it, stranger?"</em></p>
+
+                <p>The cards are dealt. The whiskey flows. And as the game progresses, the soldiers get looser with their words. Brock complains about <em>"babysitting that damned mine entrance for two weeks straight."</em> Hayes mutters about <em>"barrels in the wagon — heavy ones, marked as mining supplies but they weren't."</em> The private says nothing, but his eyes dart nervously whenever the governor's name comes up.</p>
+
+                <p>On the bar beside their chips sits a leather journal — not Rosalita's, but a territorial record book with Crane's seal embossed on the cover. One of them brought it in and forgot to secure it. If you win this hand, you could demand the journal as part of the pot. If you lose, you'll have to find another way.</p>
+
+                <p class="dim">// The soldiers know more than they're saying. The journal could be the key to everything. But Sergeant Brock doesn't look like a man who loses gracefully. //</p>
+            </div>
+            <div class="choices">
+                <label for="s3_win_poker">Play your best hand — win the soldiers' journal and their secrets</label>
+                <label for="s3_lose_poker">Fold strategically — let them win, then follow them when they leave</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3A — MAP FROM BODY ============ -->
+        <div id="scene3_map_body" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MOUNTAIN TRAIL — FOLLOWING VALDEZ'S MAP //</span>
+            <div class="story-text">
+                <p>The map leads you away from Crow's Perch, up a narrow deer trail that switchbacks through dense pine forest. The air grows colder as you climb. The only sounds are your horse's hooves on the pine needles and the distant rush of a waterfall somewhere ahead. The map's red X is marked near a geological feature labeled <em>"Spider Rock — waterfall — cave behind."</em></p>
+
+                <p>After two hours of riding, you find it: a narrow canyon where a waterfall tumbles forty feet into a clear pool. And behind the cascade, barely visible through the spray, is a dark opening in the rock face — La Cueva del Oro. But you're not alone. Fresh boot prints lead toward the cave entrance. Someone else found this place — recently. And from the look of the prints, they came in numbers.</p>
+
+                <p>Near the pool, you spot an empty barrel with territorial government markings. The same kind of barrel, you'd wager, that was used to carry the tailings that poisoned the town well. A torn piece of cloth snagged on a branch bears a button with Crane's insignia.</p>
+
+                <p class="dim">// The evidence is mounting. Governor Crane poisoned the well. Valdez found the gold. And now Crane's men are inside the cave — possibly right now. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_treasure_cave">Enter the cave — find the gold and whatever evidence is inside</label>
+                <label for="s4_ambush_pass">Ride back to town — gather armed men and return with reinforcements</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3B — CONFRONT GOVERNOR ============ -->
+        <div id="scene3_governor_talk" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MAIN STREET — THE GOVERNOR'S CARRIAGE //</span>
+            <div class="story-text">
+                <p>You catch Governor Crane's carriage just as it pulls away from the gallows. He rolls down the window with the expression of a man who is not accustomed to being stopped in the street. <em>"I'm busy,"</em> he says flatly, but his eyes flick to the oilskin map visible in your hand. Something shifts in his expression — a tightening around the mouth, a cooling of his already-cold gaze.</p>
+
+                <p><em>"That's Valdez's map,"</em> he says. <em>"You'd be wise to hand it over. It's territorial property now — evidence in a poisoning case. Possession of stolen evidence is a crime, you know."</em> He smiles, but it doesn't reach his eyes. <em>"I could have you arrested. But I'm a reasonable man. Give me the map, and I'll forget we ever had this conversation. Hell, I might even find a reward for your cooperation."</em></p>
+
+                <p>Behind him, through the carriage window, you glimpse papers on the seat — a geological survey, a telegram from a railroad company in Denver, and a document marked <strong>"Land Acquisition — Spider Rock Valley."</strong> The governor isn't just after the gold. He's after the entire valley. The railroad wants a route through these mountains, and Crane is clearing the way.</p>
+
+                <p class="dim">// Crane is dangerous not because he's violent — though he certainly can be — but because he's patient. He's been planning this for months. Maybe years. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_mansion_secrets">Refuse — keep the map and investigate the governor's mansion for more evidence</label>
+                <label for="s4_governor_confront">Pretend to cooperate — give him a fake map and follow him to see where he goes</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3C — FLEE WITH VALDEZ ============ -->
+        <div id="scene3_flee" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MOUNTAIN PASS — FUGITIVES AT LARGE //</span>
+            <div class="story-text">
+                <p>You and Valdez ride hard into the mountains, leaving the chaos of Crow's Perch behind. By noon, you've climbed high enough that the pines give way to aspens, their leaves whispering silver-green in the wind. Valdez knows these trails well — he's been prospecting here for years. <em>"The cave is another day's ride,"</em> he says. <em>"But we need to be careful. Crane has patrols everywhere. And there's something else..."</em> He hesitates. <em>"The Apache. Chief Nantan's people. They know about the gold. They've known for centuries. They consider the cave sacred. If we go in there, we might have to answer to them as well."</em></p>
+
+                <p>You make camp in a sheltered hollow as the sun sets. Valdez, finally free of the noose, talks more openly. <em>"The gold isn't just Spanish,"</em> he explains. <em>"It's older than that. The conquistadors took it from the Pueblo people, who took it from... someone else. There are carvings in the cave — things I couldn't read. The Apache call it 'the place where the sky fell.' They say the gold is cursed. I didn't believe it at first. But after what happened — the sickness, the hanging — I'm not so sure."</em></p>
+
+                <p>In the distance, a wolf howls. The stars are impossibly bright at this altitude.</p>
+
+                <p class="dim">// You're an outlaw now, riding with a condemned man toward a cursed treasure. The governor's men are behind you. The Apache are ahead. And the gold is somewhere in between. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_treasure_cave">Continue to the cave at first light — claim the gold and face whatever guards it</label>
+                <label for="s4_apache_treaty">Seek out Chief Nantan — ask permission before entering the sacred cave</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3D — HIDE IN TOWN ============ -->
+        <div id="scene3_hide" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER VEIN SALOON — BACK ROOM — HIDDEN IN PLAIN SIGHT //</span>
+            <div class="story-text">
+                <p>You drag Valdez through the back alleys of Crow's Perch and into the saloon's storage room. Rosalita, summoned by the bartender, arrives within minutes. The reunion between brother and sister is brief but fierce — whispered words in Spanish, a tight embrace, and then a shared look of determination. <em>"We have maybe until nightfall before they search every building,"</em> Rosalita says. <em>"But I've been gathering evidence for weeks. Testimonies from miners who saw Crane's men at the well. A torn uniform with tailings residue. And this..."</em></p>
+
+                <p>She produces a crumpled telegram from her pocket. It's from the Denver & Rio Grande Railroad to Governor Crane, dated three months ago: <em>"Route through Spider Rock Valley approved. Land acquisition critical. Clear all obstacles by year's end. Bonus for early completion — $15,000."</em></p>
+
+                <p><em>"The railroad is paying him,"</em> Rosalita says. <em>"He poisoned the well to drive people away from Spider Rock. When Santiago found the gold, Crane realized he could kill two birds with one stone — eliminate the only witness who knew about the poisoning AND claim the treasure for himself. He's not just corrupt. He's a murderer."</em></p>
+
+                <p class="dim">// You now have the evidence to prove Crane's crimes. But presenting it publicly means revealing Valdez is alive — and bringing the governor's full wrath down on everyone in this room. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_save_santiago">Take the evidence to Marshal Whitfield — clear Valdez's name legally</label>
+                <label for="s4_governor_confront">Confront Governor Crane directly — force him to confess or flee</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3E — MINE INVESTIGATE ============ -->
+        <div id="scene3_mine_investigate" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER QUEEN MINE — CLOSED BUT NOT ABANDONED //</span>
+            <div class="story-text">
+                <p>The Silver Queen Mine sits above town like a wound in the mountainside — dark tunnels, rusting equipment, and a foreboding silence broken only by the wind. The mine office is a small wooden shack with a padlocked door. Your deputy keys open it easily.</p>
+
+                <p>Inside, the records tell a clear story. Valdez's mining logs show he discovered a promising silver vein near Spider Rock six weeks ago and filed all the proper paperwork. But subsequent entries — written in a different hand — describe <em>"contamination of the primary well"</em> and name Valdez as the responsible party. The handwriting matches samples you've seen of Governor Crane's correspondence. He doctored the records.</p>
+
+                <p>Deeper in the office, you find a locked cabinet. Inside: a set of geological survey maps showing the Spider Rock valley, a letter from the railroad offering to purchase the land <em>"once current occupants are removed,"</em> and a small glass vial labeled <strong>"Silver Tailings — Concentrate — HANDLE WITH CARE."</strong> The vial is half-empty. A laboratory report clipped to it confirms: <em>"Substance is water-soluble and highly toxic when ingested. Symptoms consistent with reported illness in Crow's Perch."</em></p>
+
+                <p class="dim">// This is the smoking gun. Crane's men used concentrated mine tailings to poison the well. Valdez was framed. The evidence is here — but getting it out of the mine without being caught is another matter. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_mine_truth">Take the evidence and ride for Santa Fe — appeal to the territorial judge directly</label>
+                <label for="s4_mansion_secrets">Ride to Crane's mansion — find more evidence before presenting your case</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3F — GOVERNOR'S MANSION ============ -->
+        <div id="scene3_mansion" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// CRANE'S RENTED MANSION — EDGE OF TOWN — THE GOVERNOR'S SECRETS //</span>
+            <div class="story-text">
+                <p>The mansion is a two-story Victorian that looks wildly out of place in a mining town — imported furniture, velvet curtains, and a study filled with papers. With the governor occupied at the gallows, the house is lightly guarded. You slip through a side window and find yourself in his private study.</p>
+
+                <p>The desk is covered in documents. A map of the Spider Rock valley with proposed railroad routes drawn in red ink. A contract with the Denver & Rio Grande Railroad, promising <em>"exclusive right-of-way through the Sangre de Cristo range."</em> And most damning of all — a personal journal in Crane's handwriting, describing his plan in chilling detail:</p>
+
+                <p><em>"The well at Spider Rock has been treated. The sickness will be blamed on Valdez — his proximity to the mine makes him an easy scapegoat. Once the town is sufficiently frightened, I will push for a swift execution. Afterward, the land can be purchased for pennies. The railroad will pay handsomely. And if the rumors of Spanish gold are true... well. A governor's salary is modest. A man must plan for his retirement."</em></p>
+
+                <p>A floorboard creaks behind you. One of Crane's guards has returned early.</p>
+
+                <p class="dim">// You have the evidence in your hands. But getting out of this mansion alive is going to require either a very good explanation or a very fast exit. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_governor_confront">Confront the guard — reveal the governor's crimes and try to turn him</label>
+                <label for="s4_mine_truth">Flee with the journal — get this evidence to the marshal before Crane returns</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3G — PARLEY WITH APACHE ============ -->
+        <div id="scene3_parley" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// APACHE CAMP — HIGH COUNTRY — NANTAN'S FIRE //</span>
+            <div class="story-text">
+                <p>You ride into the Apache camp with your hands visible and your rifle left behind. It's a gamble, but it pays off — Chief Nantan, an older man with a face like weathered stone, receives you with cautious dignity. His people have been watching the town for weeks. They know about the sickness. They know about Valdez. They know more than you expected.</p>
+
+                <p><em>"The white governor poisoned the water,"</em> Nantan says, his English accented but clear. <em>"We saw his men carrying barrels to Spider Rock. We saw them dump the poison into the stream. We tried to warn the marshal, but the governor called us liars and put a bounty on our heads."</em> He stirs the fire. <em>"Now you come asking for truth. Why should I trust you?"</em></p>
+
+                <p>You tell him about Valdez, about the map, about the gold. At the mention of La Cueva del Oro, Nantan's expression changes. <em>"That cave is sacred,"</em> he says quietly. <em>"The gold inside does not belong to the Spanish, or the white miners, or the railroad. It belongs to the spirits of this mountain. If you go in there seeking wealth, the mountain will claim you. But if you go in seeking justice..."</em> He pauses. <em>"Then perhaps the spirits will allow it."</em></p>
+
+                <p>He offers you a choice: <em>"I will take you to the cave myself. But you must promise that the gold will not be stolen — it will be used to help the people this governor has harmed."</em></p>
+
+                <p class="dim">// Nantan is offering an alliance. But it means promising to use the gold for justice, not personal gain. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_apache_treaty">Accept Nantan's offer — ride together to the sacred cave</label>
+                <label for="s4_treasure_cave">Decline politely — find the cave yourself, on your own terms</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3H — WAR PATH (SPIDER ROCK) ============ -->
+        <div id="scene3_war_path" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SPIDER ROCK — THE POISONED STREAM //</span>
+            <div class="story-text">
+                <p>You ride to Spider Rock alone — a towering sandstone spire that marks the headwaters of the stream that feeds Crow's Perch. The Apache are right. Near the base of the rock, you find the remains of a campsite: empty barrels with territorial markings, a broken wagon wheel, and dark stains on the ground where something was spilled. The stream water here has an unnatural sheen — iridescent, faintly metallic. You wouldn't drink it. Neither should anyone else.</p>
+
+                <p>As you document the evidence, you hear horses approaching. A patrol of Crane's men — six of them, armed and moving fast. They must have spotted your trail. You have two choices: hide and let them pass, or ambush them and try to capture one for interrogation. The terrain favors the defender — narrow canyon walls, plenty of cover, and the rushing water to mask the sound of movement.</p>
+
+                <p>Through your spyglass, you recognize the lead rider: Sergeant Brock, the man from the saloon poker game. He's carrying something — a leather satchel stuffed with papers. Crane's orders, perhaps. Or something else.</p>
+
+                <p class="dim">// Six against one are poor odds. But Brock is carrying something important, and you might not get another chance to intercept it. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_ambush_pass">Set an ambush — take the satchel and capture Brock for questioning</label>
+                <label for="s4_mine_truth">Stay hidden — let them pass and take the evidence you've already gathered to the marshal</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3I — SECRET MAP (ROSALITA'S JOURNAL) ============ -->
+        <div id="scene3_secret_map" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MOUNTAIN TRAIL — ROSALITA'S MAP //</span>
+            <div class="story-text">
+                <p>With Rosalita's journal in hand, you ride toward Spider Rock and the hidden cave. The journal is more than a map — it's a record of Santiago's weeks of exploration, filled with notes about the terrain, the wildlife, and the strange carvings he found in the cave. <em>"There are symbols here I don't recognize,"</em> he wrote. <em>"Older than Spanish. Older than Pueblo. Like nothing I've ever seen."</em></p>
+
+                <p>The trail is steep and narrow. As you climb, you become aware that you're being watched. Shapes move among the trees — not threatening, but present. Apache scouts, probably, tracking your progress toward the sacred site. They don't interfere. But their presence is a reminder that this land has guardians older than any claim Governor Crane or the railroad might make.</p>
+
+                <p>You reach the waterfall by mid-afternoon. The cave entrance behind the cascade glows faintly — a trick of the light, or something else? The journal mentions that the gold inside <em>"seems to generate its own warmth."</em> You're about to find out what that means.</p>
+
+                <p class="dim">// The cave awaits. Inside: gold, secrets, and possibly a truth that changes everything. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_treasure_cave">Enter La Cueva del Oro — claim the treasure and whatever knowledge it holds</label>
+                <label for="s4_hidden_valley">Search the area around the cave — Santiago's notes mention another entrance</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3J — TESTIFY AT GALLOWS ============ -->
+        <div id="scene3_testify" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// GALLOWS KNOLL — A PUBLIC ACCUSATION //</span>
+            <div class="story-text">
+                <p>You push through the crowd just as the marshal is about to pull the lever. <em>"Stop!"</em> you shout, holding Rosalita's journal above your head. <em>"I have evidence that Santiago Valdez is innocent. Governor Crane poisoned the well himself. It's all in this journal — and I have witnesses who will testify."</em></p>
+
+                <p>The crowd stirs. Marshal Whitfield steps forward, his expression a mixture of relief and dread. Governor Crane's face turns the color of old milk. <em>"This is absurd,"</em> he sputters. <em>"Arrest this man for interfering with a lawful execution!"</em> But his guards hesitate. The crowd is growing restless. Some have lost children to the sickness. They want answers — real answers.</p>
+
+                <p>Rosalita steps out from the crowd, her voice clear and steady. <em>"My brother is innocent. The governor offered to spare Santiago's life if I gave him the location of the gold. When I refused, he moved the hanging up by a week. He's not interested in justice. He's interested in covering up his crimes."</em></p>
+
+                <p>Murmurs turn to shouts. The marshal looks at Crane, then at the journal, then at the crowd. <em>"I'm postponing this hanging,"</em> he announces, <em>"pending a full investigation."</em></p>
+
+                <p class="dim">// You've just publicly accused the most powerful man in the territory of murder. If you can't prove it, you'll hang alongside Valdez. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_save_santiago">Work with the marshal — build a formal case against Crane using the journal</label>
+                <label for="s4_governor_confront">Corner Crane before he can flee — force a confession in front of witnesses</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3K — WIN POKER ============ -->
+        <div id="scene3_win_poker" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER VEIN SALOON — WINNING HAND //</span>
+            <div class="story-text">
+                <p>You lay down a full house. Sergeant Brock stares at the cards like they've personally betrayed him. <em>"Damn,"</em> he mutters. <em>"Fine. Take the pot. Take the damned journal too — I was supposed to deliver it to the governor hours ago. He's going to have my hide."</em> He shoves the leather-bound book across the table and storms out, his men trailing behind him.</p>
+
+                <p>The journal is a goldmine — metaphorically speaking. It contains Crane's orders to his men over the past three months: instructions to poison the Spider Rock well, to frame Valdez, to intimidate anyone who asked too many questions. It also contains a detailed map of the Spider Rock valley with the location of La Cueva del Oro clearly marked — Crane has known about the gold all along. He wasn't just poisoning a well. He was clearing the land for a railroad AND stealing a treasure. The well poisoning was a convenient way to accomplish both.</p>
+
+                <p>The bartender, who has been watching the whole exchange, slides you a key. <em>"Back room,"</em> he says quietly. <em>"Rosalita Valdez is waiting there. She's been gathering evidence for weeks. With what you've got, you might actually have a chance to bring Crane down."</em></p>
+
+                <p class="dim">// You have Crane's orders in your hands. Combined with Rosalita's evidence, this could end the governor's reign of corruption. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_save_santiago">Share the journal with Rosalita — build a case to clear Valdez's name</label>
+                <label for="s4_governor_confront">Take the journal straight to Crane — give him one chance to confess before going public</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 3L — LOSE POKER ============ -->
+        <div id="scene3_lose_poker" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER VEIN SALOON — FOLDING HAND //</span>
+            <div class="story-text">
+                <p>You fold. Sergeant Brock grins, rakes in the pot, and pockets the journal. <em>"Smart man,"</em> he says. <em>"Not everyone knows when to quit."</em> He and his men leave the saloon, headed toward the governor's mansion. But as they go, you notice something: the private — the young one who barely spoke — drops a folded piece of paper near your chair. Intentional or accidental? Either way, you retrieve it.</p>
+
+                <p>The note reads: <em>"Midnight. The old stamp mill above the mine. I'll tell you everything. I joined up for money but I didn't sign up to poison children. — PFC Thomas."</em></p>
+
+                <p>You now have a potential informant inside Crane's operation. The private is young, scared, and apparently burdened by a conscience. Meeting him at the stamp mill is a risk — it could be a trap. But if he's genuine, he could provide firsthand testimony that no journal or document could match.</p>
+
+                <p class="dim">// A soldier with a guilty conscience is a fragile but valuable asset. If you can get him to talk, you might not need the journal at all. //</p>
+            </div>
+            <div class="choices">
+                <label for="s4_mine_truth">Go to the stamp mill at midnight — meet the private and hear his testimony</label>
+                <label for="s4_mansion_secrets">Don't trust the note — break into the governor's mansion instead for hard evidence</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4A — TREASURE CAVE ============ -->
+        <div id="scene4_treasure_cave" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// LA CUEVA DEL ORO — BEHIND THE WATERFALL //</span>
+            <div class="story-text">
+                <p>You step through the waterfall and into a vast limestone cavern. For a moment, the darkness is complete — then your eyes adjust, and you realize the cave is not dark at all. Veins of phosphorescent mineral run through the walls, casting a soft blue-green glow over everything. And in the center of the cavern, piled on a natural stone platform, is the gold.</p>
+
+                <p>It's more than you imagined. Spanish doubloons, conquistador armor, jeweled crucifixes, and older artifacts — Pueblo turquoise, Aztec gold worked into intricate patterns, and stranger things still. Carvings on the walls depict beings that are neither human nor animal, their outlines picked out in the glowing mineral. The air is warm and still, and you feel a strange pressure behind your eyes — not unpleasant, but present. Watching.</p>
+
+                <p>But you're not the first to arrive. Governor Crane is here — he must have ridden ahead while his men created a diversion at the gallows. He stands before the gold, his back to you, a revolver in his hand. <em>"I was wondering when someone would figure it out,"</em> he says without turning around. <em>"Valdez talked, didn't he? Even with a noose around his neck, he couldn't keep his mouth shut."</em> He turns. His eyes are wild — the gold has done something to him, or maybe it just revealed what was already there. <em>"This treasure is mine. I've worked for it. Planned for it. Killed for it. Do you really think you can just walk in and take it?"</em></p>
+
+                <p class="dim">// The governor is unhinged. The gold is within reach. But something about this cave — the glowing walls, the ancient carvings, the pressure in the air — suggests that taking the treasure may come at a cost no one has yet understood. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_treasure">Take the gold — claim the treasure and deal with Crane once and for all</label>
+                <label for="e_damned">Leave the gold — the curse is real, and some treasures aren't worth your soul</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4B — MINE TRUTH ============ -->
+        <div id="scene4_mine_truth" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// OLD STAMP MILL — MIDNIGHT — THE PRIVATE'S CONFESSION //</span>
+            <div class="story-text">
+                <p>The stamp mill is silent and dark, its machinery rusting in the moonlight. Private Thomas is waiting for you, as promised. He's young — maybe nineteen — and terrified. <em>"I didn't know what was in the barrels,"</em> he says, his voice shaking. <em>"They told us it was mining supplies. But then the children started getting sick, and I... I opened one of the barrels. It was tailings concentrate. Enough to poison every well in the territory."</em></p>
+
+                <p>He hands you a folded document. <em>"This is a copy of the governor's orders. I made it in case something happened to me. It's dated three days before the well was poisoned. It authorizes the disposal of 'excess mining byproduct' in the Spider Rock watershed. Signed by Crane himself."</em></p>
+
+                <p>He also tells you something else — something that changes everything. <em>"The governor isn't working alone. The railroad company in Denver has been paying him for months. There are telegrams — copies of telegrams — in the mine office safe. If you can get those, you can prove the whole conspiracy. The railroad wanted the land. Crane wanted the gold. They used each other."</em></p>
+
+                <p class="dim">// Private Thomas has given you the key to unraveling the entire conspiracy. But the mine office safe is in the governor's mansion — and Crane will be back from the gallows by dawn. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_justice">Take the evidence to Santa Fe — appeal to the federal authorities with everything you have</label>
+                <label for="s4_governor_confront">Confront Crane directly — use the private's testimony and the orders to force a confession</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4C — AMBUSH PASS ============ -->
+        <div id="scene4_ambush_pass" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// NARROW CANYON — THE AMBUSH //</span>
+            <div class="story-text">
+                <p>You set the ambush carefully. When Sergeant Brock and his patrol ride through the narrow pass, the first shot spooks their horses, the second pins them behind a boulder, and your voice — amplified by the canyon walls — offers them a choice: surrender or die. Brock, to his credit, recognizes a losing position. <em>"Hold your fire!"</em> he shouts. <em>"We're coming out."</em></p>
+
+                <p>The satchel contains everything you hoped for and more. Crane's written orders to poison the well. A map of the Spider Rock valley with the railroad route marked. And a personal letter from Crane to Brock, promising a <em>"substantial bonus"</em> for <em>"ensuring the Valdez situation is permanently resolved."</em> It's a contract killing in all but name.</p>
+
+                <p>Brock, disarmed and sullen, agrees to testify in exchange for leniency. <em>"I was just following orders,"</em> he says, the oldest excuse in the book. But his testimony, combined with the documents, is enough to hang Crane ten times over.</p>
+
+                <p class="dim">// You have Crane's right-hand man in custody and a satchel full of evidence. The governor's empire is crumbling. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_justice">Deliver Brock and the evidence to Marshal Whitfield — let the law take its course</label>
+                <label for="e_outlaw">Execute Brock yourself — you're past the point of trusting the courts</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4D — MANSION SECRETS ============ -->
+        <div id="scene4_mansion_secrets" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// GOVERNOR'S MANSION — THE SAFE //</span>
+            <div class="story-text">
+                <p>You break into the mansion under cover of darkness and find the safe in Crane's study — a heavy iron box concealed behind a portrait of the governor himself. The combination is in his journal (his ego wouldn't let him trust it to memory alone). Inside: piles of cash from the railroad, telegrams detailing the conspiracy, and a signed confession that Crane prepared <em>in case of emergency</em> — a document naming his railroad contacts and detailing the poisoning plot, written in such a way that he could claim he was coerced if it ever came to light. It's the ultimate insurance policy — and now it's yours.</p>
+
+                <p>But as you're gathering the documents, you hear the front door open. Crane has returned early. His voice carries up the stairs: <em>"...and then the stranger produced a journal — Valdez's journal. I need to contain this. Send riders to Spider Rock. If anyone approaches the cave, shoot on sight."</em></p>
+
+                <p>You're trapped on the second floor with the only exit downstairs, past Crane and his guards.</p>
+
+                <p class="dim">// The evidence is in your hands. But getting out of this mansion alive is going to be the hardest thing you've done yet. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_martyr">Confront Crane now — present the evidence and dare him to shoot you in his own home</label>
+                <label for="e_escape">Climb out the window — escape with the evidence and get it to the marshal</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4E — APACHE TREATY ============ -->
+        <div id="scene4_apache_treaty" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SACRED CAVE — THE APACHE AND THE GOLD //</span>
+            <div class="story-text">
+                <p>Chief Nantan leads you to the cave through a hidden route that bypasses the waterfall — an ancient path his people have used for centuries. <em>"The conquistadors never found this entrance,"</em> he says with a hint of pride. <em>"They only knew the front door. We know the whole house."</em></p>
+
+                <p>Inside, the cavern is breathtaking — glowing walls, ancient carvings, and the gold piled on its stone platform. But Nantan doesn't look at the treasure. He looks at the carvings. <em>"These are the stories of my ancestors,"</em> he says quietly. <em>"They tell of a time when the mountain gave gifts freely — water, game, shelter. Then the Spanish came, and the gifts became curses. The gold was taken from a sacred burial site. The spirits have been angry ever since."</em></p>
+
+                <p>He turns to you. <em>"You came seeking truth, not just wealth. That is why I brought you here. The gold belongs to the mountain. But the evidence you need — proof of the governor's crimes — is also here."</em> He points to a corner of the cave where several barrels stand — the same barrels used to carry the tailings. <em>"Crane stored his poison supplies here, thinking no one would find them. Take them. Show the world what he did. And leave the gold where it belongs."</em></p>
+
+                <p class="dim">// The barrels are physical evidence linking Crane to the poisoning. Combined with Nantan's testimony, they're enough to bring the governor to justice. But the gold will stay here, guarded by the Apache and the spirits of the mountain. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_peace">Accept Nantan's terms — take the evidence, leave the gold, and forge an alliance</label>
+                <label for="e_damned">Take the gold anyway — you didn't come all this way to leave empty-handed</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4F — SAVE SANTIAGO ============ -->
+        <div id="scene4_save_santiago" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MARSHAL'S OFFICE — THE CASE BUILT //</span>
+            <div class="story-text">
+                <p>With Rosalita's journal, Crane's orders from the poker game, and the testimony you've gathered, Marshal Whitfield finally has enough to act. He marches to the gallows and announces a stay of execution — permanent, this time. Santiago Valdez is cut down from the platform not as a condemned man but as a free one, his sister rushing forward to embrace him as the crowd erupts in cheers and jeers alike.</p>
+
+                <p>Governor Crane, seeing the tide turn against him, attempts to flee in his carriage. But Whitfield's deputies — now including you — block the road. <em>"Silas Crane,"</em> the marshal says, <em>"you're under arrest for conspiracy to commit murder, poisoning of a public water supply, and corruption of territorial office. You can come quietly, or you can try to run. I'm fine with either."</em></p>
+
+                <p>Crane, for the first time, looks genuinely afraid. <em>"You don't understand,"</em> he says. <em>"The railroad — they'll destroy you. They'll destroy this whole town. I was the only thing standing between them and..."</em> He stops, realizing he's said too much. The crowd has gone quiet. Everyone is listening.</p>
+
+                <p class="dim">// Crane is finished. The railroad will be investigated. Valdez is free. But the gold is still out there, and the question of what to do with it remains. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_justice">Testify at Crane's trial — make sure he never sees freedom again</label>
+                <label for="e_legend">Ride back to the cave — claim the gold now that justice has been served</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4G — CONFRONT GOVERNOR ============ -->
+        <div id="scene4_governor_confront" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// MAIN STREET — THE FINAL CONFRONTATION //</span>
+            <div class="story-text">
+                <p>You catch Governor Crane on Main Street, just as he's trying to slip out of town. <em>"Going somewhere, Governor?"</em> you ask, loud enough for the gathering crowd to hear. <em>"Before you leave, maybe you'd like to explain these."</em> You hold up the journal, the telegrams, the orders with his signature.</p>
+
+                <p>Crane's face cycles through emotions — anger, fear, calculation, and finally a cold, reptilian calm. <em>"You think those papers mean anything?"</em> he says. <em>"I own the judges in this territory. I own the marshals. I have friends in Denver who will bury you and everyone you've ever met. You're a nobody. A drifter. A man who wandered into something he doesn't understand."</em></p>
+
+                <p>But the crowd is not on his side. These are people who have lost children to the sickness. These are miners who were cheated out of their claims. These are townsfolk who have watched Crane's corruption for months and felt powerless to stop it. Now, seeing someone stand up to him, they find their courage. One by one, they step forward. A woman who lost her son. A miner who was threatened into silence. The bartender who saw everything. Rosalita, holding her brother's hand.</p>
+
+                <p><em>"You're outnumbered, Governor,"</em> Marshal Whitfield says, stepping out of the crowd. <em>"And you're under arrest."</em></p>
+
+                <p class="dim">// The governor's power was always built on fear. Now that the fear is broken, he has nothing left. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_justice">See Crane arrested — let justice take its course through the courts</label>
+                <label for="e_martyr">Let the crowd have him — sometimes frontier justice is the only justice that sticks</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4H — HIDDEN VALLEY ============ -->
+        <div id="scene4_hidden_valley" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// HIDDEN VALLEY — BEYOND THE CAVE //</span>
+            <div class="story-text">
+                <p>Following Santiago's notes, you find a second entrance to the cave system — a narrow fissure in the rock that opens into a hidden valley. It's a place of startling beauty: a meadow of wildflowers, a clear stream, and the ruins of an ancient pueblo built into the cliff face. The valley has been untouched for centuries, protected by the mountains and the Apache who guard its secrets.</p>
+
+                <p>In the pueblo ruins, you find what Santiago only glimpsed: a kiva — a ceremonial chamber — with murals painted on its walls. The murals tell the story of the Madrigal treasure: how Spanish conquistadors stole gold from this valley in 1598, how the pueblo people cursed the treasure, and how every person who tried to claim it met with disaster. Shipwrecks. Plagues. Betrayals. The treasure was eventually hidden in the cave by a Spanish priest who believed it was too cursed to ever be spent. He left a warning: <em>"El oro es sangre. La sangre es oro."</em> Gold is blood. Blood is gold.</p>
+
+                <p>But in the kiva, you also find something else: a small, simple clay pot containing not gold, but seeds — ancient corn, beans, and squash, preserved for centuries. The real treasure of this valley was never metal. It was life.</p>
+
+                <p class="dim">// The conquistadors took the gold and were cursed. The pueblo people saved the seeds and endured. The lesson is clear, if you choose to see it. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_peace">Take the seeds — return them to the Apache and help restore the valley's legacy</label>
+                <label for="e_treasure">Ignore the warning — go back to the cave and take the gold after all</label>
+            </div>
+        </div>
+
+        <!-- ============ SCENE 4I — MINE COLLAPSE ============ -->
+        <div id="scene4_mine_collapse" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// SILVER QUEEN MINE — THE COLLAPSE //</span>
+            <div class="story-text">
+                <p>You're deep in the mine when you hear it — a low rumble, then a thunderous crack. The ground shakes. Dust fills the air. When the noise stops, the main tunnel behind you has collapsed. You're trapped — but you're not alone. Governor Crane is here too, pinned beneath a fallen timber, his leg crushed. He must have followed you in, hoping to retrieve his evidence before you could.</p>
+
+                <p><em>"Help me,"</em> he gasps. <em>"Please. I'll confess to everything. I'll give you the railroad contacts. Just... don't leave me here."</em></p>
+
+                <p>There's another way out — a ventilation shaft that leads to the surface. You could make it, but not if you're carrying Crane. You could leave him. No one would know. The mine collapse would be ruled an accident. The governor would simply... disappear. Or you could save him — drag him to safety and let him face justice in the light of day.</p>
+
+                <p class="dim">// Crane is a murderer. He poisoned children. He framed an innocent man. He doesn't deserve your mercy. But leaving a man to die in the dark — even a man like Crane — is a choice that changes you forever. //</p>
+            </div>
+            <div class="choices">
+                <label for="e_martyr">Save Crane — drag him to safety and let him stand trial</label>
+                <label for="e_damned">Leave him — the mine will be his tomb, and the world will be better for it</label>
+            </div>
+        </div>
+
+        <!-- ============ ENDING: TREASURE ============ -->
+        <div id="scene_e_treasure" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE GOLDEN CURSE //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="gold-text">✦ ENDING: RICH AS A KING, POOR AS A GHOST ✦</span></p>
+                <p>You take the Madrigal treasure — sacks of gold coins, jeweled crucifixes, ancient artifacts. You're wealthy beyond anything you ever dreamed. You leave Crow's Perch behind and ride for San Francisco, where you buy a mansion on Nob Hill and live in luxury. But the curse is real. Within a year, your fortune turns. Investments fail. Ships sink. Friends betray you. The gold seems to slip through your fingers like water. Within five years, you're broke — worse off than when you started. You return to Crow's Perch, hoping to find more treasure, but the cave has collapsed. The Apache guard the valley now, and they don't let anyone through. You spend your remaining years in the Silver Vein Saloon, telling anyone who'll listen about the cave behind the waterfall and the fortune you once held. They call you the Gold Ghost — a man who had everything and lost it all. Sometimes, late at night, you still feel the warmth of the treasure in your hands. But when you look down, your palms are empty.</p>
+                <p class="dim">// The gold was cursed. The conquistadors knew it. The Pueblo knew it. Now you know it too. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Mountain Has Many Paths</label></div>
+        </div>
+
+        <!-- ============ ENDING: JUSTICE ============ -->
+        <div id="scene_e_justice" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE SCALES BALANCED //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#b8c8d8;">◇ ENDING: THE LAWMAN'S PEACE ◇</span></p>
+                <p>Governor Silas Crane is tried in Santa Fe before a federal judge. The evidence you gathered — the journal, the telegrams, the testimony of Private Thomas and Sergeant Brock — is overwhelming. Crane is convicted on twelve counts, including conspiracy to commit murder, poisoning of a public water supply, and corruption. He's sentenced to life in federal prison. The railroad executives in Denver, exposed by the investigation, resign in disgrace. The Spider Rock valley is declared off-limits to railway development.</p>
+                <p>Santiago Valdez is fully exonerated. He returns to prospecting — legally, this time — and within a year discovers a legitimate silver vein that makes him a modest fortune. Rosalita becomes the town's schoolteacher, educating the children who survived the sickness. Marshal Whitfield retires, and you — you're offered his badge. You wear it with pride, knowing that in a territory where justice often bends toward power, you helped bend it back toward the truth.</p>
+                <p class="dim">// The gold remains in the cave. The Apache guard it still. Some treasures are safer left where they lie. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — Every Dawn Brings New Choices</label></div>
+        </div>
+
+        <!-- ============ ENDING: OUTLAW ============ -->
+        <div id="scene_e_outlaw" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE OUTLAW TRAIL //</span>
+            <div class="story-text">
+                <p class="ending-title"><span class="warn">▲ ENDING: WANTED IN SIX TERRITORIES ▲</span></p>
+                <p>You saved Santiago Valdez, but at a cost. The law doesn't distinguish between a righteous intervention and a criminal one — cutting a condemned man from the gallows is a felony, regardless of the reason. Crane, before his own crimes were exposed, issued warrants for your arrest. By the time his corruption came to light, you were already gone — riding hard for the border with a price on your head.</p>
+                <p>You never did get the gold. But you got something else: a reputation. In the years that follow, you become a figure of legend — the stranger who rode into Crow's Perch and stopped a hanging with a single shot, who faced down a corrupt governor and lived to tell about it. Bounty hunters chase you. Lawmen curse your name. But the common folk — the miners, the farmers, the people who've been chewed up by the powerful — they tell your story with a smile. You're an outlaw, yes. But you're <em>their</em> outlaw. And sometimes, when you pass through a small town, someone buys you a drink and whispers, <em>"I heard about what you did in Crow's Perch. Thank you."</em></p>
+                <p class="dim">// You lost the gold. You lost the badge. But you kept your soul. That's more than most men can say. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The West Is Wide Open</label></div>
+        </div>
+
+        <!-- ============ ENDING: MARTYR ============ -->
+        <div id="scene_e_martyr" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE PRICE OF TRUTH //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ff8877;">✕ ENDING: BURIED IN CROW'S PERCH ✕</span></p>
+                <p>You died bringing Crane to justice. Maybe it was in the mansion, facing his guards alone. Maybe it was in the mine, saving him from the collapse even as the last breath left your lungs. Maybe it was on Main Street, taking a bullet meant for Santiago Valdez. It doesn't matter how. What matters is what your death accomplished.</p>
+                <p>Your body was carried to the cemetery on the hill above Crow's Perch — Boot Hill, they call it, though the pine trees make it feel more like a cathedral than a graveyard. They buried you with a view of the mountains, facing Spider Rock. Santiago Valdez spoke at your funeral. So did Chief Nantan, who walked into town for the first time in a year to honor the stranger who listened when no one else would. Even Marshal Whitfield wiped his eyes when he thought no one was looking.</p>
+                <p>Governor Crane was convicted. The railroad deal collapsed. The town's children stopped getting sick. None of it brought you back. But on clear nights, when the moon hits the waterfall just right, people say they can see a figure standing at the entrance to La Cueva del Oro — a guardian, watching over the treasure. The Apache call you <em>"the spirit who chose justice over gold."</em> It's a good name. You earned it.</p>
+                <p class="dim">// Some victories are won by the living. Others are purchased by the dead. Yours was the latter — and the West is better for it. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — A New Life, A New Story</label></div>
+        </div>
+
+        <!-- ============ ENDING: PEACE ============ -->
+        <div id="scene_e_peace" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE VALLEY RESTORED //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#5a9a8a;">○ ENDING: SEEDS INSTEAD OF GOLD ○</span></p>
+                <p>You returned the ancient seeds to Chief Nantan's people. It was a small gesture — a clay pot, some dried kernels — but to the Apache, it meant everything. Those seeds were the legacy of their ancestors, preserved for centuries in the hidden valley. With them, they could restore the old gardens, grow the old crops, and reconnect with traditions that had been nearly lost.</p>
+                <p>In gratitude, Nantan offered you a place among his people. You accepted. Over the years, you learned their language, their stories, their ways of reading the mountain. You never got rich in gold, but you became wealthy in knowledge. You helped negotiate a treaty between the Apache and the territorial government — one that protected the Spider Rock valley permanently as Apache land, with the sacred cave off-limits to all mining and development. Governor Crane was long gone by then, his conspiracy exposed by the evidence you helped gather.</p>
+                <p>Sometimes, young Apache children ask you about the gold. <em>"Is it still there? In the cave?"</em> you smile and tell them: <em>"The real treasure was never the gold. It was the seeds. The gold is just... decoration."</em> They don't always understand. But they will. And the valley blooms every spring with cornflowers and wild beans, a living testament to what happens when you choose life over wealth.</p>
+                <p class="dim">// You found the gold and walked away from it. That made you richer than any conquistador. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Valley Remembers</label></div>
+        </div>
+
+        <!-- ============ ENDING: DAMNED ============ -->
+        <div id="scene_e_damned" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE MOUNTAIN CLAIMS ITS DUE //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#cc3344;">▼ ENDING: INTO THE DARK ▼</span></p>
+                <p>The cave took you. Whether you took the gold and were cursed, or left Crane to die and were haunted by it, or simply pushed too far into the darkness and never found your way back — the result was the same. The mountain claimed another soul.</p>
+                <p>Your body was never found. The Apache say the cave has many chambers, many passages, and some of them lead to places that are not part of this world. Maybe you wandered into one of those. Maybe you're still wandering. The gold sits untouched on its stone platform, glowing softly in the phosphorescent light. Crane's body — if he died in the mine — molders in the dark. The evidence of his crimes was lost with you.</p>
+                <p>But not everything was lost. The journal you left behind — Rosalita's journal, or Crane's orders, or the map — made its way to Marshal Whitfield. A partial investigation was launched. Crane's railroad deal fell through. The well at Spider Rock was cleaned. The children stopped getting sick. The town survived. You didn't. But the thing about sacrifices is that they're not measured by who remembers them. They're measured by what they saved. And you saved Crow's Perch — even if no one ever knows your name.</p>
+                <p class="dim">// The mountain remembers. The Apache remember. The gold remembers. That will have to be enough. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — The Mountain Waits For Another</label></div>
+        </div>
+
+        <!-- ============ ENDING: LEGEND ============ -->
+        <div id="scene_e_legend" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// TRUE ENDING: THE SILVER NOOSE //</span>
+            <div class="story-text">
+                <p class="ending-title"><span style="color:#ffcc88;">✦ TRUE ENDING: THE NAME THEY'LL REMEMBER ✦</span></p>
+                <p>In the years that follow, your story becomes legend. The stranger who rode into Crow's Perch at dawn on the day of a hanging and changed everything. The one who uncovered the governor's conspiracy, saved an innocent man, and faced down the curse of La Cueva del Oro. The one who chose justice over gold, truth over wealth, and people over power.</p>
+                <p>A newspaperman from St. Louis came west to write your story. He published it as a dime novel — <em>"The Silver Noose: A Tale of the New Mexico Frontier"</em> — and it sold thousands of copies. Some of the details were exaggerated. (You never actually swung from a chandelier in the governor's mansion, but it made for good reading.) But the heart of the story was true: one person, armed with nothing but courage and a stubborn refusal to look away, can bring down even the most powerful of villains.</p>
+                <p>Santiago Valdez named his first son after you. Rosalita became a teacher and taught her students your story every year. Marshal Whitfield — old, retired, sitting on his porch — told anyone who'd listen that you were the best deputy he ever had, even if you only wore the badge for a week. And Chief Nantan's people still tell the tale around their fires: <em>"The stranger who returned the seeds. The stranger who listened."</em></p>
+                <p>As for you — you're still out there somewhere. Riding the mountain trails. Watching the sunsets. Helping whoever needs help. You never did get rich. But every town you pass through, someone recognizes you. Someone buys you a drink. Someone says, <em>"You're the one from Crow's Perch, aren't you? The one who did the right thing."</em> And you smile, tip your hat, and ride on. Because the West is wide, and there are always more wrongs to right. But you've already proven that one person can make a difference. And that's a legend worth living.</p>
+                <p class="dim">// To reach this ending, you chose justice over gold, people over power, and truth over convenience. You didn't just survive Crow's Perch — you changed it. And the West will never forget. //</p>
+            </div>
+            <div class="choices">
+                <label for="s0">★ Begin Again — Every Story Is a New Dawn ★</label>
+            </div>
+            <p class="note">// CROW'S PERCH: THE SILVER NOOSE //<br>A Western Tale · 7 endings · 30+ scenes · The mountain remembers every choice //</p>
+        </div>
+
+        <!-- ESCAPE ENDING (from mansion window) -->
+        <div id="scene_e_escape" class="scene">
+            <pre></pre>
+            <span class="scene-tag">// ENDING: THE LONG RIDE TO SANTA FE //</span>
+            <div class="story-text">
+                <p class="ending-title">□ ENDING: THE EVIDENCE SURVIVES □</p>
+                <p>You climb out the mansion window, drop into the garden, and run for your horse. Behind you, Crane's voice rises in panic as he realizes his safe has been emptied. But you're already riding — hard and fast toward Santa Fe, the evidence bundled in your saddlebag. The ride takes two days. By the time you reach the federal courthouse, you're exhausted, hungry, and covered in trail dust. But you're alive. And the documents are intact.</p>
+                <p>The federal judge is skeptical at first — Crane had friends in high places. But the evidence is undeniable. Within a month, a formal investigation is launched. Crane is arrested. The railroad executives are subpoenaed. Santiago Valdez is released. You testify in open court, and when the gavel falls and Crane is sentenced, you feel something you haven't felt in weeks: peace. You didn't get the gold. You didn't become a hero. But you did the job you came to do. Sometimes that's enough. Sometimes that's everything.</p>
+                <p class="dim">// You survived. The evidence survived. Justice — slow, imperfect, but real — prevailed. //</p>
+            </div>
+            <div class="choices"><label for="s0">Begin Again — Justice Is Always Worth Another Try</label></div>
+        </div>
+
+    </div>
+</body>
+</html>
